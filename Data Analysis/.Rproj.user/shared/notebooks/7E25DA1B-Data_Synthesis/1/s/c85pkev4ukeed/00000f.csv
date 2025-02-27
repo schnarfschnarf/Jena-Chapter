@@ -1,0 +1,809 @@
+"0","biomass <- read_xlsx(""Data/Biomass_Aboveground_Jena_Dataset/624_9_data.xlsx"")
+"
+"2","Warning:"
+"2"," Expecting numeric in G14520 / R14520C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G14521 / R14521C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G15075 / R15075C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G16042 / R16042C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G17006 / R17006C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G17007 / R17007C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G17008 / R17008C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G17009 / R17009C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G17295 / R17295C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G17373 / R17373C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G17683 / R17683C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G17847 / R17847C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G18524 / R18524C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G18525 / R18525C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G18653 / R18653C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G18923 / R18923C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G19701 / R19701C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G19727 / R19727C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G22602 / R22602C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G22603 / R22603C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G22604 / R22604C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G22605 / R22605C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G22606 / R22606C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G22607 / R22607C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G22608 / R22608C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G22609 / R22609C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G25459 / R25459C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G29418 / R29418C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G32490 / R32490C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G36872 / R36872C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G38282 / R38282C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G38283 / R38283C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G38820 / R38820C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G43290 / R43290C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G43784 / R43784C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G43908 / R43908C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G43923 / R43923C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G44270 / R44270C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G44728 / R44728C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G44747 / R44747C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G44816 / R44816C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G44819 / R44819C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G44990 / R44990C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G45191 / R45191C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G45377 / R45377C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G45516 / R45516C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G45803 / R45803C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G45824 / R45824C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G45849 / R45849C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G46096 / R46096C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G46099 / R46099C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G46101 / R46101C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G46795 / R46795C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G46853 / R46853C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G47018 / R47018C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G47118 / R47118C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G47119 / R47119C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G47565 / R47565C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G47604 / R47604C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G47623 / R47623C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G47856 / R47856C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G47938 / R47938C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G47968 / R47968C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G48701 / R48701C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G48765 / R48765C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G48988 / R48988C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G49040 / R49040C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G49041 / R49041C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G49045 / R49045C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G49170 / R49170C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G50072 / R50072C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G50317 / R50317C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G51060 / R51060C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G51639 / R51639C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G51644 / R51644C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G51699 / R51699C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G51795 / R51795C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G52464 / R52464C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G52689 / R52689C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G52973 / R52973C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G53116 / R53116C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G53359 / R53359C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G53400 / R53400C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G54128 / R54128C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G54647 / R54647C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G54873 / R54873C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G54994 / R54994C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G55024 / R55024C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G55462 / R55462C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G56331 / R56331C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G56994 / R56994C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G56996 / R56996C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57157 / R57157C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57291 / R57291C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57307 / R57307C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57323 / R57323C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57336 / R57336C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57344 / R57344C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57352 / R57352C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57398 / R57398C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57460 / R57460C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57476 / R57476C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57492 / R57492C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57627 / R57627C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57629 / R57629C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57630 / R57630C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57631 / R57631C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57637 / R57637C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57638 / R57638C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G57642 / R57642C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G58212 / R58212C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G58228 / R58228C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G58244 / R58244C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G58288 / R58288C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G58342 / R58342C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G58344 / R58344C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G58346 / R58346C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G58357 / R58357C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G58427 / R58427C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G58429 / R58429C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G58430 / R58430C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G58754 / R58754C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G58762 / R58762C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G58770 / R58770C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59155 / R59155C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59159 / R59159C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59163 / R59163C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59197 / R59197C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59205 / R59205C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59213 / R59213C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59280 / R59280C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59296 / R59296C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59312 / R59312C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59328 / R59328C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59344 / R59344C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59360 / R59360C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59381 / R59381C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59385 / R59385C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59389 / R59389C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59397 / R59397C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59413 / R59413C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59429 / R59429C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59442 / R59442C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59450 / R59450C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59458 / R59458C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59566 / R59566C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59582 / R59582C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59598 / R59598C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G59757 / R59757C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G60318 / R60318C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G60334 / R60334C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G60350 / R60350C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G60448 / R60448C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G60450 / R60450C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G60452 / R60452C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G60860 / R60860C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G60868 / R60868C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G60876 / R60876C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61261 / R61261C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61265 / R61265C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61269 / R61269C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61303 / R61303C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61311 / R61311C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61319 / R61319C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61386 / R61386C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61402 / R61402C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61418 / R61418C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61434 / R61434C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61450 / R61450C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61466 / R61466C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61487 / R61487C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61491 / R61491C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61495 / R61495C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61503 / R61503C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61519 / R61519C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61532 / R61532C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61540 / R61540C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61615 / R61615C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G61631 / R61631C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62117 / R62117C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62133 / R62133C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62202 / R62202C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62204 / R62204C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62477 / R62477C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62485 / R62485C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62744 / R62744C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62748 / R62748C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62773 / R62773C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62781 / R62781C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62828 / R62828C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62844 / R62844C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62860 / R62860C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62876 / R62876C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62895 / R62895C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62899 / R62899C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62907 / R62907C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62923 / R62923C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62936 / R62936C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G62944 / R62944C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G63019 / R63019C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G63035 / R63035C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G63521 / R63521C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G63537 / R63537C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G63606 / R63606C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G63608 / R63608C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G63881 / R63881C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G63889 / R63889C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G64148 / R64148C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G64152 / R64152C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G64177 / R64177C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G64185 / R64185C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G64232 / R64232C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G64248 / R64248C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G64264 / R64264C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G64280 / R64280C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G64299 / R64299C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G64303 / R64303C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G65577 / R65577C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G68422 / R68422C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G68423 / R68423C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G68424 / R68424C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G68425 / R68425C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G68426 / R68426C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G68427 / R68427C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G68428 / R68428C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G68429 / R68429C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G68704 / R68704C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G68705 / R68705C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69016 / R69016C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69017 / R69017C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69018 / R69018C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69019 / R69019C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69020 / R69020C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69021 / R69021C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69022 / R69022C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69023 / R69023C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69222 / R69222C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69224 / R69224C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69242 / R69242C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69243 / R69243C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69244 / R69244C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69245 / R69245C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69246 / R69246C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69247 / R69247C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69248 / R69248C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69249 / R69249C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69768 / R69768C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69788 / R69788C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69816 / R69816C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69817 / R69817C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G69824 / R69824C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G70030 / R70030C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G70031 / R70031C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72282 / R72282C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72283 / R72283C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72284 / R72284C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72285 / R72285C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72286 / R72286C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72287 / R72287C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72288 / R72288C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72289 / R72289C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72290 / R72290C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72291 / R72291C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72292 / R72292C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72293 / R72293C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72294 / R72294C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72295 / R72295C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72296 / R72296C7: got 'NA'
+"
+"2","Warning:"
+"2"," Expecting numeric in G72297 / R72297C7: got 'NA'
+"

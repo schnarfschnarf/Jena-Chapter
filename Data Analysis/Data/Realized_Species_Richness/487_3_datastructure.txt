@@ -1,0 +1,124 @@
+{
+  "Id": 286,
+  "Title": "Realized species richness",
+  "Description": "",
+  "inUse": true,
+  "Structured": true,
+  "Variables": [
+    {
+      "Id": 2276,
+      "Label": "plotcode",
+      "Description": "plotcode id",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 1,
+        "Name": "string",
+        "Description": "String",
+        "SystemType": "String"
+      }
+    },
+    {
+      "Id": 2277,
+      "Label": "year",
+      "Description": "calendar year",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 6,
+        "Name": "integer",
+        "Description": "An 32 bit integer number",
+        "SystemType": "Int32"
+      }
+    },
+    {
+      "Id": 2278,
+      "Label": "season",
+      "Description": "season with three levels May or August or Total. For the Total, the realizedSR is calculated by the sum of all the target species found in May and August",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 1,
+        "Name": "string",
+        "Description": "String",
+        "SystemType": "String"
+      }
+    },
+    {
+      "Id": 2279,
+      "Label": "realizedSR",
+      "Description": "realized species richness, i.e. number of target species in the plot during sampling time",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 7,
+        "Name": "number",
+        "Description": "An 16 bit integer number",
+        "SystemType": "Int16"
+      }
+    },
+    {
+      "Id": 2280,
+      "Label": "sowndiv",
+      "Description": "sown plant richness",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 7,
+        "Name": "number",
+        "Description": "An 16 bit integer number",
+        "SystemType": "Int16"
+      }
+    }
+  ]
+}

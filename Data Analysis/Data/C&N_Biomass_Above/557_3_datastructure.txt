@@ -1,0 +1,147 @@
+{
+  "Id": 325,
+  "Title": "Data structure for plant C and N bulk plant material",
+  "Description": "",
+  "inUse": true,
+  "Structured": true,
+  "Variables": [
+    {
+      "Id": 2532,
+      "Label": "plot",
+      "Description": "plot of the Jena Experiment (main experiment)",
+      "isOptional": true,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 1,
+        "Name": "string",
+        "Description": "String",
+        "SystemType": "String"
+      }
+    },
+    {
+      "Id": 2536,
+      "Label": "sampling date 1",
+      "Description": "sampling date of the first biomass harvest",
+      "isOptional": true,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 15,
+        "Name": "date-ISO",
+        "Description": null,
+        "SystemType": "DateTime"
+      }
+    },
+    {
+      "Id": 2537,
+      "Label": "sampling date 2",
+      "Description": "sampling date of the second biomass harvest",
+      "isOptional": true,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 14,
+        "Name": "date2",
+        "Description": null,
+        "SystemType": "DateTime"
+      }
+    },
+    {
+      "Id": 2533,
+      "Label": "carbon concentration",
+      "Description": "carbon concentration in plant tissue",
+      "isOptional": true,
+      "unit": {
+        "Id": 104,
+        "Name": "milligram per gram",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass ratio",
+          "Description": "g/kg",
+          "Specification": "L(0,0)M(1,1)T(0,0)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2534,
+      "Label": "nitrogen concentration",
+      "Description": "nitrogen concentration in plant tissue (bulk of the target species)",
+      "isOptional": true,
+      "unit": {
+        "Id": 104,
+        "Name": "milligram per gram",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass ratio",
+          "Description": "g/kg",
+          "Specification": "L(0,0)M(1,1)T(0,0)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2535,
+      "Label": "C:N ratio",
+      "Description": "plant tissue C to N ratio",
+      "isOptional": true,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    }
+  ]
+}

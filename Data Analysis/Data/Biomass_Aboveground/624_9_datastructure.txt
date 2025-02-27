@@ -1,0 +1,170 @@
+{
+  "Id": 365,
+  "Title": "Biomass_all_synthesis",
+  "Description": "biomass data in the main plots with species level data from 2002 to 2022",
+  "inUse": true,
+  "Structured": true,
+  "Variables": [
+    {
+      "Id": 2919,
+      "Label": "row_id",
+      "Description": "primary key, which is used to identify each row",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 6,
+        "Name": "integer",
+        "Description": "An 32 bit integer number",
+        "SystemType": "Int32"
+      }
+    },
+    {
+      "Id": 2912,
+      "Label": "plotcode",
+      "Description": "unique plot ID of the Jena Experiment",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 1,
+        "Name": "string",
+        "Description": "String",
+        "SystemType": "String"
+      }
+    },
+    {
+      "Id": 2913,
+      "Label": "year",
+      "Description": "calendar year",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 6,
+        "Name": "integer",
+        "Description": "An 32 bit integer number",
+        "SystemType": "Int32"
+      }
+    },
+    {
+      "Id": 2914,
+      "Label": "season",
+      "Description": "May = spring harvest in May or June; August = summer harvest in August or September;",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 1,
+        "Name": "string",
+        "Description": "String",
+        "SystemType": "String"
+      }
+    },
+    {
+      "Id": 2915,
+      "Label": "subsample",
+      "Description": "sample number within one plotcode",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 1,
+        "Name": "string",
+        "Description": "String",
+        "SystemType": "String"
+      }
+    },
+    {
+      "Id": 2917,
+      "Label": "species_other",
+      "Description": "species abbreviations together with other groups. Rest/Unidentified (plant material that could not be identified for sorting into the other groups), Dead (dead plant material, excluding inflorescences), Weeds (all non-target colonizing plant species), ALL (whole vegetation-agriculture plots), C4 (all C4 plants-C4 plots)",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 1,
+        "Name": "string",
+        "Description": "String",
+        "SystemType": "String"
+      }
+    },
+    {
+      "Id": 2918,
+      "Label": "biomass",
+      "Description": "aboveground biomass",
+      "isOptional": false,
+      "unit": {
+        "Id": 85,
+        "Name": "gram per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per area",
+          "Description": "g/m², kg/ha",
+          "Specification": "L(0,2)M(1,0)T(0,0)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    }
+  ]
+}

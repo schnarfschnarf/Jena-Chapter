@@ -1,0 +1,346 @@
+
+<h3>Soil microbial respiration and biomass at different soil depth (244)</h3>
+<table>
+    <thead>
+        <tr>
+                <th> VariableName </th>
+                <th> Optional </th>
+                <th> VariableId </th>
+                <th> ShortName </th>
+                <th> Description </th>
+                <th> Unit </th>
+                <th> DataType </th>
+        </tr>
+    </thead>
+
+        <tr>
+                <td>
+                    plot
+                </td>
+                <td>
+                    False
+                </td>
+                <td>
+                    1851
+                </td>
+                <td>
+                    plot
+                </td>
+                <td>
+                    
+                </td>
+                <td>
+                    none
+                </td>
+                <td>
+                    string
+                </td>
+        </tr>
+        <tr>
+                <td>
+                    depthU
+                </td>
+                <td>
+                    False
+                </td>
+                <td>
+                    1857
+                </td>
+                <td>
+                    length
+                </td>
+                <td>
+                    soil sampling up layer depth
+                </td>
+                <td>
+                    centimeter
+                </td>
+                <td>
+                    double
+                </td>
+        </tr>
+        <tr>
+                <td>
+                    depthL
+                </td>
+                <td>
+                    False
+                </td>
+                <td>
+                    1858
+                </td>
+                <td>
+                    length
+                </td>
+                <td>
+                    lower layer soil depth
+                </td>
+                <td>
+                    centimeter
+                </td>
+                <td>
+                    double
+                </td>
+        </tr>
+        <tr>
+                <td>
+                    basal_respiration
+                </td>
+                <td>
+                    False
+                </td>
+                <td>
+                    1852
+                </td>
+                <td>
+                    BR
+                </td>
+                <td>
+                    Basal respiration reflects the active part of the soil microbial community at the time of sampling.
+                </td>
+                <td>
+                    microliter per gram and hour
+                </td>
+                <td>
+                    double
+                </td>
+        </tr>
+        <tr>
+                <td>
+                    soil_microbial_biomass_C
+                </td>
+                <td>
+                    False
+                </td>
+                <td>
+                    1853
+                </td>
+                <td>
+                    Cmic
+                </td>
+                <td>
+                    Cmic: Soil microbial carbon biomass [&#181;g Cmic*g soil dw-1]; Calculated on the basis of MIRR values, with Cmic = 38*0.7*MIRR
+                </td>
+                <td>
+                    microgram per gram
+                </td>
+                <td>
+                    double
+                </td>
+        </tr>
+        <tr>
+                <td>
+                    respiratory_quotient
+                </td>
+                <td>
+                    False
+                </td>
+                <td>
+                    1854
+                </td>
+                <td>
+                    qO2
+                </td>
+                <td>
+                    qO2: specific respiratory quotient (metabolic oxygen quotient; &#181;g O2/mg Cmic*h), calculated by dividing basal respiration by microbial biomass; used as a measure for  C use efficiency of the microbial community (the higher qO2, the lower the C use efficiency)
+                </td>
+                <td>
+                    microliter per microgram and hour
+                </td>
+                <td>
+                    double
+                </td>
+        </tr>
+        <tr>
+                <td>
+                    soil_water_content
+                </td>
+                <td>
+                    False
+                </td>
+                <td>
+                    1855
+                </td>
+                <td>
+                    H2O
+                </td>
+                <td>
+                    Soil water content [mass %] measured as difference of fresh weight and dry weight. Soil was dried 2 days at 70&#176;.
+                </td>
+                <td>
+                    percent
+                </td>
+                <td>
+                    double
+                </td>
+        </tr>
+        <tr>
+                <td>
+                    year
+                </td>
+                <td>
+                    False
+                </td>
+                <td>
+                    1856
+                </td>
+                <td>
+                    year
+                </td>
+                <td>
+                    
+                </td>
+                <td>
+                    none
+                </td>
+                <td>
+                    integer
+                </td>
+        </tr>
+
+</table>
+
+
+<style>
+    /*----------------------------------------------------------
+Color Overview
+
+White    #000000    brigth
+Gray 01  #f5f5f5
+Gray 02  #ebebeb
+Gray 03  #afb0b1
+Gray 04  #009cdf    // new 323232 dark
+Black    #ffffff
+Yellow   #ffbb52
+Orange   #ff9700
+Red      #f24c24
+Green 01  #388670 dark
+Green 02  #72b1a0
+Green 03  #bee1da
+Green 04  #d2e8e3
+Green 05  #eff7f6 brigth
+
+----------------------------------------------------------*/
+    body {
+        background-color: #ffffff;
+        font-size: 11pt;
+        font-family: Arial;
+        padding: 50px 0 0 0;
+        color: #000000;
+    }
+
+
+
+    /* HEADINGS   
+----------------------------------------------------------*/
+    h1, h2, h3, h4, h5, h6 {
+        font-size: 1.5em;
+        color: #000;
+    }
+
+    h1 {
+        font-size: 2em;
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+
+    h2 {
+        padding: 0 0 10px 0;
+    }
+
+    h3 {
+        font-size: 1.2em;
+    }
+
+    h4 {
+        font-size: 1.1em;
+    }
+
+    h5, h6 {
+        font-size: 1em;
+    }
+
+    a {
+        color: #696969;
+    }
+
+    li {
+        line-height: 1.6;
+    }
+
+
+    /* TABLE
+----------------------------------------------------------*/
+
+    table {
+        width: 100%;
+        background-color: white;
+    }
+
+        table td {
+            padding: 5px;
+            border-bottom: #ebebeb solid thin;
+            vertical-align: middle;
+            line-height: 14pt;
+            text-align: left;
+            float: none;
+        }
+
+
+        table th {
+            color: black;
+            margin: 3px 0 3px 0;
+            padding: 0;
+            text-align: left;
+            border-top: solid 2px #565655;
+            border-Bottom: solid 2px #565655;
+            line-height: 28px;
+        }
+
+        table th, table td {
+            border-right: solid 4px white;
+        }
+
+        table tr {
+            border: none;
+            line-height: 14pt;
+        }
+
+        table th a {
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+ 
+
+    table.bx-table-form tr td {
+        padding: 5px;
+        border: 0 none;
+        vertical-align: middle;
+        line-height: 14pt;
+        /*overflow:hidden;*/
+    }
+
+    #Content_Data > .t-grid > table > tbody > tr:hover {
+        background-color: #eff7f6;
+    }
+
+    #Content_Data > .t-grid > table > tbody > tr:active,
+    #Content_Data > .t-grid > table > tbody > tr.t-state-selected {
+        background-color: #d2e8e3;
+    }
+
+    .t-grid > table {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .t-grid td,
+    .t-grid th {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+
+</style>

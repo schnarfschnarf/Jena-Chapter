@@ -1,0 +1,1274 @@
+{
+  "Id": 284,
+  "Title": "ClimateData_JE_daily_synthesis",
+  "Description": "daily climate synthesis data set from the climate station",
+  "inUse": true,
+  "Structured": true,
+  "Variables": [
+    {
+      "Id": 2272,
+      "Label": "year",
+      "Description": "calendar year",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 6,
+        "Name": "integer",
+        "Description": "An 32 bit integer number",
+        "SystemType": "Int32"
+      }
+    },
+    {
+      "Id": 2273,
+      "Label": "month",
+      "Description": "sampling month within the year",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 6,
+        "Name": "integer",
+        "Description": "An 32 bit integer number",
+        "SystemType": "Int32"
+      }
+    },
+    {
+      "Id": 2274,
+      "Label": "day",
+      "Description": "day within the month",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 6,
+        "Name": "integer",
+        "Description": "An 32 bit integer number",
+        "SystemType": "Int32"
+      }
+    },
+    {
+      "Id": 2275,
+      "Label": "date",
+      "Description": "date of the measurement. Time zone is CET, i.e. UTC+1",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 15,
+        "Name": "date-ISO",
+        "Description": null,
+        "SystemType": "DateTime"
+      }
+    },
+    {
+      "Id": 2220,
+      "Label": "p_air",
+      "Description": "air pressure",
+      "isOptional": false,
+      "unit": {
+        "Id": 89,
+        "Name": "hectopascal",
+        "Description": "1hPa = 1000 Pascal; Same as mbar (Millibar)",
+        "Dimension": {
+          "Name": "pressure",
+          "Description": "P, bar ",
+          "Specification": "L(0,1)M(1,0)T(0,2)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2221,
+      "Label": "T_air",
+      "Description": "air temperature at 2m height",
+      "isOptional": false,
+      "unit": {
+        "Id": 44,
+        "Name": "degree celsius",
+        "Description": "",
+        "Dimension": {
+          "Name": "temperature",
+          "Description": "°C, °F, °K ",
+          "Specification": "L(0,0)M(0,0)T(0,0)I(0,0)?(1,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2222,
+      "Label": "rh",
+      "Description": "relative humidity at 2m height",
+      "isOptional": false,
+      "unit": {
+        "Id": 132,
+        "Name": "percent",
+        "Description": "",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2223,
+      "Label": "sh",
+      "Description": "specific humidity at 2m height",
+      "isOptional": false,
+      "unit": {
+        "Id": 84,
+        "Name": "gram kilogram ratio",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass ratio",
+          "Description": "g/kg",
+          "Specification": "L(0,0)M(1,1)T(0,0)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2224,
+      "Label": "Tpot",
+      "Description": "potential temperature",
+      "isOptional": false,
+      "unit": {
+        "Id": 43,
+        "Name": "kelvin",
+        "Description": "",
+        "Dimension": {
+          "Name": "temperature",
+          "Description": "°C, °F, °K ",
+          "Specification": "L(0,0)M(0,0)T(0,0)I(0,0)?(1,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2225,
+      "Label": "Tdew",
+      "Description": "dew point temperature",
+      "isOptional": false,
+      "unit": {
+        "Id": 44,
+        "Name": "degree celsius",
+        "Description": "",
+        "Dimension": {
+          "Name": "temperature",
+          "Description": "°C, °F, °K ",
+          "Specification": "L(0,0)M(0,0)T(0,0)I(0,0)?(1,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2226,
+      "Label": "VPmax",
+      "Description": "saturation water vapor pressure",
+      "isOptional": false,
+      "unit": {
+        "Id": 89,
+        "Name": "hectopascal",
+        "Description": "1hPa = 1000 Pascal; Same as mbar (Millibar)",
+        "Dimension": {
+          "Name": "pressure",
+          "Description": "P, bar ",
+          "Specification": "L(0,1)M(1,0)T(0,2)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2227,
+      "Label": "VPact",
+      "Description": "actual water vapor pressure",
+      "isOptional": false,
+      "unit": {
+        "Id": 89,
+        "Name": "hectopascal",
+        "Description": "1hPa = 1000 Pascal; Same as mbar (Millibar)",
+        "Dimension": {
+          "Name": "pressure",
+          "Description": "P, bar ",
+          "Specification": "L(0,1)M(1,0)T(0,2)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2228,
+      "Label": "VPdef",
+      "Description": "water vapor pressure deficit",
+      "isOptional": false,
+      "unit": {
+        "Id": 89,
+        "Name": "hectopascal",
+        "Description": "1hPa = 1000 Pascal; Same as mbar (Millibar)",
+        "Dimension": {
+          "Name": "pressure",
+          "Description": "P, bar ",
+          "Specification": "L(0,1)M(1,0)T(0,2)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2229,
+      "Label": "H2OC",
+      "Description": "Water vapor concentration",
+      "isOptional": false,
+      "unit": {
+        "Id": 142,
+        "Name": "mmol per mol",
+        "Description": null,
+        "Dimension": {
+          "Name": "amount per mass",
+          "Description": "mol/mg",
+          "Specification": "L(0,0)M(0,1)T(0,0)I(0,0)?(0,0)N(1,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2230,
+      "Label": "rho",
+      "Description": "air density used to calculate fluxes",
+      "isOptional": false,
+      "unit": {
+        "Id": 143,
+        "Name": "gram per cubic meter",
+        "Description": null,
+        "Dimension": {
+          "Name": "mass per volume",
+          "Description": "g/m³, kg/L",
+          "Specification": "L(0,3)M(1,0)T(0,0)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2231,
+      "Label": "wv",
+      "Description": "wind velocity",
+      "isOptional": false,
+      "unit": {
+        "Id": 25,
+        "Name": "meter per second",
+        "Description": "",
+        "Dimension": {
+          "Name": "length per time",
+          "Description": "m/s, km/h",
+          "Specification": "L(1,0)M(0,0)T(0,1)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2232,
+      "Label": "wd",
+      "Description": "wind direction",
+      "isOptional": false,
+      "unit": {
+        "Id": 14,
+        "Name": "degree",
+        "Description": "",
+        "Dimension": {
+          "Name": "dimensionless",
+          "Description": "",
+          "Specification": ""
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2233,
+      "Label": "rain1",
+      "Description": "precipitation from drop counter (resolution 0.005 mm)",
+      "isOptional": false,
+      "unit": {
+        "Id": 111,
+        "Name": "millimeter",
+        "Description": "",
+        "Dimension": {
+          "Name": "length",
+          "Description": "m, cm, km",
+          "Specification": "L(1,0)M(0,0)T(0,0)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2234,
+      "Label": "rain2",
+      "Description": "precipitation from tipping bucket (resolution 0.1 mm)",
+      "isOptional": false,
+      "unit": {
+        "Id": 111,
+        "Name": "millimeter",
+        "Description": "",
+        "Dimension": {
+          "Name": "length",
+          "Description": "m, cm, km",
+          "Specification": "L(1,0)M(0,0)T(0,0)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2235,
+      "Label": "Srain1",
+      "Description": "cumulative precipitation from drop counter (resolution 0.005 mm)",
+      "isOptional": false,
+      "unit": {
+        "Id": 111,
+        "Name": "millimeter",
+        "Description": "",
+        "Dimension": {
+          "Name": "length",
+          "Description": "m, cm, km",
+          "Specification": "L(1,0)M(0,0)T(0,0)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2236,
+      "Label": "Srain2",
+      "Description": "cumulative precipitation from tipping bucket (resolution 0.1 mm)",
+      "isOptional": false,
+      "unit": {
+        "Id": 111,
+        "Name": "millimeter",
+        "Description": "",
+        "Dimension": {
+          "Name": "length",
+          "Description": "m, cm, km",
+          "Specification": "L(1,0)M(0,0)T(0,0)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2237,
+      "Label": "Tpyr",
+      "Description": "temperature of net radiometer",
+      "isOptional": false,
+      "unit": {
+        "Id": 44,
+        "Name": "degree celsius",
+        "Description": "",
+        "Dimension": {
+          "Name": "temperature",
+          "Description": "°C, °F, °K ",
+          "Specification": "L(0,0)M(0,0)T(0,0)I(0,0)?(1,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2238,
+      "Label": "TDR",
+      "Description": "total downward (incoming) radiation",
+      "isOptional": false,
+      "unit": {
+        "Id": 31,
+        "Name": "watt per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per time 3",
+          "Description": "",
+          "Specification": "L(0,0)M(1,0)T(0,3)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2239,
+      "Label": "TUR",
+      "Description": "total upward (outgoing) radiation",
+      "isOptional": false,
+      "unit": {
+        "Id": 31,
+        "Name": "watt per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per time 3",
+          "Description": "",
+          "Specification": "L(0,0)M(1,0)T(0,3)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2240,
+      "Label": "SWDR",
+      "Description": "short wave downward (incoming) radiation",
+      "isOptional": false,
+      "unit": {
+        "Id": 31,
+        "Name": "watt per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per time 3",
+          "Description": "",
+          "Specification": "L(0,0)M(1,0)T(0,3)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2241,
+      "Label": "SWUR",
+      "Description": "short wave upward (outgoing) radiation",
+      "isOptional": false,
+      "unit": {
+        "Id": 31,
+        "Name": "watt per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per time 3",
+          "Description": "",
+          "Specification": "L(0,0)M(1,0)T(0,3)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2242,
+      "Label": "albedo",
+      "Description": "albedo (100 · SWUR/SWDR)",
+      "isOptional": false,
+      "unit": {
+        "Id": 132,
+        "Name": "percent",
+        "Description": "",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2243,
+      "Label": "SDUR",
+      "Description": "sunshine duration",
+      "isOptional": false,
+      "unit": {
+        "Id": 45,
+        "Name": "second",
+        "Description": "",
+        "Dimension": {
+          "Name": "time",
+          "Description": "min, s, h",
+          "Specification": "L(0,0)M(0,0)T(1,0)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2244,
+      "Label": "SDIR",
+      "Description": "direct sun radiation",
+      "isOptional": false,
+      "unit": {
+        "Id": 31,
+        "Name": "watt per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per time 3",
+          "Description": "",
+          "Specification": "L(0,0)M(1,0)T(0,3)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2245,
+      "Label": "LWDR",
+      "Description": "long wave downward (incoming) radiation",
+      "isOptional": false,
+      "unit": {
+        "Id": 31,
+        "Name": "watt per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per time 3",
+          "Description": "",
+          "Specification": "L(0,0)M(1,0)T(0,3)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2246,
+      "Label": "LWUR",
+      "Description": "long wave upward (outgoing) radiation",
+      "isOptional": false,
+      "unit": {
+        "Id": 31,
+        "Name": "watt per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per time 3",
+          "Description": "",
+          "Specification": "L(0,0)M(1,0)T(0,3)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2247,
+      "Label": "TRAD",
+      "Description": "radiation temperature from long wave upwards (outgoing) radiation",
+      "isOptional": false,
+      "unit": {
+        "Id": 44,
+        "Name": "degree celsius",
+        "Description": "",
+        "Dimension": {
+          "Name": "temperature",
+          "Description": "°C, °F, °K ",
+          "Specification": "L(0,0)M(0,0)T(0,0)I(0,0)?(1,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2248,
+      "Label": "PAR",
+      "Description": "photosynthetically active radiation",
+      "isOptional": false,
+      "unit": {
+        "Id": 55,
+        "Name": "micromole per area time",
+        "Description": "",
+        "Dimension": {
+          "Name": "amount per area time",
+          "Description": "mol/mm² s",
+          "Specification": "L(0,2)M(0,0)T(0,1)I(0,0)?(0,0)N(1,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2249,
+      "Label": "Rn",
+      "Description": "net radiation",
+      "isOptional": false,
+      "unit": {
+        "Id": 31,
+        "Name": "watt per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per time 3",
+          "Description": "",
+          "Specification": "L(0,0)M(1,0)T(0,3)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2250,
+      "Label": "SHF1",
+      "Description": "soil heat flux of sensor 1 at depth 2cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 31,
+        "Name": "watt per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per time 3",
+          "Description": "",
+          "Specification": "L(0,0)M(1,0)T(0,3)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2251,
+      "Label": "SHF2",
+      "Description": "soil heat flux of sensor 2 at depth 2cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 31,
+        "Name": "watt per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per time 3",
+          "Description": "",
+          "Specification": "L(0,0)M(1,0)T(0,3)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2252,
+      "Label": "SHF3",
+      "Description": "soil heat flux of sensor 3 at depth 2cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 31,
+        "Name": "watt per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per time 3",
+          "Description": "",
+          "Specification": "L(0,0)M(1,0)T(0,3)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2253,
+      "Label": "SHF4",
+      "Description": "soil heat flux of sensor 4 at depth 2cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 31,
+        "Name": "watt per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per time 3",
+          "Description": "",
+          "Specification": "L(0,0)M(1,0)T(0,3)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2254,
+      "Label": "SHF5",
+      "Description": "soil heat flux of sensor 5 at depth 2cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 31,
+        "Name": "watt per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per time 3",
+          "Description": "",
+          "Specification": "L(0,0)M(1,0)T(0,3)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2255,
+      "Label": "SHFM",
+      "Description": "mean soil heat flux of all sensors",
+      "isOptional": false,
+      "unit": {
+        "Id": 31,
+        "Name": "watt per square meter",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass per time 3",
+          "Description": "",
+          "Specification": "L(0,0)M(1,0)T(0,3)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2256,
+      "Label": "ST002",
+      "Description": "soil temperature from profile at depth 2cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 44,
+        "Name": "degree celsius",
+        "Description": "",
+        "Dimension": {
+          "Name": "temperature",
+          "Description": "°C, °F, °K ",
+          "Specification": "L(0,0)M(0,0)T(0,0)I(0,0)?(1,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2257,
+      "Label": "ST004",
+      "Description": "soil temperature from profile at depth 4cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 44,
+        "Name": "degree celsius",
+        "Description": "",
+        "Dimension": {
+          "Name": "temperature",
+          "Description": "°C, °F, °K ",
+          "Specification": "L(0,0)M(0,0)T(0,0)I(0,0)?(1,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2258,
+      "Label": "ST008",
+      "Description": "soil temperature from profile at depth 8cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 44,
+        "Name": "degree celsius",
+        "Description": "",
+        "Dimension": {
+          "Name": "temperature",
+          "Description": "°C, °F, °K ",
+          "Specification": "L(0,0)M(0,0)T(0,0)I(0,0)?(1,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2259,
+      "Label": "ST016",
+      "Description": "soil temperature from profile at depth 16cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 44,
+        "Name": "degree celsius",
+        "Description": "",
+        "Dimension": {
+          "Name": "temperature",
+          "Description": "°C, °F, °K ",
+          "Specification": "L(0,0)M(0,0)T(0,0)I(0,0)?(1,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2260,
+      "Label": "ST032",
+      "Description": "soil temperature from profile at depth 32cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 44,
+        "Name": "degree celsius",
+        "Description": "",
+        "Dimension": {
+          "Name": "temperature",
+          "Description": "°C, °F, °K ",
+          "Specification": "L(0,0)M(0,0)T(0,0)I(0,0)?(1,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2261,
+      "Label": "ST064",
+      "Description": "soil temperature from profile at depth 64cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 44,
+        "Name": "degree celsius",
+        "Description": "",
+        "Dimension": {
+          "Name": "temperature",
+          "Description": "°C, °F, °K ",
+          "Specification": "L(0,0)M(0,0)T(0,0)I(0,0)?(1,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2262,
+      "Label": "ST128",
+      "Description": "soil temperature from profile at depth 128cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 44,
+        "Name": "degree celsius",
+        "Description": "",
+        "Dimension": {
+          "Name": "temperature",
+          "Description": "°C, °F, °K ",
+          "Specification": "L(0,0)M(0,0)T(0,0)I(0,0)?(1,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2263,
+      "Label": "SM008",
+      "Description": "soil moisture from profile at depth 8cm; unit is \"volumetric percent\"",
+      "isOptional": false,
+      "unit": {
+        "Id": 132,
+        "Name": "percent",
+        "Description": "",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2264,
+      "Label": "SM016",
+      "Description": "soil moisture from profile at depth 16cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 132,
+        "Name": "percent",
+        "Description": "",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2265,
+      "Label": "SM032",
+      "Description": "soil moisture from profile at depth 32cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 132,
+        "Name": "percent",
+        "Description": "",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2266,
+      "Label": "SM064",
+      "Description": "soil moisture from profile at depth 64cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 132,
+        "Name": "percent",
+        "Description": "",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2267,
+      "Label": "SM128",
+      "Description": "soil moisture from profile at depth 128cm",
+      "isOptional": false,
+      "unit": {
+        "Id": 132,
+        "Name": "percent",
+        "Description": "",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2268,
+      "Label": "Tlog",
+      "Description": "internal logger temperature",
+      "isOptional": false,
+      "unit": {
+        "Id": 44,
+        "Name": "degree celsius",
+        "Description": "",
+        "Dimension": {
+          "Name": "temperature",
+          "Description": "°C, °F, °K ",
+          "Specification": "L(0,0)M(0,0)T(0,0)I(0,0)?(1,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2269,
+      "Label": "Heating1",
+      "Description": "percentage of time with active instrument heating of level 1",
+      "isOptional": false,
+      "unit": {
+        "Id": 132,
+        "Name": "percent",
+        "Description": "",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 2270,
+      "Label": "Heating2",
+      "Description": "percentage of time with active instrument heating of level 2",
+      "isOptional": false,
+      "unit": {
+        "Id": 132,
+        "Name": "percent",
+        "Description": "",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    }
+  ]
+}

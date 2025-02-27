@@ -1,0 +1,38 @@
+---
+title: "Data Exploration + Synthesis"
+author: "Marius Munschek"
+date: "2025-02-20"
+output: html_document
+---
+
+Preface: This R Script is intended to be used to load, explore, and synthesize the datasets for the following metrics measured in the Jena main experiment: Aboveground biomass production, C&N content in the soil, Realized Species Richness, climate variability, water N, pollination, flower diversity, total flowering period per plot, above- and belowground herbivory, soil orgnic carbon (SOC), leaf dry matter content (LDMC), soil aggregate stability, soil diversity, microbial biomass + respiration, 
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Loading packages
+
+```{r cars}
+install.packages("dplyr")
+install.packages("readr")
+install.packages("readxl")
+
+library(dplyr)
+library(readr)
+library(readxl)
+```
+
+
+Load and inspect data
+
+```{r}
+#load data on aboveground biomass production (ID = 624) 
+biomass <- read_xlsx("Data/Biomass_Aboveground_Jena_Dataset/624_9_data.xlsx")
+
+
+
+```
+

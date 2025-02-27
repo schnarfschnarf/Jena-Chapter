@@ -1,0 +1,30 @@
+"0","install.packages(""readxl"")
+"
+"1","The following package(s) will be installed:
+"
+"1","- cellranger [1.1.0]
+"
+"1","- readxl     [1.4.3]
+"
+"1","- rematch    [2.0.0]
+"
+"1","These packages will be installed into ""C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/renv/library/windows/R-4.4/x86_64-w64-mingw32"".
+"
+"1","
+"
+"0","y"
+"1","
+"
+"1","# Installing packages --------------------------------------------------------
+"
+"1","- Installing rematch ...                        "
+"1","OK [linked from cache]
+"
+"1","- Installing cellranger ...                     "
+"1","OK [linked from cache]
+"
+"1","- Installing readxl ...                         "
+"1","OK [linked from cache]
+"
+"1","Successfully installed 3 packages in 49 milliseconds.
+"
