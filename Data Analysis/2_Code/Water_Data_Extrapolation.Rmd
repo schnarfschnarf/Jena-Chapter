@@ -1,0 +1,93 @@
+---
+title: "Water Data Extrapolation"
+author: "Marius Munschek"
+date: "2025-03-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Preface
+
+This is an R script to extrapolate the yearly nitrogen leaching in the Jena experiment. This extrapolation is necessary to fill some gaps in the dataset. The data was provided by Wolfgang Wilcke (IFGG, Karlsruhe), the code for the gap filling was provided by Markus Lange (MPI, Jena).
+
+
+### Packages
+
+```{r}
+library(readxl)
+library(tidyverse)
+```
+
+
+
+```{r}
+leaching<-read_excel("errechnete Wasserflüsse+Auswaschung_ml.xlsx",1)
+names(leaching)
+
+leach_x1<-leaching[,c(1:2,9,16,19)]
+leach_x1$year <- as.numeric(format(leach_x1$date, "%Y"))
+leach_x1$month <- as.numeric(format(leach_x1$date, "%m"))
+
+names(leach_x1)
+library(dplyr)
+
+# Function to fill gaps using linear regression
+fill_gaps_with_regression <- function(data) {
+  plots <- unique(data$plot)
+  
+  for (plot in plots) {
+    plot_data <- data %>% filter(plot == !!plot)
+    
+    # Fit linear model if there are enough non-NA values
+    if (sum(!is.na(plot_data$NF1)) > 1) {
+      lm_model <- lm(NF1 ~ NS_Summe_mm, data = plot_data, na.action = na.exclude)
+      missing_indices <- which(is.na(plot_data$NF1))
+      
+      # Predict missing values
+      if (length(missing_indices) > 0) {
+        plot_data$NF1[missing_indices] <- predict(lm_model, newdata = plot_data[missing_indices, ])
+      }
+      
+      # Update the original data frame
+      data[data$plot == plot, ] <- plot_data
+    }
+  }
+  
+  return(data)
+}
+
+# Apply the function to your data frame
+leach_x1_filled <- fill_gaps_with_regression(leach_x1)
+
+# Function to fill gaps with the average values per year using a for loop
+fill_gaps_with_yearly_avg <- function(data) {
+  data %>%
+    group_by(plot, year) %>%
+    mutate(yearly_avg = ifelse(all(is.na(tn)), NA, mean(tn, na.rm = TRUE))) %>%
+    mutate(tn = ifelse(is.na(tn), yearly_avg, tn)) %>%
+    select(-yearly_avg) %>%
+    ungroup()
+}
+
+# Apply the function to your data frame
+leach_x1_2filled <- fill_gaps_with_yearly_avg(leach_x1_filled)
+leach_x1_2filled$TN_leach<-leach_x1_2filled$NF1*leach_x1_2filled$tn
+
+leaching_y <- ddply(leach_x1_2filled, c("plot","year"), summarise,
+                    leach_y = sum(TN_leach,na.rm = TRUE))
+
+leach_y_av <- ddply(leaching_y, c("plot"), summarise,
+                       TNleaching_av = mean(leach_y/100,na.rm = TRUE)) #kg/ha
+summary(leach_y_av)
+
+```
+
+
+
+```{r}
+
+```
+

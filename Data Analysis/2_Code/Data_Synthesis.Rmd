@@ -5,7 +5,7 @@ date: "2025-02-20"
 output: html_document
 ---
 
-Preface: This R Script is intended to be used to load, explore, and synthesize the datasets for the following metrics measured in the Jena main experiment: Aboveground biomass production, C&N content in the soil, Realized Species Richness, climate variability, water N, pollination, flower diversity, total flowering period per plot, above- and belowground herbivory, soil orgnic carbon (SOC), leaf dry matter content (LDMC), soil aggregate stability, soil diversity, microbial biomass + respiration, 
+# Preface: This R Script is intended to be used to load, explore, and synthesize the datasets for the following metrics measured in the Jena main experiment: Aboveground biomass production, C&N content in the soil, Realized Species Richness, climate variability, water N, pollination, flower diversity, total flowering period per plot, above- and belowground herbivory, soil orgnic carbon (SOC), leaf dry matter content (LDMC), soil aggregate stability, soil diversity, microbial biomass + respiration, 
 
 
 ```{r setup, include=FALSE}
@@ -13,26 +13,71 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-Loading packages
+## Loading packages
 
-```{r cars}
-install.packages("dplyr")
-install.packages("readr")
-install.packages("readxl")
-
+```{r Packages}
 library(dplyr)
 library(readr)
 library(readxl)
 ```
 
 
-Load and inspect data
+## Load and inspect data
 
-```{r}
+```{r Data}
 #load data on aboveground biomass production (ID = 624) 
-biomass <- read_xlsx("Data/Biomass_Aboveground_Jena_Dataset/624_9_data.xlsx")
+biomass <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Aboveground/624_9_data.xlsx")
+head(biomass)
+
+
+#load data on realized species richness (ID = 487)
+realSR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Realized_Species_Richness/487_3_data.xlsx")
+head(realSR)
+
+#load data on soil CN (ID = 655)
+soilCN <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/655_12_data.xlsx")
+
+#load data on biomass CN (ID = 557)
+biomassCN <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Biomass_Above/557_3_data.xlsx")
+
+# load data on microbial biomass and respiration from 2022 (ID = 398)
+microbial <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/MicBiomass_MicRespiration/398_3_data.xlsx")
+
+
+#load data from ZARAH???
+unknown <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/2024_May_Main_O2_Results.xlsx")
+
+#load data on water quality
+water <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/WaterN/errechnete Wasserflüsse+Auswaschung.xlsx")
+
+```
+
+## Data wrangling
+
+```{r Wrangling}
+#create new dataset that contains only measurements for the year 2022
+biomass <- biomass %>% 
+  filter(year == 2022) %>% 
+  group_by(plotcode) %>% 
+  mutate(sum_biomass = sum(biomass)/2) %>% #sum up biomass for each plot and calculate mean between subsamples 
+  ungroup() %>%
+  distinct(plotcode, sum_biomass)
+
+realSR <- filter(realSR, year == 2022 & season == "Total" ) #keep only total SR in 2022
+
+synthesis <- biomass %>% # merge the datasets 
+  left_join(realSR, by = join_by(plotcode))
+
+
+```
 
 
 
+Note to myself: Should I use the corresponding realized species richness from the respective years fopr each soil function?
+
+## Plot biomass against realized species richness
+
+```{r Plotting}
+plot(synthesis$realizedSR, synthesis$sum_biomass) #how does the relationship look like?
 ```
 
