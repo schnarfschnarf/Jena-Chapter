@@ -1,0 +1,101 @@
+{
+  "Id": 254,
+  "Title": "Pollinator numbers in 2005, 2006 and 2008",
+  "Description": "",
+  "inUse": true,
+  "Structured": true,
+  "Variables": [
+    {
+      "Id": 1911,
+      "Label": "plotcode",
+      "Description": "plot identity; there are 73 plots",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 1,
+        "Name": "string",
+        "Description": "String",
+        "SystemType": "String"
+      }
+    },
+    {
+      "Id": 1912,
+      "Label": "year",
+      "Description": "calendar year",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 6,
+        "Name": "integer",
+        "Description": "An 32 bit integer number",
+        "SystemType": "Int32"
+      }
+    },
+    {
+      "Id": 1913,
+      "Label": "frequency",
+      "Description": "total number of flower-visiting insect individuals",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 1914,
+      "Label": "species_richness",
+      "Description": "total number of  flower-visiting species",
+      "isOptional": false,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 7,
+        "Name": "number",
+        "Description": "An 16 bit integer number",
+        "SystemType": "Int16"
+      }
+    }
+  ]
+}
