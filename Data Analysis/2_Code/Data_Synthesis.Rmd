@@ -6,7 +6,7 @@ output: html_document
 ---
 
 # Preface
-This R Script is intended to be used to load, explore, and synthesize the datasets for the following metrics measured in the Jena main experiment: Aboveground biomass production, C&N content in the soil, Realized Species Richness, climate variability, water N, pollination, flower diversity, total flowering period per plot, above- and belowground herbivory, soil orgnic carbon (SOC), leaf dry matter content (LDMC), soil aggregate stability, soil diversity, microbial biomass + respiration, 
+This R Script is intended to be used to load, explore, and synthesize the datasets for the following metrics measured in the Jena main experiment: Aboveground biomass production, C&N content in the soil, Realized Species Richness, climate variability, water N (nitrogen leaching), pollination, flower diversity, total flowering period per plot, above- and belowground herbivory (for belowground measured as eneergy fluxes in the food web), soil orgnic carbon (SOC), leaf dry matter content (LDMC), soil aggregate stability, soil diversity, microbial biomass + respiration, 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -17,6 +17,7 @@ library(dplyr)
 library(readr)
 library(readxl)
 library(brms)
+library(ggplot2)
 ```
 
 ## Load datasets and filter for relevant observations/measurements
@@ -76,14 +77,17 @@ flowers <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Dat
 Before the individual datasets can be merged, they have to be harmonized. Additionally for some datasets, aggregated values have to be calculated. 
 ```{r Biomass data}
 biomassDat$plotcode <- as.factor(biomassDat$plotcode) #change the plotcode to a factor
+samplingSeasons <- unique(biomassDat[c("season","year")]) # only used to check whether every year had the same number of sampling seasons
 
-#create new dataset that contains only measurements for the year 2022
-biomassPlot <- biomassDat %>% 
-  filter(year == 2022) %>% 
-  group_by(plotcode) %>% 
-  mutate(sum_biomass = sum(biomass, na.rm = TRUE)/2) %>% #sum up biomass for each plot and calculate mean between subsamples 
-  ungroup() %>%
-  distinct(plotcode, sum_biomass)
+# exclude the first 5 years of the experiment
+# sum up biomass for each plot and calculate mean between subsamples
+biomassMeans <- biomassDat %>% 
+  filter(year > 2018) %>% 
+  group_by(plotcode, year, season) %>% 
+  summarise(sum_biomass = sum(biomass, na.rm = TRUE), .groups = "drop") %>%
+  group_by(plotcode) %>%
+  summarise(mean_biomass = mean(sum_biomass, na.rm = TRUE), .groups = "drop")
+
 ```
 
 ```{r Yield stability}
@@ -125,9 +129,9 @@ soilCN02_clean <- soilCN02 %>% group_by(plotcode) %>%
 ```
 
 ```{r Species Richness data}
-realSR22 <- filter(realSR, year == 2022 & season == "Total" ) #keep only total SR in 2022
+realSR <- filter(realSR, year > 2018 & season == "Total" ) #keep only total SR from year 2007 onwards
 
-realSRmean <- filter(realSR, year < 2019 & season == "Total" ) %>% #calculate the mean realized SR for the years 2003-2019
+realSRmean <- realSR %>%                    #calculate the mean realized SR for the years 2003-2019
   group_by(plotcode) %>% 
   mutate(meanSR = mean(realizedSR, na.rm = TRUE)) %>% 
   ungroup() %>%
@@ -150,21 +154,34 @@ herbivoryAbove <- herbivoryAbove %>% rename_at('plot', ~'plotcode') # rename plo
 
 ## Synthesize in one Dataset
 ```{r Data Synthesis}
-synthesis22 <- biomassPlot %>% # merge the biomass and the realized SR data
-  left_join(realSR22, by = join_by(plotcode)) #%>% 
+synthesis <- biomassMeans %>% # merge the biomass and the realized SR data
+  left_join(realSRmean, by = join_by(plotcode)) #%>% 
   left_join(water, by = join_by(plotcode)) # %>%
   left_join(herbivoryAbove, by )
 ```
 
 
 
-## Run some basic linear models
-```{r}
+## Linear models 
+```{r Biomass ~ realized SR}
 #check distribution of data
-hist(synthesis22$sum_biomass)
-plot(synthesis22$realizedSR, synthesis22$sum_biomass)
+hist(synthesis$mean_biomass)
+plot(synthesis$realizedSR, synthesis$mean_biomass)
+ggplot2::ggplot(synthesis,
+                aes(x = meanSR, y = mean_biomass)
+                ) +
+  geom_point(
+    color = "#28a87d",
+    alpha = .5,
+    shape = "X",
+    stroke = 1,
+    size = 4
+  ) +
+   geom_smooth(
+    method = "lm"
+  )
 
-lmBio <- lm(sum_biomass ~ realizedSR, synthesis22)
+lmBio <- lm(mean_biomass ~ meanSR, synthesis) #log2 transform the x and use lmer 
 summary(lmBio)
 
 plot(lmBio)
@@ -181,8 +198,24 @@ summary(lmN)
 ```
 
 
+```{r SOC ~ realized SR}
 
-## Plot biomass against realized species richness
+```
+
+
+```{r N leaching ~ realized SR}
+
+```
+
+
+```{r HerbivoryAbove ~ Realized SR}
+
+```
+
+
+## Plotting
+
+### Plot biomass against realized species richness
 ```{r Plotting}
 plot(synthesis22$realizedSR, synthesis22$sum_biomass) #how does the relationship look like?
 ```
