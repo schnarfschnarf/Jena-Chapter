@@ -6,35 +6,45 @@ output: html_document
 ---
 
 # Preface
-This R Script is intended to be used to load, explore, and synthesize the datasets for the following metrics measured in the Jena main experiment: Aboveground biomass production, C&N content in the soil, Realized Species Richness, climate variability, water N (nitrogen leaching), pollination, flower diversity, total flowering period per plot, above- and belowground herbivory (for belowground measured as eneergy fluxes in the food web), soil orgnic carbon (SOC), leaf dry matter content (LDMC), soil aggregate stability, soil diversity, microbial biomass + respiration, 
+This R Script is intended to be used to load, explore, and synthesize the datasets for the following metrics measured in the Jena main experiment: Aboveground biomass production, C&N content in the soil, Realized Species Richness, climate variability, leaching N (nitrogen leaching), pollination, flower diversity, total flowering period per plot, above- and belowground herbivory (for belowground measured as energy fluxes in the food web), soil organic carbon (SOC), leaf dry matter content (LDMC), soil aggregate stability, soil diversity, microbial biomass + respiration, 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Preparation
 ## Loading packages
 ```{r Packages}
 library(dplyr)
 library(readr)
 library(readxl)
-library(brms)
+library(lme4)
 library(ggplot2)
+```
+
+## Set up a theme
+```{r}
+theme_set(theme_minimal(base_size = 14)+
+            theme(plot.title = element_text(size=17,hjust=0.5),
+                  axis.text = element_text(size = 7),
+                  axis.text.y = element_text(size = 10),
+                  axis.text.x = element_text(size = 10)))
 ```
 
 ## Load datasets and filter for relevant observations/measurements
 ```{r Read Data}
+# load data on plot design (needed for 'block code')
+design <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Plot_Design/90_20_data.xlsx")
+
 #load data on aboveground biomass production (ID = 624) 
 biomassDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/624_9_data.xlsx")
-head(biomass)
 
 #load data on realized species richness (ID = 487)
-realSR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Realized_Species_Richness/487_3_data.xlsx")
-  #change data type for realized SR
-  realSR$realizedSR <- as.numeric(realSR$realizedSR)
+SR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Realized_Species_Richness/487_3_data.xlsx")
+  #change data type for realized SR &sowndiv
+  SR$realizedSR <- as.numeric(SR$realizedSR)
+  SR$sowndiv <- as.numeric(SR$sowndiv)
 
-
-# BE AWARE THAT YOU NEED TO CHECK SR INFLUENCE FOR DIFFERENT YEARS, ACCORDING TO MEASURED FUNCTION
-
-#load data on soil CN (2022: ID = 655; 2002: ID = 278)
+#load data on soil CN (2022: ID = 655; 2002: ID = 278) 2002 is to compare the  carbon content at the beginning of the experiment with the current carbon content
 soilCN22 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/655_12_data.xlsx")
 soilCN02 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/278_2_data.xlsx") %>% 
   filter(depthU < 0.1 & year == 2002) #filter for first two soil layers (0-5 mm & 5-10mm)
@@ -62,8 +72,8 @@ herbivoryAbove <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysi
 
 #load data on soil diversity
 
-#load data on water quality
-water <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/WaterN/Overall_Leaching_Plot.xlsx")
+#load data on nitrogen leaching
+leaching <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/WaterN/Overall_Leaching_Plot.xlsx")
 
 #load data on pollinators
 pollinators <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Pollinators/PollinatorObservation_Main_2011_id140.xlsx")
@@ -77,10 +87,10 @@ flowers <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Dat
 Before the individual datasets can be merged, they have to be harmonized. Additionally for some datasets, aggregated values have to be calculated. 
 ```{r Biomass data}
 biomassDat$plotcode <- as.factor(biomassDat$plotcode) #change the plotcode to a factor
-samplingSeasons <- unique(biomassDat[c("season","year")]) # only used to check whether every year had the same number of sampling seasons
+# samplingSeasons <- unique(biomassDat[c("season","year")]) # used to check whether every year had the same number of sampling seasons
 
-# exclude the first 5 years of the experiment
-# sum up biomass for each plot and calculate mean between subsamples
+# exclude the years before 2018
+# sum up biomass for each plot and calculate the mean across subsamples and years
 biomassMeans <- biomassDat %>% 
   filter(year > 2018) %>% 
   group_by(plotcode, year, season) %>% 
@@ -129,46 +139,105 @@ soilCN02_clean <- soilCN02 %>% group_by(plotcode) %>%
 ```
 
 ```{r Species Richness data}
-realSR <- filter(realSR, year > 2018 & season == "Total" ) #keep only total SR from year 2007 onwards
+SR <- filter(SR, year > 2018 & season == "Total" ) #keep only total SR from year 2018 onwards
 
-realSRmean <- realSR %>%                    #calculate the mean realized SR for the years 2003-2019
+SRmean <- SR %>%                    #calculate the mean realized SR for the years 2003-2019
   group_by(plotcode) %>% 
   mutate(meanSR = mean(realizedSR, na.rm = TRUE)) %>% 
   ungroup() %>%
   distinct(plotcode, meanSR)
 ```
 
---> should I calculate the mean realized species richness for the nitrogen leaching analysis? I mean, the yearly average of leaking is calculated from the years 2003 - 2019, therefore I should take the corresponding realized SRs, right?
 
-Or should I take the yearly N leaching and regress against the yearly realized SR and then make a regression of the regressions or sth. similar?
-
-```{r Water}
-water <- water %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
+```{r leaching}
+leaching <- leaching %>% 
+            rename_at('plot', ~'plotcode') # rename plot to plotcode
 ```
 
 ```{r Herbivory}
-herbivoryAbove <- herbivoryAbove %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
+herbivoryAbove <- herbivoryAbove %>% 
+            rename_at('plot', ~'plotcode') # rename plot to plotcode
 
 ```
-
 
 ## Synthesize in one Dataset
 ```{r Data Synthesis}
-synthesis <- biomassMeans %>% # merge the biomass and the realized SR data
-  left_join(realSRmean, by = join_by(plotcode)) #%>% 
-  left_join(water, by = join_by(plotcode)) # %>%
+synthDat <- biomassMeans %>% # merge the biomass and the realized SR data
+  left_join(SRmean, by = join_by(plotcode)) %>%
+  left_join(select(SR, sowndiv, plotcode), by = join_by(plotcode)) %>% 
+  unique() %>% 
+  left_join(select(design, plotcode, block)) %>% 
+  left_join(leaching, by = join_by(plotcode)) # %>%
   left_join(herbivoryAbove, by )
+  
+synthDat$block <- as.factor(synthDat$block)
+synthDat$plotcode <- as.factor(synthDat$plotcode)
+```
+
+## Calculations
+### Ecological Multifunctionality (averaging approach)
+```{r Ecological MF}
+# I need to standardize all the values and then average across functions/services
+
+```
+
+### Multidiversity Index
+```{r Multidiversity}
+
+```
+
+### Soil Health Index
+```{r Soil health}
+
 ```
 
 
+## Statistical Models 
+```{r Biomass ~ SR}
 
-## Linear models 
-```{r Biomass ~ realized SR}
+# with sown species number
+lmBioSown <- lm(
+  mean_biomass ~ log2(sowndiv),
+  synthDat)
+
+plot(lmBioSown)
+summary(lmBioSown)
+
+# with realized species diversity
+lmBioReal <- lm(
+  mean_biomass ~ log2(meanSR),
+  synthDat) 
+
+plot(lmBioReal) # check model assumptions
+summary(lmBioReal)
+```
+
+
+```{r SOC ~ realized SR}
+
+```
+
+```{r N leaching ~ realized SR}
+#check the distribution of the data
+hist(synthDat$TNleaching_av)
+plot(synthDat$sowndiv, synthDat$TNleaching_av)
+
+lmLeach <- lm(TNleaching_av ~ log2(sowndiv), synthDat)
+plot(lmLeach)
+summary(lmLeach)
+```
+
+```{r HerbivoryAbove ~ Realized SR}
+
+```
+
+
+## Plotting
+### Plot biomass against realized species richness
+```{r Plotting}
 #check distribution of data
-hist(synthesis$mean_biomass)
-plot(synthesis$realizedSR, synthesis$mean_biomass)
-ggplot2::ggplot(synthesis,
-                aes(x = meanSR, y = mean_biomass)
+ggplot2::ggplot(synthDat,
+                aes(x = log2(as.numeric(sowndiv)), y = mean_biomass)
                 ) +
   geom_point(
     color = "#28a87d",
@@ -179,44 +248,12 @@ ggplot2::ggplot(synthesis,
   ) +
    geom_smooth(
     method = "lm"
-  )
+  ) +
+  theme_minimal(
+  ) +
+  labs(
+    x = "Sown Plant Diversity",
+    y = "Mean Biomass per Plot (g)")
 
-lmBio <- lm(mean_biomass ~ meanSR, synthesis) #log2 transform the x and use lmer 
-summary(lmBio)
-
-plot(lmBio)
-
-
-#check the distribution of the data
-hist(synthesis22$TNleaching_av)
-plot(synthesis22$meanSR, synthesis22$TNleaching_av)
-
-#create linear model
-lmN <- lm(TNleaching_av ~ meanSR, synthesis22)
-plot(lmN)
-summary(lmN)
-```
-
-
-```{r SOC ~ realized SR}
-
-```
-
-
-```{r N leaching ~ realized SR}
-
-```
-
-
-```{r HerbivoryAbove ~ Realized SR}
-
-```
-
-
-## Plotting
-
-### Plot biomass against realized species richness
-```{r Plotting}
-plot(synthesis22$realizedSR, synthesis22$sum_biomass) #how does the relationship look like?
 ```
 

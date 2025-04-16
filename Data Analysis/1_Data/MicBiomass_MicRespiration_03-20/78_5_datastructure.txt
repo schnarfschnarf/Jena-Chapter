@@ -1,0 +1,147 @@
+{
+  "Id": 72,
+  "Title": "Soil microbial respiration and biomass",
+  "Description": "",
+  "inUse": true,
+  "Structured": true,
+  "Variables": [
+    {
+      "Id": 203,
+      "Label": "plot",
+      "Description": null,
+      "isOptional": true,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 1,
+        "Name": "string",
+        "Description": "String",
+        "SystemType": "String"
+      }
+    },
+    {
+      "Id": 198,
+      "Label": "basal_respiration",
+      "Description": "Basal respiration reflects the active part of the soil microbial community at the time of sampling.",
+      "isOptional": true,
+      "unit": {
+        "Id": 146,
+        "Name": "microliter per gram and hour",
+        "Description": null,
+        "Dimension": {
+          "Name": "volume per mass time",
+          "Description": "volume per mass time",
+          "Specification": "L(3,0)M(0,1)T(0,1)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 199,
+      "Label": "soil_microbial_biomass_C",
+      "Description": "Cmic: Soil microbial carbon biomass [µg Cmic*g soil dw-1]; Calculated on the basis of MIRR values, with Cmic = 38*MIRR",
+      "isOptional": true,
+      "unit": {
+        "Id": 52,
+        "Name": "microgram per gram",
+        "Description": "",
+        "Dimension": {
+          "Name": "mass ratio",
+          "Description": "g/kg",
+          "Specification": "L(0,0)M(1,1)T(0,0)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 200,
+      "Label": "respiratory_quotient",
+      "Description": "qO2: specific respiratory quotient (metabolic oxygen quotient; µg O2/mg Cmic*h), calculated by dividing basal respiration by microbial biomass; used as a measure for  C use efficiency of the microbial community (the higher qO2, the lower the C use efficiency)",
+      "isOptional": true,
+      "unit": {
+        "Id": 145,
+        "Name": "microliter per microgram and hour",
+        "Description": null,
+        "Dimension": {
+          "Name": "volume per mass time",
+          "Description": "volume per mass time",
+          "Specification": "L(3,0)M(0,1)T(0,1)I(0,0)?(0,0)N(0,0)J(0,0)"
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 202,
+      "Label": "soil_water_content",
+      "Description": "Soil water content [mass %] measured as difference of fresh weight and dry weight. Soil was dried 2 days at 70°.",
+      "isOptional": true,
+      "unit": {
+        "Id": 132,
+        "Name": "percent",
+        "Description": "",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Metric"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 204,
+      "Label": "year",
+      "Description": null,
+      "isOptional": true,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 6,
+        "Name": "integer",
+        "Description": "An 32 bit integer number",
+        "SystemType": "Int32"
+      }
+    }
+  ]
+}
