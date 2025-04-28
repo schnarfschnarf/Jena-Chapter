@@ -40,19 +40,21 @@ biomassDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_
 
 #load data on realized species richness (ID = 487)
 SR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Realized_Species_Richness/487_3_data.xlsx")
-  #change data type for realized SR &sowndiv
+  #change data type for realized SR & sowndiv
   SR$realizedSR <- as.numeric(SR$realizedSR)
   SR$sowndiv <- as.numeric(SR$sowndiv)
 
-#load data on soil CN (2022: ID = 655; 2002: ID = 278) 2002 is to compare the  carbon content at the beginning of the experiment with the current carbon content
+#load data on soil CN (2022: ID = 655; 2020: ID = 424 2002: ID = 278): 2002 is to compare the carbon content at the beginning of the experiment with the current (2022) carbon content. 2020 data includes bulk density measurements.
+# Dataset on deep soil measurement (ID = 433) from 0-100cm is only one Block (D2) and most recent measurement year is 2016.
 soilCN22 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/655_12_data.xlsx")
 soilCN02 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/278_2_data.xlsx") %>% 
   filter(depthU < 0.1 & year == 2002) #filter for first two soil layers (0-5 mm & 5-10mm)
+soilCNdeep <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/278_2_data.xlsx")
 
 #load data on biomass CN (ID = 557)
 biomassCN <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Biomass_Above/557_3_data.xlsx")
 
-# load data on microbial biomass and respiration from 2022 (ID = 398)
+# load data on microbial biomass and respiration from 2022 (ID = 398) and 2021 (ID = 240)
 microbial <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/MicBiomass_MicRespiration/398_3_data.xlsx")
 
 #load data on soil aggregates
