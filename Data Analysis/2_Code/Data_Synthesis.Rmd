@@ -91,6 +91,15 @@ Before the individual datasets can be merged, they have to be harmonized. Additi
 biomassDat$plotcode <- as.factor(biomassDat$plotcode) #change the plotcode to a factor
 # samplingSeasons <- unique(biomassDat[c("season","year")]) # used to check whether every year had the same number of sampling seasons
 
+# calculate total biomass per plot for 2022
+biomassDat <- biomassDat %>% 
+  filter(year == 2022) %>% 
+  group_by(plotcode, year) %>% 
+  summarise(sum_biomass = sum(biomass, na.rm = TRUE), .groups = "drop")
+
+# introduce new column with SGM
+biomassDat$SGM <- (biomassDat$sum_biomass/1000)*4.46
+
 # exclude the years before 2018
 # sum up biomass for each plot and calculate the mean across subsamples and years
 biomassMeans <- biomassDat %>% 
