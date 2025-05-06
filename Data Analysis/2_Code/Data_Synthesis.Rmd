@@ -45,11 +45,13 @@ SR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Rea
   SR$sowndiv <- as.numeric(SR$sowndiv)
 
 #load data on soil CN (2022: ID = 655; 2020: ID = 424 2002: ID = 278): 2002 is to compare the carbon content at the beginning of the experiment with the current (2022) carbon content. 2020 data includes bulk density measurements.
-# Dataset on deep soil measurement (ID = 433) from 0-100cm is only one Block (D2) and most recent measurement year is 2016.
+  # Dataset on deep soil measurement (ID = 433) from 0-100cm is only one Block (D2) and most recent measurement year is 2016.
+
+soilCN20 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/424_7_data.xlsx")
 soilCN22 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/655_12_data.xlsx")
 soilCN02 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/278_2_data.xlsx") %>% 
-  filter(depthU < 0.1 & year == 2002) #filter for first two soil layers (0-5 mm & 5-10mm)
-soilCNdeep <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/278_2_data.xlsx")
+  filter(year == 2002) 
+
 
 #load data on biomass CN (ID = 557)
 biomassCN <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Biomass_Above/557_3_data.xlsx")
@@ -132,27 +134,48 @@ microbial <- microbial %>% rename_at('plot', ~'plotcode') # rename plot to plotc
 ```{r Soil CN}
 soilCN22 <- soilCN22 %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
 soilCN02 <- soilCN02 %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
+soilCN20 <- soilCN20 %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
 
   #change data types 
   soilCN02$plotcode <- as.factor(soilCN02$plotcode)
   soilCN02$Corg_Soil <- as.numeric(soilCN02$Corg_Soil)
   soilCN02$Cinorg_Soil <- as.numeric(soilCN02$Cinorg_Soil)
+  
+  soilCN20$plotcode <- as.factor(soilCN20$plotcode)
+  soilCN20$Corg_Soil <- as.numeric(soilCN20$Corg_Soil)
+  soilCN20$Cinorg_Soil <- as.numeric(soilCN20$Cinorg_Soil)
  
   soilCN22$plotcode <- as.factor(soilCN22$plotcode)
 
-# create a new column with total SOC per plot  
+# create a new column with mean C across layers per plot for 2002
 soilCN02_clean <- soilCN02 %>% group_by(plotcode) %>% 
-                      mutate(total_org = sum(Corg_Soil), total_inorg = sum(Cinorg_Soil)) %>%
-                      distinct(plotcode, total_org, total_inorg) %>% 
-                      mutate(total_C = total_org + total_inorg)
+                      mutate(mean_org_02 = mean(Corg_Soil), mean_inorg_02 = mean(Cinorg_Soil)) %>%
+                      distinct(plotcode, mean_org_02, mean_inorg_02) %>% 
+                      mutate(mean_C_02 = mean_org_02 + mean_inorg_02)
+
+# create a new column with mean C across layers per plot for 2020
+soilCN20_clean <- soilCN20 %>% group_by(plotcode) %>% 
+                      mutate(mean_org_20 = mean(Corg_Soil), mean_inorg_20 = mean(Cinorg_Soil), mean_bulk = mean(BulkDensity_Soil)) %>%
+                      distinct(plotcode, mean_org_20, mean_inorg_20, mean_bulk) %>% 
+                      mutate(mean_C_20 = mean_org_20 + mean_inorg_20)
 
 
+# create a new column with mean C across layers per plot for 2022
+soilCN22_clean <- soilCN22 %>% group_by(plotcode) %>% 
+                      mutate(mean_C_22 = mean(TC), mean_N_22 = mean(TN)) %>%
+                      distinct(plotcode, mean_C_22, mean_N_22)  
+                      
+# convert carbon unit from percentage to g/kg 
+soilCN22_clean$mean_C_mass_22 <- soilCN22_clean$mean_C_22 * 10
+  
 ```
 
 ```{r Species Richness data}
-SR <- filter(SR, year > 2018 & season == "Total" ) #keep only total SR from year 2018 onwards
+SR <- distinct(SR, plotcode, sowndiv)
 
-SRmean <- SR %>%                    #calculate the mean realized SR for the years 2003-2019
+realdiv <- filter(SR, year > 2018 & season == "Total" ) #keep only total SR from year 2018 onwards
+
+realdiv <- SR %>%                    #calculate the mean realized SR for the years 2003-2019
   group_by(plotcode) %>% 
   mutate(meanSR = mean(realizedSR, na.rm = TRUE)) %>% 
   ungroup() %>%
@@ -173,16 +196,20 @@ herbivoryAbove <- herbivoryAbove %>%
 
 ## Synthesize in one Dataset
 ```{r Data Synthesis}
-synthDat <- biomassMeans %>% # merge the biomass and the realized SR data
-  left_join(SRmean, by = join_by(plotcode)) %>%
-  left_join(select(SR, sowndiv, plotcode), by = join_by(plotcode)) %>% 
-  unique() %>% 
+synthDat <- biomassDat %>% # merge the biomass and the realized SR data
+  left_join(SR, by = join_by(plotcode)) %>%
+  left_join(soilCN02_clean, by = join_by(plotcode)) %>% 
+  left_join(soilCN20_clean, by = join_by(plotcode)) %>% 
   left_join(select(design, plotcode, block)) %>% 
   left_join(leaching, by = join_by(plotcode)) # %>%
   left_join(herbivoryAbove, by )
+
+synthDat$mean_org_diff <- synthDat$mean_org_20 - synthDat$mean_org_02
   
+    
 synthDat$block <- as.factor(synthDat$block)
 synthDat$plotcode <- as.factor(synthDat$plotcode)
+
 ```
 
 ## Calculations
@@ -248,7 +275,7 @@ summary(lmLeach)
 ```{r Plotting}
 #check distribution of data
 ggplot2::ggplot(synthDat,
-                aes(x = log2(as.numeric(sowndiv)), y = mean_biomass)
+                aes(x = log2(as.numeric(sowndiv)), y = sum_biomass)
                 ) +
   geom_point(
     color = "#28a87d",
@@ -260,7 +287,36 @@ ggplot2::ggplot(synthDat,
    geom_smooth(
     method = "lm"
   ) +
-  theme_minimal(
+  labs(
+    x = "Sown Plant Diversity",
+    y = "Mean Biomass per Plot (g)")
+
+# check distribution of C difference for sowndiv
+
+ggplot2::ggplot(synthDat,
+                aes(x = sowndiv, y = mean_org_diff)
+                ) +
+  geom_boxplot(
+  ) +
+  labs(
+    x = "Sown Plant Diversity",
+    y = "Difference in SOC (2020 - 2002)")
+
+
+
+#check distribution of data
+ggplot2::ggplot(synthDat,
+                aes(x = log2(as.numeric(sowndiv)), y = mean_bulk)
+                ) +
+  geom_point(
+    color = "#28a87d",
+    alpha = .5,
+    shape = "X",
+    stroke = 1,
+    size = 4
+  ) +
+   geom_smooth(
+    method = "lm"
   ) +
   labs(
     x = "Sown Plant Diversity",
