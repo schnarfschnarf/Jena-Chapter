@@ -76,7 +76,7 @@ herbivoryAbove <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysi
 
 #load data on soil diversity
 
-#load data on nitrogen leaching
+#load data on nitrogen leaching (this should be in kg/ha per year)
 leaching <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/WaterN/Overall_Leaching_Plot.xlsx")
 
 #load data on pollinators
@@ -186,6 +186,10 @@ realdiv <- SR %>%                    #calculate the mean realized SR for the yea
 ```{r leaching}
 leaching <- leaching %>% 
             rename_at('plot', ~'plotcode') # rename plot to plotcode
+
+# calculate the costs in €/ha/a for each plot
+
+leaching$costs <- leaching$TNleaching_av * 11.23
 ```
 
 ```{r Herbivory}
