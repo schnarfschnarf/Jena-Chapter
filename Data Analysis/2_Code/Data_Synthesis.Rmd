@@ -48,9 +48,10 @@ SR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Rea
   # Dataset on deep soil measurement (ID = 433) from 0-100cm is only one Block (D2) and most recent measurement year is 2016.
 
 soilCN20 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/424_7_data.xlsx")
-soilCN22 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/655_12_data.xlsx")
+# soilCN22 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/655_12_data.xlsx")
 soilCN02 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/278_2_data.xlsx") %>% 
   filter(year == 2002) 
+
 
 
 #load data on biomass CN (ID = 557)
@@ -97,10 +98,10 @@ biomassDat$plotcode <- as.factor(biomassDat$plotcode) #change the plotcode to a 
 biomassDat <- biomassDat %>% 
   filter(year == 2022) %>% 
   group_by(plotcode, year) %>% 
-  summarise(sum_biomass = sum(biomass, na.rm = TRUE), .groups = "drop")
+  summarise(sum_biomass = sum(biomass, na.rm = TRUE)/2, .groups = "drop") # divide by 2 to get the mean biomass per plot (2 subsamples per plot)
 
 # introduce new column with SGM
-biomassDat$SGM <- (biomassDat$sum_biomass/1000)*4.46
+biomassDat$SGM <- (biomassDat$sum_biomass*0.1)*(6.15)-96
 
 # exclude the years before 2018
 # sum up biomass for each plot and calculate the mean across subsamples and years
@@ -132,7 +133,7 @@ microbial <- microbial %>% rename_at('plot', ~'plotcode') # rename plot to plotc
 ```
 
 ```{r Soil CN}
-soilCN22 <- soilCN22 %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
+# soilCN22 <- soilCN22 %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
 soilCN02 <- soilCN02 %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
 soilCN20 <- soilCN20 %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
 
@@ -145,11 +146,11 @@ soilCN20 <- soilCN20 %>% rename_at('plot', ~'plotcode') # rename plot to plotcod
   soilCN20$Corg_Soil <- as.numeric(soilCN20$Corg_Soil)
   soilCN20$Cinorg_Soil <- as.numeric(soilCN20$Cinorg_Soil)
  
-  soilCN22$plotcode <- as.factor(soilCN22$plotcode)
+#  soilCN22$plotcode <- as.factor(soilCN22$plotcode)
 
 # create a new column with mean C across layers per plot for 2002
 soilCN02_clean <- soilCN02 %>% group_by(plotcode) %>% 
-                      mutate(mean_org_02 = mean(Corg_Soil), mean_inorg_02 = mean(Cinorg_Soil)) %>%
+                    mutate(mean_org_02 = mean(Corg_Soil), mean_inorg_02 = mean(Cinorg_Soil)) %>%
                       distinct(plotcode, mean_org_02, mean_inorg_02) %>% 
                       mutate(mean_C_02 = mean_org_02 + mean_inorg_02)
 
@@ -189,7 +190,7 @@ leaching <- leaching %>%
 
 # calculate the costs in €/ha/a for each plot
 
-leaching$costs <- leaching$TNleaching_av * 11.23
+leaching$leach_costs <- leaching$TNleaching_av * 11.23
 ```
 
 ```{r Herbivory}
@@ -208,8 +209,12 @@ synthDat <- biomassDat %>% # merge the biomass and the realized SR data
   left_join(leaching, by = join_by(plotcode)) # %>%
   left_join(herbivoryAbove, by )
 
+# create a column with carbon difference between 2002 and 2022
 synthDat$mean_org_diff <- synthDat$mean_org_20 - synthDat$mean_org_02
-  
+
+# create a column with social costs of carbon
+
+synthDat$SOC_costs <- synthDat$mean_org_diff * 1000 * synthDat$mean_bulk * 0.3 / 100 * 3.66 * 195 / 20 # in €/ha/a and converted to CO2 and a carbon CO2 price of 195€/t
     
 synthDat$block <- as.factor(synthDat$block)
 synthDat$plotcode <- as.factor(synthDat$plotcode)
@@ -277,7 +282,7 @@ summary(lmLeach)
 ## Plotting
 ### Plot biomass against realized species richness
 ```{r Plotting}
-#check distribution of data
+#check distribution of biomass data
 ggplot2::ggplot(synthDat,
                 aes(x = log2(as.numeric(sowndiv)), y = sum_biomass)
                 ) +
@@ -295,6 +300,25 @@ ggplot2::ggplot(synthDat,
     x = "Sown Plant Diversity",
     y = "Mean Biomass per Plot (g)")
 
+
+#check distribution of SGM data
+ggplot2::ggplot(synthDat,
+                aes(x = log2(as.numeric(sowndiv)), y = SGM)
+                ) +
+  geom_point(
+    color = "#28a87d",
+    alpha = .5,
+    shape = "X",
+    stroke = 1,
+    size = 4
+  ) +
+   geom_smooth(
+    method = "lm"
+  ) +
+  labs(
+    x = "log2(Sown Plant Diversity)",
+    y = "standard gross margin (€/ha)")
+
 # check distribution of C difference for sowndiv
 
 ggplot2::ggplot(synthDat,
@@ -307,6 +331,34 @@ ggplot2::ggplot(synthDat,
     y = "Difference in SOC (2020 - 2002)")
 
 
+#check distribution of climate regulation cost data
+ggplot2::ggplot(synthDat,
+                aes(x = log2(as.numeric(sowndiv)), y = SOC_costs)
+                ) +
+  geom_point(
+    color = "#28a87d",
+    alpha = .5,
+    shape = "X",
+    stroke = 1,
+    size = 4
+  ) +
+   geom_smooth(
+    method = "lm"
+  ) +
+  labs(
+    x = "log2(Sown Plant Diversity)",
+    y = "standard gross margin (€/ha)")
+
+# check distribution of C difference for sowndiv
+
+ggplot2::ggplot(synthDat,
+                aes(x = sowndiv, y = mean_org_diff)
+                ) +
+  geom_boxplot(
+  ) +
+  labs(
+    x = "Sown Plant Diversity",
+    y = "Difference in SOC (2020 - 2002)")
 
 #check distribution of data
 ggplot2::ggplot(synthDat,
@@ -325,6 +377,9 @@ ggplot2::ggplot(synthDat,
   labs(
     x = "Sown Plant Diversity",
     y = "Mean Biomass per Plot (g)")
+
+
+hist(synthDat,  )
 
 ```
 
