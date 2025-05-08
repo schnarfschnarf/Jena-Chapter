@@ -209,15 +209,19 @@ synthDat <- biomassDat %>% # merge the biomass and the realized SR data
   left_join(leaching, by = join_by(plotcode)) # %>%
   left_join(herbivoryAbove, by )
 
+synthDat$block <- as.factor(synthDat$block) # change block to a factor
+synthDat$plotcode <- as.factor(synthDat$plotcode)  # change plotcode to a factor
+  
 # create a column with carbon difference between 2002 and 2022
 synthDat$mean_org_diff <- synthDat$mean_org_20 - synthDat$mean_org_02
 
 # create a column with social costs of carbon
+synthDat$SOC_costs <- synthDat$mean_org_diff * 1000 * synthDat$mean_bulk * 0.3 / 10 * 3.66 * 195 / 20 # in €/ha/a and converted to CO2 and a carbon CO2 price of 195€/t
 
-synthDat$SOC_costs <- synthDat$mean_org_diff * 1000 * synthDat$mean_bulk * 0.3 / 100 * 3.66 * 195 / 20 # in €/ha/a and converted to CO2 and a carbon CO2 price of 195€/t
-    
-synthDat$block <- as.factor(synthDat$block)
-synthDat$plotcode <- as.factor(synthDat$plotcode)
+# add up all the costs for total value
+synthDat$costs_total <- synthDat$SOC_costs + synthDat$leach_costs + synthDat$SGM
+
+
 
 ```
 
@@ -257,6 +261,13 @@ lmBioReal <- lm(
 
 plot(lmBioReal) # check model assumptions
 summary(lmBioReal)
+
+# check if species richness increases total value, include block as random effect
+
+lmCostsSR <- lmer(
+  costs_total ~ log2(sowndiv) + (1|block),
+  synthDat)
+
 ```
 
 
