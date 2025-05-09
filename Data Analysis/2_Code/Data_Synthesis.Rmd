@@ -110,6 +110,8 @@ biomassMeans <- biomassDat %>%
   group_by(plotcode) %>%
   summarise(mean_biomass = mean(sum_biomass, na.rm = TRUE), .groups = "drop")
 
+biomassMeans$SGM <- (biomassMeans$mean_biomass*0.1)*(6.83)-180
+
 ```
 
 ```{r Yield stability}
@@ -204,7 +206,7 @@ herbivoryAbove <- herbivoryAbove %>%
 
 ## Synthesize in one Dataset
 ```{r Data Synthesis}
-synthDat <- biomassDat %>% # merge the biomass and the realized SR data
+synthDat <- biomassMeans %>% # merge the biomass and the realized SR data
   left_join(SR, by = join_by(plotcode)) %>%
   left_join(soilCN02_clean, by = join_by(plotcode)) %>% 
   left_join(soilCN20_clean, by = join_by(plotcode)) %>% 
@@ -251,19 +253,19 @@ synthDat$costs_total <- synthDat$SOC_costs + synthDat$leach_costs + synthDat$SGM
 
 # with sown species number
 lmBioSown <- lm(
-  mean_biomass ~ log2(sowndiv),
+  mean_biomass ~ log2(as.numeric(sowndiv)),
   synthDat)
 
 plot(lmBioSown)
 summary(lmBioSown)
 
 # with realized species diversity
-lmBioReal <- lm(
-  mean_biomass ~ log2(meanSR),
+lmSGM <- lm(
+  SGM ~ log2(as.numeric(sowndiv)),
   synthDat) 
 
-plot(lmBioReal) # check model assumptions
-summary(lmBioReal)
+plot(lmSGM) # check model assumptions
+summary(lmSGM)
 
 
 # check if species richness increases biomass
@@ -283,10 +285,9 @@ lmSOCdiff <- lmer(
 
 summary(lmSOCdiff)
 
-# check if species richness increases total value, include block as random effect
-
-lmCostsSR <- lmer(
-  costs_total ~ log2(sowndiv) + (1|block),
+# check if species richness increases total value
+lmCostsSR <- lm(
+  costs_total ~ log2(as.numeric(sowndiv)),
   synthDat)
 
 plot(lmCostsSR)
@@ -319,7 +320,7 @@ summary(lmLeach)
 ```{r Plotting}
 #check distribution of biomass data
 p1 <- ggplot2::ggplot(synthDat,
-                aes(x = log2(as.numeric(sowndiv)), y = sum_biomass)
+                aes(x = log2(as.numeric(sowndiv)), y = mean_biomass)
                 ) +
   geom_point(
     color = "#28a87d",
@@ -440,7 +441,7 @@ p5 <- ggplot2::ggplot(synthDat,
 
 p5
 
-ggsave("TotalCosts.png",
+ggsave("TotalCosts2.png",
        plot = p5,
        device = "png",
        bg = "white",
