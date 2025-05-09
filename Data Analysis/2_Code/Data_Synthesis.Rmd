@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Preparation
 ## Loading packages
-```{r Packages}
+```{r Packages, include=FALSE}
 library(dplyr)
 library(readr)
 library(readxl)
@@ -22,7 +22,7 @@ library(ggplot2)
 ```
 
 ## Set up a theme
-```{r}
+```{r include=FALSE}
 theme_set(theme_minimal(base_size = 14)+
             theme(plot.title = element_text(size=17,hjust=0.5),
                   axis.text = element_text(size = 7),
@@ -31,7 +31,7 @@ theme_set(theme_minimal(base_size = 14)+
 ```
 
 ## Load datasets and filter for relevant observations/measurements
-```{r Read Data}
+```{r Read Data, include=FALSE}
 # load data on plot design (needed for 'block code')
 design <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Plot_Design/90_20_data.xlsx")
 
@@ -51,8 +51,6 @@ soilCN20 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Da
 # soilCN22 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/655_12_data.xlsx")
 soilCN02 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/278_2_data.xlsx") %>% 
   filter(year == 2002) 
-
-
 
 #load data on biomass CN (ID = 557)
 biomassCN <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Biomass_Above/557_3_data.xlsx")
@@ -133,19 +131,24 @@ microbial <- microbial %>% rename_at('plot', ~'plotcode') # rename plot to plotc
 ```
 
 ```{r Soil CN}
-# soilCN22 <- soilCN22 %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
-soilCN02 <- soilCN02 %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
-soilCN20 <- soilCN20 %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
-
-  #change data types 
-  soilCN02$plotcode <- as.factor(soilCN02$plotcode)
-  soilCN02$Corg_Soil <- as.numeric(soilCN02$Corg_Soil)
-  soilCN02$Cinorg_Soil <- as.numeric(soilCN02$Cinorg_Soil)
+# rename plot to plotcode and change data types 
+soilCN02 <- soilCN02 %>%
+  rename_at('plot', ~'plotcode') %>% 
+  mutate(
+    plotcode = as.factor(plotcode),
+    Corg_Soil = as.numeric(Corg_Soil),
+    Cinorg_Soil = as.numeric(Cinorg_Soil)
+  )
   
-  soilCN20$plotcode <- as.factor(soilCN20$plotcode)
-  soilCN20$Corg_Soil <- as.numeric(soilCN20$Corg_Soil)
-  soilCN20$Cinorg_Soil <- as.numeric(soilCN20$Cinorg_Soil)
+soilCN20 <- soilCN20 %>%
+  rename_at('plot', ~'plotcode') %>%
+  mutate(
+    plotcode = as.factor(plotcode),
+    Corg_Soil = as.numeric(Corg_Soil),
+    Cinorg_Soil = as.numeric(Cinorg_Soil)
+  )
  
+# soilCN22 <- soilCN22 %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
 #  soilCN22$plotcode <- as.factor(soilCN22$plotcode)
 
 # create a new column with mean C across layers per plot for 2002
@@ -162,12 +165,12 @@ soilCN20_clean <- soilCN20 %>% group_by(plotcode) %>%
 
 
 # create a new column with mean C across layers per plot for 2022
-soilCN22_clean <- soilCN22 %>% group_by(plotcode) %>% 
-                      mutate(mean_C_22 = mean(TC), mean_N_22 = mean(TN)) %>%
-                      distinct(plotcode, mean_C_22, mean_N_22)  
+# soilCN22_clean <- soilCN22 %>% group_by(plotcode) %>% 
+#                      mutate(mean_C_22 = mean(TC), mean_N_22 = mean(TN)) %>%
+#                      distinct(plotcode, mean_C_22, mean_N_22)  
                       
 # convert carbon unit from percentage to g/kg 
-soilCN22_clean$mean_C_mass_22 <- soilCN22_clean$mean_C_22 * 10
+# soilCN22_clean$mean_C_mass_22 <- soilCN22_clean$mean_C_22 * 10
   
 ```
 
@@ -190,7 +193,7 @@ leaching <- leaching %>%
 
 # calculate the costs in €/ha/a for each plot
 
-leaching$leach_costs <- leaching$TNleaching_av * 11.23
+leaching$leach_costs <- leaching$TNleaching_av * 11.23 *(-1)
 ```
 
 ```{r Herbivory}
@@ -216,7 +219,7 @@ synthDat$plotcode <- as.factor(synthDat$plotcode)  # change plotcode to a factor
 synthDat$mean_org_diff <- synthDat$mean_org_20 - synthDat$mean_org_02
 
 # create a column with social costs of carbon
-synthDat$SOC_costs <- synthDat$mean_org_diff * 1000 * synthDat$mean_bulk * 0.3 / 10 * 3.66 * 195 / 20 # in €/ha/a and converted to CO2 and a carbon CO2 price of 195€/t
+synthDat$SOC_costs <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 195 / 20 # in €/ha/a and converted to CO2 and a carbon CO2 price of 195€/t
 
 # add up all the costs for total value
 synthDat$costs_total <- synthDat$SOC_costs + synthDat$leach_costs + synthDat$SGM
@@ -262,11 +265,32 @@ lmBioReal <- lm(
 plot(lmBioReal) # check model assumptions
 summary(lmBioReal)
 
+
+# check if species richness increases biomass
+
+# check if species richness increases SOC
+lmSOC <- lmer(
+  mean_C_20 ~ log2(sowndiv) + (1|block),
+  synthDat)
+
+summary(lmSOC)
+
+# check if block has effect on SOC differences between 2002 and 2020
+
+lmSOCdiff <- lmer(
+  mean_org_diff ~ log2(sowndiv) + (1|block),
+  synthDat)
+
+summary(lmSOCdiff)
+
 # check if species richness increases total value, include block as random effect
 
 lmCostsSR <- lmer(
   costs_total ~ log2(sowndiv) + (1|block),
   synthDat)
+
+plot(lmCostsSR)
+summary(lmCostsSR)
 
 ```
 
@@ -294,7 +318,7 @@ summary(lmLeach)
 ### Plot biomass against realized species richness
 ```{r Plotting}
 #check distribution of biomass data
-ggplot2::ggplot(synthDat,
+p1 <- ggplot2::ggplot(synthDat,
                 aes(x = log2(as.numeric(sowndiv)), y = sum_biomass)
                 ) +
   geom_point(
@@ -308,12 +332,19 @@ ggplot2::ggplot(synthDat,
     method = "lm"
   ) +
   labs(
-    x = "Sown Plant Diversity",
-    y = "Mean Biomass per Plot (g)")
+    x = "log2(Sown Plant Diversity)",
+    y = "Summed Biomass per Plot in 2022 (g)")
 
+p1
+
+ggsave("Biomass.png",
+       plot = last_plot(),
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
 
 #check distribution of SGM data
-ggplot2::ggplot(synthDat,
+p2 <- ggplot2::ggplot(synthDat,
                 aes(x = log2(as.numeric(sowndiv)), y = SGM)
                 ) +
   geom_point(
@@ -330,20 +361,14 @@ ggplot2::ggplot(synthDat,
     x = "log2(Sown Plant Diversity)",
     y = "standard gross margin (€/ha)")
 
-# check distribution of C difference for sowndiv
-
-ggplot2::ggplot(synthDat,
-                aes(x = sowndiv, y = mean_org_diff)
-                ) +
-  geom_boxplot(
-  ) +
-  labs(
-    x = "Sown Plant Diversity",
-    y = "Difference in SOC (2020 - 2002)")
-
+ggsave("SGM.png",
+       plot = last_plot(),
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
 
 #check distribution of climate regulation cost data
-ggplot2::ggplot(synthDat,
+p3 <- ggplot2::ggplot(synthDat,
                 aes(x = log2(as.numeric(sowndiv)), y = SOC_costs)
                 ) +
   geom_point(
@@ -358,22 +383,13 @@ ggplot2::ggplot(synthDat,
   ) +
   labs(
     x = "log2(Sown Plant Diversity)",
-    y = "standard gross margin (€/ha)")
+    y = "climate regulation costs/gains (€/ha)")
 
-# check distribution of C difference for sowndiv
+ggsave("SOC.png", plot = last_plot(), device = "png", path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/", width = 10, height = 15, units = "cm", dpi = 300)
 
-ggplot2::ggplot(synthDat,
-                aes(x = sowndiv, y = mean_org_diff)
-                ) +
-  geom_boxplot(
-  ) +
-  labs(
-    x = "Sown Plant Diversity",
-    y = "Difference in SOC (2020 - 2002)")
-
-#check distribution of data
-ggplot2::ggplot(synthDat,
-                aes(x = log2(as.numeric(sowndiv)), y = mean_bulk)
+# check distribution of leaching costs data
+p4 <- ggplot2::ggplot(synthDat,
+                aes(x = log2(as.numeric(sowndiv)), y = leach_costs)
                 ) +
   geom_point(
     color = "#28a87d",
@@ -386,11 +402,95 @@ ggplot2::ggplot(synthDat,
     method = "lm"
   ) +
   labs(
-    x = "Sown Plant Diversity",
-    y = "Mean Biomass per Plot (g)")
+    x = "log2(Sown Plant Diversity)",
+    y = "leaching costs (€/ha/a)")
+
+ggsave("Leaching.png", plot = last_plot(), device = "png", path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/", width = 10, height = 15, units = "cm", dpi = 300)
+
+# combine the above 4 plots in one grid
+library(patchwork)
+p1 + p2 + p3 + p4 +
+  plot_layout(ncol = 2) +
+  plot_annotation(title = "") &
+  theme(plot.title = element_text(size=20,hjust=0.5))
+
+ggsave("Single_Services.png",
+       plot = last_plot(),
+       bg = "white",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+#check distribution of total costs across sowndiv
+p5 <- ggplot2::ggplot(synthDat,
+                aes(x = log2(as.numeric(sowndiv)), y = costs_total)
+                ) +
+  geom_point(
+    color = "#28a87d",
+    alpha = .5,
+    shape = "X",
+    stroke = 1,
+    size = 4
+  ) +
+   geom_smooth(
+    method = "lm"
+  ) +
+  labs(
+    x = "log2(Sown Plant Diversity)",
+    y = "total benefit/costs (€/ha/a)")
+
+p5
+
+ggsave("TotalCosts.png",
+       plot = p5,
+       device = "png",
+       bg = "white",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+# create boxplots for each factorial sowndiv and SGM
+#p1 <- ggplot2::ggplot(synthDat,
+#                aes(x = as.factor(sowndiv), y = SGM)
+#                ) +
+#  geom_boxplot(
+#  ) +
+#  labs(
+#    x = "Sown Plant Diversity",
+#    y = "SGM (€/ha)")
 
 
-hist(synthDat,  )
+# create boxplots for each factorial sowndiv and leaching costs
+#p2 <- ggplot2::ggplot(synthDat,
+#                aes(x = as.factor(sowndiv), y = leach_costs)
+#                ) +
+#  geom_boxplot(
+#  ) +
+#  labs(
+#    x = "Sown Plant Diversity",
+#    y = "Social costs of nitrogen leaching (€/ha/a)")
+
+
+
+# create boxplots for each factorial sowndiv and SOC costs
+#p3 <- ggplot2::ggplot(synthDat,
+#                aes(x = as.factor(sowndiv), y = SOC_costs)
+#                ) +
+#  geom_boxplot(
+#  ) +
+#  labs(
+#    x = "Sown Plant Diversity",
+#    y = "Social costs/benefits of climate regulation (€/ha/a)")
+
+
+
+# combine the three plots above in a grid
+#library(patchwork)
+#p1 + p2 + p3 +
+#  plot_layout(ncol = 3) +
+#  plot_annotation(title = "Costs and Benefits of Sown Plant Diversity") &
+#  theme(plot.title = element_text(size=20,hjust=0.5))
+
+#ggsave("Costs_Benefits.png", plot = last_plot(), device = "png", path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/", width = 10, height = 15, units = "cm", dpi = 300)
+
 
 ```
 
