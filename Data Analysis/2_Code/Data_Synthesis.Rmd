@@ -216,7 +216,7 @@ synthDat <- biomassMeans %>% # merge the biomass and the realized SR data
 synthDat$block <- as.factor(synthDat$block) # change block to a factor
 synthDat$plotcode <- as.factor(synthDat$plotcode)  # change plotcode to a factor
   
-# create a column with carbon difference between 2002 and 2022
+# create a column with carbon difference between 2002 and 2020
 synthDat$mean_org_diff <- synthDat$mean_org_20 - synthDat$mean_org_02
 
 # create a column with social costs of carbon

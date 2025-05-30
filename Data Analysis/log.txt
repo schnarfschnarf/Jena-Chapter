@@ -1,0 +1,12 @@
+------------------------------------------------
+------------  Jena Project Log    --------------
+------------------------------------------------
+
+30.05.25: 
+- I wrote something for my manuscript (mostly Introduction)
+- I thought about the next steps for my analysis
+- I worked on the R scripts
+- Little bit of reading and literature search
+- I created this log file here and now want to write down what I did every day
+- I installed a program that tracks my working time
+
