@@ -6,7 +6,7 @@
 0) For both, ecological and economic analysis, focus on biomass, nitrogen and carbon: You can still add more functions and services after the first steps are taken
 
 1) Create a synthesis datasets and save it. Then you don't waste time each time on loading and merging the datasets
-	- this you can then subset for the different analyses 
+	- this you can then subset for the different analyses --> HALF DONE (NEED TO DO ONE WITH YEARLY CARBON CHANGES AND SGM VALUES)
 
 2) Reconsider how to calculate the SOC stocks (Calculate increase/decrease for each consecutive year and then take the mean and not the difference between first and last year)
 	- Think about the metrics you want to include in the ecological MF analysis (e.g. SOC concentration vs. stocks, same for nitrogen)

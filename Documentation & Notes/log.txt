@@ -10,3 +10,11 @@
 - I created this log file here and now want to write down what I did every day
 - I installed a program that tracks my working time
 
+02.06.25:
+- I started working super late (1PM)
+- I spend some time on the garden stuff from Ingmar (interview coordination)
+- I spend some time on LinkedIn
+- I spend some time on outlook
+- I worked a little bit on the synthesis code and saved the first synthesis dataset
+- I wrote a few sentences for the manuscript
+

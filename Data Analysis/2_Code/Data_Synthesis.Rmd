@@ -103,7 +103,7 @@ biomassDat$SGM <- (biomassDat$sum_biomass*0.1)*(6.15)-96
 # exclude the years before 2018
 # sum up biomass for each plot and calculate the mean across subsamples and years
 biomassMeans <- biomassDat %>% 
-  filter(year > 2018) %>% 
+  filter(year > 2004) %>% 
   group_by(plotcode, year, season) %>% 
   summarise(sum_biomass = sum(biomass, na.rm = TRUE), .groups = "drop") %>%
   group_by(plotcode) %>%
@@ -210,7 +210,9 @@ synthDat <- biomassMeans %>% # merge the biomass and the realized SR data
   left_join(soilCN02_clean, by = join_by(plotcode)) %>% 
   left_join(soilCN20_clean, by = join_by(plotcode)) %>% 
   left_join(select(design, plotcode, block)) %>% 
-  left_join(leaching, by = join_by(plotcode)) # %>%
+  left_join(leaching, by = join_by(plotcode))  %>%
+  left_join(realdiv, by = join_by(plotcode))
+
   left_join(herbivoryAbove, by )
 
 synthDat$block <- as.factor(synthDat$block) # change block to a factor
@@ -225,6 +227,7 @@ synthDat$SOC_costs <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 
 # add up all the costs for total value
 synthDat$costs_total <- synthDat$SOC_costs + synthDat$leach_costs + synthDat$SGM
 
-
+# save the synthesized dataset
+write.csv(synthDat, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/synthesized_means_data.csv", row.names = FALSE)
 
 ```

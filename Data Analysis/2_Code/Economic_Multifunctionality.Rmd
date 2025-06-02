@@ -277,7 +277,7 @@ ggsave("Biomass.png",
 
 #check distribution of SGM data
 p2 <- ggplot2::ggplot(synthDat,
-                aes(x = log2(as.numeric(sowndiv)), y = SGM)
+                aes(x = as.numeric(meanSR), y = SGM)
                 ) +
   geom_point(
     color = "#28a87d",
@@ -292,6 +292,8 @@ p2 <- ggplot2::ggplot(synthDat,
   labs(
     x = "log2(Sown Plant Diversity)",
     y = "standard gross margin (€/ha)")
+
+p2
 
 ggsave("SGM.png",
        plot = last_plot(),
