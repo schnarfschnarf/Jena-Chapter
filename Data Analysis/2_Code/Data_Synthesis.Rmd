@@ -26,8 +26,14 @@ design <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data
 
 #load data on aboveground biomass production (ID = 624) 
 biomassDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/624_9_data.xlsx")
+  biomassD$plotcode <- as.factor(biomassDat$plotcode) # change plotcode to a factor
+  biomassDat$year <- as.factor(biomassDat$year) # change year to a factor
 
 #load data on root biomass production (ID = 714) 
+
+# load data on SGMs 
+SGMS <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/SGMs.xlsx")
+  SGMS$year <- as.factor(SGMS$year) # change year to a factor
 
 #load data on realized species richness (ID = 487)
 SR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Realized_Species_Richness/487_3_data.xlsx")
@@ -88,28 +94,27 @@ flowers <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Dat
 ## Data wrangling
 Before the individual datasets can be merged, they have to be harmonized. Additionally for some datasets, aggregated values have to be calculated. 
 ```{r Biomass data}
-biomassDat$plotcode <- as.factor(biomassDat$plotcode) #change the plotcode to a factor
-# samplingSeasons <- unique(biomassDat[c("season","year")]) # used to check whether every year had the same number of sampling seasons
-
-# calculate total biomass per plot for 2022
-biomassDat <- biomassDat %>% 
-  filter(year == 2022) %>% 
-  group_by(plotcode, year) %>% 
-  summarise(sum_biomass = sum(biomass, na.rm = TRUE)/2, .groups = "drop") # divide by 2 to get the mean biomass per plot (2 subsamples per plot)
-
-# introduce new column with SGM
-biomassDat$SGM <- (biomassDat$sum_biomass*0.1)*(6.15)-96
-
-# exclude the years before 2018
-# sum up biomass for each plot and calculate the mean across subsamples and years
-biomassMeans <- biomassDat %>% 
-  filter(year > 2004) %>% 
-  group_by(plotcode, year, season) %>% 
-  summarise(sum_biomass = sum(biomass, na.rm = TRUE), .groups = "drop") %>%
-  group_by(plotcode) %>%
+# calculate biomass for each year per plot and average across subsamples
+biomassAnnual <- biomassDat %>% 
+  filter(year > 2003) %>% 
+  group_by(plotcode, year, subsample) %>%
+  summarise(sum_biomass = sum(biomass, na.rm = TRUE), .groups = "drop") %>% 
+  group_by(plotcode, year) %>%
   summarise(mean_biomass = mean(sum_biomass, na.rm = TRUE), .groups = "drop")
 
-biomassMeans$SGM <- (biomassMeans$mean_biomass*0.1)*(6.83)-180
+# merge annual biomass data with the SGMs dataset
+biomassAnnual <- biomassAnnual %>% 
+  left_join(SGMS, by = join_by(year)) %>% 
+  select(plotcode, year, mean_biomass, price, costs)  # select only relevant columns
+  
+# calculate individual SGM for each year
+biomassAnnual$SGM_annual <- biomassAnnual$mean_biomass * 0.1 * biomassAnnual$price - biomassAnnual$costs 
+
+# sum up biomass for each plot and calculate the mean biomass and SGM across years
+
+biomassMeans <- biomassAnnual %>% 
+  group_by(plotcode) %>% 
+  summarise(mean_biomass = mean(mean_biomass, na.rm = TRUE), SGM_mean = mean(SGM_annual, na.rm = TRUE), .groups = "drop")
 
 ```
 
