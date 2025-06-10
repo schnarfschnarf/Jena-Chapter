@@ -24,3 +24,22 @@
 - I improved the data analysis and calculated the annual SGM and biomass for each year as well as the mean biomass and SGM across years
 - I attended the jour fixe at ECO-N
 
+04.06.25:
+- I worked on the code for the data analysis (updated the synthesis dataset)
+- I attended the seminar series
+- I prepared for the MDR interview about GartenDiv
+
+05.06.25:
+- I "worked" on the train to Paris.
+- reading emails
+- working a little bit on my R code
+- 
+
+10.06.25:
+- got up at 09:00 and started working super late (10:30)
+- first reading emails
+- then doing stupid procrastination (time tracking, todo lists, this list)
+- worked on my code an the economic functionality models (changed all to Bayesian)
+- attended at JourFixe on synthesis (1.5h)
+- completed my LinkedIn profile (45 min)
+- finish work at 16:45

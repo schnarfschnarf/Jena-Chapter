@@ -19,6 +19,9 @@ Wolfgnag Wilcke wrote:
  
 Da es Datenlücken sowohl bei den Wassergehalten im Boden als auch bei den Stoffkonzentrationen gibt, braucht es für die jährlichen Flüsse eine Extrapolations-Prozedur. Beispielsweise könnte man die jährlichen NF1 über den vollständig vorliegenden Freilandniederschlag extrapolieren, also Verhältnis Jahres-FNS/Summe der vorhandenen monatlichen NF-Werte x Summe der vorhandenen Stoffflüsse. Wenn man das z.B. mit R automatisieren kann, könnte man auch hier schnell zu Jahreswerten für die Stoffausträge aus 30 cm Bodentiefe kommen. Man könnte aber auch mithilfe einer Regression der vorhandenen monatlichen NF-Werte auf den FNS jeweils die fehlenden Monatswerte des NF berechnen, daraus dann einen Jahreswert, den man mit den mittleren Konzentrationen aus diesem Jahr multipliziert. Der zweite Weg hätte den Vorteil, dass in ihn auch Konzentrationen einfließen würden, für die es keine modellierten Wasserflüsse gibt (weil die Wassergehalte fehlen)."
 
+Markus Lange wrote:
+"das gap-filling hab ich entsprechend Wolfgangs Vorschlag mit dem unten angefügten Skript durchgeführt. Du kannst das Skript gerne nutzen, müsstest es aber sicher für Dich noch leicht anpassen, da ich mein eigenes Plot-file vom Jena Exp hier genut habe."
+
 
 ### Packages
 

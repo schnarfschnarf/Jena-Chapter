@@ -26,8 +26,7 @@ design <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data
 
 #load data on aboveground biomass production (ID = 624) 
 biomassDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/624_9_data.xlsx")
-  biomassD$plotcode <- as.factor(biomassDat$plotcode) # change plotcode to a factor
-  biomassDat$year <- as.factor(biomassDat$year) # change year to a factor
+  biomassDat$plotcode <- as.factor(biomassDat$plotcode) # change plotcode to a factor
 
 #load data on root biomass production (ID = 714) 
 
@@ -45,9 +44,11 @@ SR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Rea
 
 #soilCN22 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/655_12_data.xlsx")  
   
-soilCN20 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/424_7_data.xlsx")
-soilCN02 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/278_2_data.xlsx") %>% 
+carbon20 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/424_7_data.xlsx")
+carbon02 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/278_2_data.xlsx") %>% 
   filter(year == 2002) 
+
+
 
 #load data on biomass CN (ID = 557)
 biomassCN <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Biomass_Above/557_3_data.xlsx")
@@ -102,6 +103,8 @@ biomassAnnual <- biomassDat %>%
   group_by(plotcode, year) %>%
   summarise(mean_biomass = mean(sum_biomass, na.rm = TRUE), .groups = "drop")
 
+biomassAnnual$year <- as.factor(biomassAnnual$year) # change year to a factor
+
 # merge annual biomass data with the SGMs dataset
 biomassAnnual <- biomassAnnual %>% 
   left_join(SGMS, by = join_by(year)) %>% 
@@ -136,60 +139,63 @@ biomassCN <- biomassCN %>% group_by(plotcode) %>%                      # calcula
 microbial <- microbial %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
 ```
 
-```{r Soil CN}
+```{r soil carbon}
 # rename plot to plotcode and change data types 
-soilCN02 <- soilCN02 %>%
+carbon02 <- carbon02 %>%
   rename_at('plot', ~'plotcode') %>% 
   mutate(
     plotcode = as.factor(plotcode),
-    Corg_Soil = as.numeric(Corg_Soil),
-    Cinorg_Soil = as.numeric(Cinorg_Soil)
+    c_org = as.numeric(Corg_Soil),
+    c_inorg = as.numeric(Cinorg_Soil)
   )
   
-soilCN20 <- soilCN20 %>%
+carbon20 <- carbon20 %>%
   rename_at('plot', ~'plotcode') %>%
   mutate(
     plotcode = as.factor(plotcode),
-    Corg_Soil = as.numeric(Corg_Soil),
-    Cinorg_Soil = as.numeric(Cinorg_Soil)
+    c_org = as.numeric(Corg_Soil),
+    c_inorg = as.numeric(Cinorg_Soil)
   )
  
-# soilCN22 <- soilCN22 %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
-#  soilCN22$plotcode <- as.factor(soilCN22$plotcode)
+# carbon22 <- carbon22 %>% rename_at('plot', ~'plotcode') # rename plot to plotcode
+#  carbon22$plotcode <- as.factor(carbon22$plotcode)
 
 # create a new column with mean C across layers per plot for 2002
-soilCN02_clean <- soilCN02 %>% group_by(plotcode) %>% 
-                    mutate(mean_org_02 = mean(Corg_Soil), mean_inorg_02 = mean(Cinorg_Soil)) %>%
+carbon02_clean <- carbon02 %>% group_by(plotcode) %>% 
+                    mutate(mean_org_02 = mean(c_org), mean_inorg_02 = mean(c_inorg)) %>%
                       distinct(plotcode, mean_org_02, mean_inorg_02) %>% 
                       mutate(mean_C_02 = mean_org_02 + mean_inorg_02)
 
 # create a new column with mean C across layers per plot for 2020
-soilCN20_clean <- soilCN20 %>% group_by(plotcode) %>% 
-                      mutate(mean_org_20 = mean(Corg_Soil), mean_inorg_20 = mean(Cinorg_Soil), mean_bulk = mean(BulkDensity_Soil)) %>%
+carbon20_clean <- carbon20 %>% group_by(plotcode) %>% 
+                      mutate(mean_org_20 = mean(c_org), mean_inorg_20 = mean(c_inorg), mean_bulk = mean(BulkDensity_Soil)) %>%
                       distinct(plotcode, mean_org_20, mean_inorg_20, mean_bulk) %>% 
                       mutate(mean_C_20 = mean_org_20 + mean_inorg_20)
 
 
 # create a new column with mean C across layers per plot for 2022
-# soilCN22_clean <- soilCN22 %>% group_by(plotcode) %>% 
+# carbon22_clean <- carbon22 %>% group_by(plotcode) %>% 
 #                      mutate(mean_C_22 = mean(TC), mean_N_22 = mean(TN)) %>%
 #                      distinct(plotcode, mean_C_22, mean_N_22)  
                       
 # convert carbon unit from percentage to g/kg 
-# soilCN22_clean$mean_C_mass_22 <- soilCN22_clean$mean_C_22 * 10
+# carbon22_clean$mean_C_mass_22 <- carbon22_clean$mean_C_22 * 10
   
 ```
 
 ```{r Species Richness data}
-SR <- distinct(SR, plotcode, sowndiv)
-
-realdiv <- filter(SR, year > 2018 & season == "Total" ) #keep only total SR from year 2018 onwards
 
 realdiv <- SR %>%                    #calculate the mean realized SR for the years 2003-2019
   group_by(plotcode) %>% 
   mutate(meanSR = mean(realizedSR, na.rm = TRUE)) %>% 
   ungroup() %>%
   distinct(plotcode, meanSR)
+
+SR <- distinct(SR, plotcode, sowndiv)
+
+realdiv <- filter(SR, year > 2018 & season == "Total" ) #keep only total SR from year 2018 onwards
+
+
 ```
 
 
@@ -199,8 +205,11 @@ leaching <- leaching %>%
 
 # calculate the costs in €/ha/a for each plot
 
-leaching$leach_costs <- leaching$TNleaching_av * 11.23 *(-1)
+leaching$leach_costs_lo <- leaching$TNleaching_av * 6.3 *(-1)
+leaching$leach_costs_mid <- leaching$TNleaching_av * 11.23 *(-1)
+leaching$leach_costs_hi <- leaching$TNleaching_av * 20 *(-1)
 ```
+
 
 ```{r Herbivory}
 herbivoryAbove <- herbivoryAbove %>% 
@@ -212,8 +221,8 @@ herbivoryAbove <- herbivoryAbove %>%
 ```{r Data Synthesis}
 synthDat <- biomassMeans %>% # merge the biomass and the realized SR data
   left_join(SR, by = join_by(plotcode)) %>%
-  left_join(soilCN02_clean, by = join_by(plotcode)) %>% 
-  left_join(soilCN20_clean, by = join_by(plotcode)) %>% 
+  left_join(carbon02_clean, by = join_by(plotcode)) %>% 
+  left_join(carbon20_clean, by = join_by(plotcode)) %>% 
   left_join(select(design, plotcode, block)) %>% 
   left_join(leaching, by = join_by(plotcode))  %>%
   left_join(realdiv, by = join_by(plotcode))
@@ -227,12 +236,15 @@ synthDat$plotcode <- as.factor(synthDat$plotcode)  # change plotcode to a factor
 synthDat$mean_org_diff <- synthDat$mean_org_20 - synthDat$mean_org_02
 
 # create a column with social costs of carbon
-synthDat$SOC_costs <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 195 / 20 # in €/ha/a and converted to CO2 and a carbon CO2 price of 195€/t
+synthDat$SOC_costs_mid <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 195 / 20 # in €/ha/a and converted to CO2 and a carbon CO2 price of 195€/t
+synthDat$SOC_costs_lo <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 70 / 20 # low price scenario - ETS price
+synthDat$SOC_costs_hi <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 268.64 / 20
 
 # add up all the costs for total value
-synthDat$costs_total <- synthDat$SOC_costs + synthDat$leach_costs + synthDat$SGM
+synthDat$costs_total_mid <- synthDat$SOC_costs_mid + synthDat$leach_costs_mid + synthDat$SGM_mean
 
 # save the synthesized dataset
-write.csv(synthDat, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/synthesized_means_data.csv", row.names = FALSE)
+writexl::write_xlsx(synthDat, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/synthesized_means_data.xlsx")
 
 ```
+

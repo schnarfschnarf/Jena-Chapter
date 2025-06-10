@@ -45,7 +45,7 @@ setwd("C:/Users/idivsh33caqo/Documents/00_PhDPES/InsuranceGrass/PES/Empirischer 
 #########################################
 ###DATA IMPORT ##########################
 #########################################
-finaldata <- read_xlsx("Data5.xlsx") #read data
+finaldata <- Data5 #read data
 finaldata <- finaldata[complete.cases(finaldata),]
 finaldata <- subset(finaldata, finaldata$plot != "B1A09")
 finaldata <- subset(finaldata, finaldata$plot != "B4A03")

@@ -6,20 +6,41 @@
 0) For both, ecological and economic analysis, focus on biomass, nitrogen and carbon: You can still add more functions and services after the first steps are taken
 
 1) Create a synthesis datasets and save it. Then you don't waste time each time on loading and merging the datasets
-	- this you can then subset for the different analyses --> HALF DONE (NEED TO DO ONE WITH YEARLY CARBON CHANGES AND SGM VALUES)
+	- this you can then subset for the different analyses 
+	
+	--> DONE
 
 2) Reconsider how to calculate the SOC stocks (Calculate increase/decrease for each consecutive year and then take the mean and not the difference between first and last year)
 	- Think about the metrics you want to include in the ecological MF analysis (e.g. SOC concentration vs. stocks, same for nitrogen)
 	
-3) Also look at realized species richness as a predictor: There you will have a better understanding about the type of relationship and how it is shaped.
-	- Exclude the monocultures from the analysis and think about the effect and consequences
+	--> DONE: I will take the net change between 2002 and 2020 and the carbon stock, not concentration.
 
-) Do a sensitivity analysis with different price scenarios for carbon and nitrogen
+NEXT PROBLEM WITH SOC stocks. When I take the measure from 2002, this can rather be considered as the SOC stock of arable land. So the main effect in SOC change that I see is that resulting from the conversion of arable land to a grassland. 
+	--> Actually, Sophie will take care of this question when analyzing the time series.
 
-) Change the calculation of the monetary value of yield: You have to consider that for each year the SGM is different, so it would be wrong to take the mean across years and then only one SGM value
+3) Change the calculation of the monetary value of yield: You have to consider that for each year the SGM is different, so it would be wrong to take the mean across years and then only one SGM value
 	- For nitrogen leaching I also calculate a monetary value for each year and then take the average across years --> should therefore treat carbon and yield equally!
 
-) Rethink statistical models: Bayesian analysis? Linear model for categorical analysis (sown diversity) --> shouldn't this be some sort of ANOVA? 
+	--> DONE (at least for yield), for carbon it is not necessary
+	
+4) Also look at realized species richness as a predictor: There you will have a better understanding about the type of relationship and how it is shaped.
+	- Exclude the monocultures from the analysis and think about the effect and consequences
+	
+	--> Do I have to exclude the 4 'all-species-mixtures' because this makes the distribution of the predictor variable weird?
+
+5) Rethink statistical models: Bayesian analysis? Linear model for categorical analysis (sown diversity) --> shouldn't this be some sort of ANOVA? 
+	
+	--> replaced all the linear models with bayesian models
+
+	5.1) Ask for help with assessing the model fit and interpreting the model outputs
+
+6) Do a sensitivity analysis with different price scenarios for carbon and nitrogen (I can include the other prices as extra columns in the synth data)
+	
+	--> DONE (for leaching, I used the prices as stated in the google doc, for carbon, I used the carbon price from the European carbon market and the upper price same as Fritz) 
+
+
+
+
 
 ) For ecological MF also include the root biomass
 
