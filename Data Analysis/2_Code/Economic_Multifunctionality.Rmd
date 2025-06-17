@@ -39,31 +39,6 @@ theme_set(theme_minimal(base_size = 14)+
 
 ## Load datasets and filter for relevant observations/measurements
 ```{r Read Data, include=FALSE}
-# load data on plot design (needed for 'block code')
-design <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Plot_Design/90_20_data.xlsx")
-
-#load data on aboveground biomass production (ID = 624) 
-biomassDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/624_9_data.xlsx")
-
-#load data on root biomass production ?
-
-#load data on realized species richness (ID = 487)
-SR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Realized_Species_Richness/487_3_data.xlsx")
-  #change data type for realized SR & sowndiv
-  SR$realizedSR <- as.numeric(SR$realizedSR)
-  SR$sowndiv <- as.numeric(SR$sowndiv)
-
-#load data on soil carbon (2022: ID = 655; 2020: ID = 424 2002: ID = 278): 2002 is to compare the carbon content at the beginning of the experiment with the current (2022) carbon content. 2020 data includes bulk density measurements.
-  # Dataset on deep soil measurement (ID = 433) from 0-100cm is only one Block (D2) and most recent measurement year is 2016.
-
-carbon20 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/424_7_data.xlsx")
-# carbon22 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/655_12_data.xlsx")
-carbon02 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/278_2_data.xlsx") %>% 
-  filter(year == 2002)
-
-#load data on nitrogen leaching (this should be in kg/ha per year)
-leaching <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/WaterN/Overall_Leaching_Plot.xlsx")
-
 #load synthesis dataset
 synthDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/synthesized_means_data.xlsx")
 
@@ -232,7 +207,7 @@ fitLeach2 <- brm(
 # Total Costs against species richness
 fitTotal2 <- brm(
   costs_total_mid ~ log2(sowndiv),
-  noMono)
+  noMono, student())
 
     # check model assumptions
     pp_check(fitTotal2, type="scatter_avg") 
@@ -244,6 +219,19 @@ fitTotal2 <- brm(
     # check output of model
     summary(fitTotal2)
 
+fitTotal2.1 <- brm(
+  bf(costs_total_mid ~ log2(sowndiv),
+     sigma ~ log2(sowndiv)),
+  noMono)
+
+    # check model assumptions
+    pp_check(fitTotal2.1, type="scatter_avg") 
+    pp_check(fitTotal2.1, ndraws=50)
+    check_model(fitTotal2.1, check="linearity") 
+    check_model(fitTotal2.1, check="homogeneity")
+    plot(fitTotal2.1)        
+
+    loo(fitTotal2, fitTotal2.1) # compare the two models with and without student-t distribution
 
 ```
 
@@ -252,7 +240,7 @@ fitTotal2 <- brm(
 # Biomass against species richness
 fitBiomassSR3 <- brm(
   mean_biomass ~ meanSR,
-  noMono)
+  synthDat)
 
     # check model assumptions
     pp_check(fitBiomassSR3, type="scatter_avg") 
@@ -267,7 +255,7 @@ fitBiomassSR3 <- brm(
 # SGM against species richness
 fitSGM3 <- brm(
   SGM_mean ~ meanSR,
-  noMono) 
+  synthDat) 
 
     # check model assumptions 
     pp_check(fitSGM3, type="scatter_avg")
@@ -282,7 +270,7 @@ fitSGM3 <- brm(
 # SOC against species richness
 fitSOC3 <- brm(
   mean_org_diff ~ meanSR,
-  noMono)
+  synthDat)
 
     # check model assumptions
     pp_check(fitSOC3, type="scatter_avg") 
@@ -297,7 +285,7 @@ fitSOC3 <- brm(
 # Leaching costs against species richness
 fitLeach3 <- brm(
   leach_costs_mid ~ meanSR,
-  noMono)
+  synthDat)
 
     # check model assumptions
     pp_check(fitLeach3, type="scatter_avg") 
@@ -312,7 +300,7 @@ fitLeach3 <- brm(
 # Total Costs against species richness
 fitTotal3 <- brm(
   costs_total_mid ~ meanSR,
-  noMono)
+  synthDat)
 
     # check model assumptions
     pp_check(fitTotal3, type="scatter_avg") 

@@ -27,6 +27,7 @@ NEXT PROBLEM WITH SOC stocks. When I take the measure from 2002, this can rather
 	- Exclude the monocultures from the analysis and think about the effect and consequences
 	
 	--> Do I have to exclude the 4 'all-species-mixtures' because this makes the distribution of the predictor variable weird?
+	--> Should I only exclude the monocultures from the SGM calculation but keep them for SOC and leaching?
 
 5) Rethink statistical models: Bayesian analysis? Linear model for categorical analysis (sown diversity) --> shouldn't this be some sort of ANOVA? 
 	
