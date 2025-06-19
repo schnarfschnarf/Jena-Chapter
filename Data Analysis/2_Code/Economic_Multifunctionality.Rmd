@@ -26,6 +26,7 @@ library(ggplot2)
 library(patchwork)
 library(brms)
 library(performance)
+library(ggpmisc)
 ```
 
 ## Set up a theme
@@ -56,13 +57,13 @@ synthDat$costs_total_lo <- synthDat$SOC_costs_lo + synthDat$leach_costs_lo + syn
 synthDat$costs_total_hi <- synthDat$SOC_costs_hi + synthDat$leach_costs_hi + synthDat$SGM_mean
 
 noMono <- synthDat %>% 
-  filter(sowndiv != 1) #filter out monocultures
+  filter(sowndiv > 1 & sowndiv < 60) #filter out monocultures and all-species-mixtures
 
 ```
 
 
 ## Statistical Models 
-```{r Sown Diversity With Monocultures}
+```{r Sown Diversity With Monocultures, include=FALSE}
 
 # Biomass against species richness
 fitBiomassSR <- brm(
@@ -142,7 +143,7 @@ fitTotal <- brm(
 ```
 
 
-```{r Sown Diversity without Monocultures}
+```{r Sown Diversity without Monocultures, include=FALSE}
 
 # Biomass against species richness
 fitBiomassSR2 <- brm(
@@ -207,7 +208,7 @@ fitLeach2 <- brm(
 # Total Costs against species richness
 fitTotal2 <- brm(
   costs_total_mid ~ log2(sowndiv),
-  noMono, student())
+  noMono)
 
     # check model assumptions
     pp_check(fitTotal2, type="scatter_avg") 
@@ -231,12 +232,12 @@ fitTotal2.1 <- brm(
     check_model(fitTotal2.1, check="homogeneity")
     plot(fitTotal2.1)        
 
-    loo(fitTotal2, fitTotal2.1) # compare the two models with and without student-t distribution
+    loo(fitTotal2, fitTotal4) # compare the two models
 
 ```
 
 
-```{r Realized Diversity With Monocultures}
+```{r Realized Diversity With Monocultures, include=FALSE}
 # Biomass against species richness
 fitBiomassSR3 <- brm(
   mean_biomass ~ meanSR,
@@ -316,7 +317,7 @@ fitTotal3 <- brm(
 ```
 
 
-```{r Realized Diversity without Monocultures}
+```{r Realized Diversity without Monocultures, include=FALSE}
 # Biomass against species richness
 fitBiomassSR4 <- brm(
   mean_biomass ~ meanSR,
@@ -392,6 +393,9 @@ fitTotal4 <- brm(
     # check output of model
     summary(fitTotal4)
 
+    
+
+    
 ```
 
 ## Plotting
@@ -521,8 +525,36 @@ ggsave("Single_Services.png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
 
-#check distribution of mid total costs across sowndiv
-p5 <- ggplot2::ggplot(noMono,
+#check distribution of mid total costs across sown diversity
+pCostsSown <- ggplot2::ggplot(noMono,
+                aes(x = log2(sowndiv), y = costs_total_mid)
+                ) +
+  geom_point(
+    color = "#28a87d",
+    alpha = .5,
+    stroke = 1,
+    size = 4
+  ) +
+  labs(
+    x = "",
+    y = ""
+    ) +
+   geom_smooth(
+    method = "lm",
+    se = FALSE,
+    color = "blue"
+  ) +
+  stat_poly_eq(
+    aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")),
+    formula = y ~ x,
+    parse = TRUE,
+    size = 5
+  )
+
+pCostsSown
+
+#check distribution of mid total costs across realized diversity
+pCostsReal <- ggplot2::ggplot(noMono,
                 aes(x = meanSR, y = costs_total_mid)
                 ) +
   geom_point(
@@ -536,10 +568,18 @@ p5 <- ggplot2::ggplot(noMono,
     y = ""
     ) +
    geom_smooth(
-    method = "lm"
+    method = "lm",
+    se = FALSE,
+    color = "blue"
+  ) +
+  stat_poly_eq(
+    aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")),
+    formula = y ~ x,
+    parse = TRUE,
+    size = 5
   )
 
-p5
+pCostsReal
 
 ggsave("TotalCosts2.png",
        plot = p5,
@@ -587,6 +627,7 @@ p7 <- ggplot2::ggplot(noMono,
   )
 
 p7
+
 
 # create boxplots for each factorial sowndiv and SGM
 #p1 <- ggplot2::ggplot(synthDat,
