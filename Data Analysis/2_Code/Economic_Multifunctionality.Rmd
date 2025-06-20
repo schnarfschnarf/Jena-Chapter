@@ -31,7 +31,7 @@ library(ggpmisc)
 
 ## Set up a theme
 ```{r include=FALSE}
-theme_set(theme_minimal(base_size = 14)+
+theme_set(theme_classic(base_size = 14)+
             theme(plot.title = element_text(size=13,hjust=0.5),
                   axis.text = element_text(size = 7),
                   axis.text.y = element_text(size = 13),
@@ -62,91 +62,120 @@ noMono <- synthDat %>%
 ```
 
 
-## Statistical Models 
-```{r Sown Diversity With Monocultures, include=FALSE}
+## Plot the densities of the data
+```{r Densities, include=FALSE}
 
-# Biomass against species richness
-fitBiomassSR <- brm(
-  mean_biomass ~ log2(sowndiv),
-  synthDat)
+# check distribution of sowndiv
+p1 <- ggplot2::ggplot(synthDat,
+                aes(x = log2(sowndiv))
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "log2(Sown Plant Diversity)",
+    y = "Density"
+  )
 
-    # check model assumptions
-    pp_check(fitBiomassSR, type="scatter_avg") 
-    pp_check(fitBiomassSR, ndraws=50)
-    check_model(fitBiomassSR, check="linearity") 
-    check_model(fitBiomassSR, check="homogeneity")
-    plot(fitBiomassSR)
-    
-    # check output of model
-    summary(fitBiomassSR)
+p1
 
-# SGM against species richness
-fitSGM <- brm(
-  SGM_mean ~ log2(sowndiv),
-  synthDat) 
+# check distribution of realSR
+p2 <- ggplot2::ggplot(noMono,
+                aes(x = meanSR)
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Realized Species Richness",
+    y = "Density"
+  )
 
-    # check model assumptions 
-    pp_check(fitSGM, type="scatter_avg")
-    pp_check(fitSGM, ndraws=50)
-    check_model(fitSGM, check="linearity")
-    check_model(fitSGM, check="homogeneity")
-    plot(fitSGM)
-    
-    # check output of model
-    summary(fitSGM)
+p2
 
-# SOC against species richness
-fitSOC <- brm(
-  mean_org_diff ~ log2(sowndiv),
-  synthDat)
+p3 <- ggplot2::ggplot(synthDat,
+                aes(x = mean_biomass)
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Biomass (g)",
+    y = "Density"
+  )
 
-    # check model assumptions
-    pp_check(fitSOC, type="scatter_avg") 
-    pp_check(fitSOC, ndraws=50)
-    check_model(fitSOC, check="linearity") 
-    check_model(fitSOC, check="homogeneity")
-    plot(fitSOC)
-    
-    # check output of model
-    summary(fitSOC)
+p4 <- ggplot2::ggplot(synthDat,
+                aes(x = SGM_mean)
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Standard Gross Margin (€/ha)",
+    y = "Density"
+  )
 
-# Leaching costs against species richness
-fitLeach <- brm(
-  leach_costs_mid ~ log2(sowndiv),
-  synthDat)
+p5 <- ggplot2::ggplot(synthDat,
+                aes(x = SOC_costs_mid)
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "SOC Costs (€/ha)",
+    y = "Density"
+  )
 
-    # check model assumptions
-    pp_check(fitLeach, type="scatter_avg") 
-    pp_check(fitLeach, ndraws=50)
-    check_model(fitLeach, check="linearity") 
-    check_model(fitLeach, check="homogeneity")
-    plot(fitLeach)
-    
-    # check output of model
-    summary(fitLeach)
+p6 <- ggplot2::ggplot(synthDat,
+                aes(x = leach_costs_mid)
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Leaching Costs (€/ha/a)",
+    y = "Density"
+  )
 
-# Total Costs against species richness
-fitTotal <- brm(
-  costs_total_mid ~ log2(sowndiv),
-  synthDat)
+p7 <- ggplot2::ggplot(synthDat,
+                aes(x = costs_total_mid)
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Total Costs (€/ha/a)",
+    y = "Density"
+  )
 
-    # check model assumptions
-    pp_check(fitTotal, type="scatter_avg") 
-    pp_check(fitTotal, ndraws=50)
-    check_model(fitTotal, check="linearity") 
-    check_model(fitTotal, check="homogeneity")
-    plot(fitTotal)
-    
-    # check output of model
-    summary(fitTotal)
-    
+
+# show all in one grid
+p1 + p2 + p3 + p4 + p5 + p6 + p7 +
+  plot_layout(ncol = 3) +
+  plot_annotation(title = "Densities of Sown Plant Diversity, Realized Species Richness, Biomass, SGM, SOC Costs, Leaching Costs and Total Costs") &
+  theme(plot.title = element_text(size=20,hjust=0.5))
+
+ggsave("Densities.png",
+       plot = last_plot(),
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
 ```
 
+## Statistical Models 
 
-```{r Sown Diversity without Monocultures, include=FALSE}
+```{r Sown Diversity WITHOUT Monocultures, include=FALSE}
 
 # Biomass against species richness
-fitBiomassSR2 <- brm(
+fitBiomassSown <- brm(
   mean_biomass ~ log2(sowndiv),
   noMono)
 
@@ -161,7 +190,7 @@ fitBiomassSR2 <- brm(
     summary(fitBiomassSR2)
 
 # SGM against species richness
-fitSGM2 <- brm(
+fitSGMsown <- brm(
   SGM_mean ~ log2(sowndiv),
   noMono) 
 
@@ -176,7 +205,7 @@ fitSGM2 <- brm(
     summary(fitSGM2)
 
 # SOC against species richness
-fitSOC2 <- brm(
+fitSOCsown <- brm(
   mean_org_diff ~ log2(sowndiv),
   noMono)
 
@@ -191,7 +220,7 @@ fitSOC2 <- brm(
     summary(fitSOC2)
 
 # Leaching costs against species richness
-fitLeach2 <- brm(
+fitLeachSown <- brm(
   leach_costs_mid ~ log2(sowndiv),
   noMono)
 
@@ -206,7 +235,7 @@ fitLeach2 <- brm(
     summary(fitLeach2)
 
 # Total Costs against species richness
-fitTotal2 <- brm(
+fitTotalSown <- brm(
   costs_total_mid ~ log2(sowndiv),
   noMono)
 
@@ -237,89 +266,10 @@ fitTotal2.1 <- brm(
 ```
 
 
-```{r Realized Diversity With Monocultures, include=FALSE}
-# Biomass against species richness
-fitBiomassSR3 <- brm(
-  mean_biomass ~ meanSR,
-  synthDat)
-
-    # check model assumptions
-    pp_check(fitBiomassSR3, type="scatter_avg") 
-    pp_check(fitBiomassSR3, ndraws=50)
-    check_model(fitBiomassSR3, check="linearity") 
-    check_model(fitBiomassSR3, check="homogeneity")
-    plot(fitBiomassSR3)
-    
-    # check output of model
-    summary(fitBiomassSR3)
-
-# SGM against species richness
-fitSGM3 <- brm(
-  SGM_mean ~ meanSR,
-  synthDat) 
-
-    # check model assumptions 
-    pp_check(fitSGM3, type="scatter_avg")
-    pp_check(fitSGM3, ndraws=50)
-    check_model(fitSGM3, check="linearity")
-    check_model(fitSGM3, check="homogeneity")
-    plot(fitSGM3)
-    
-    # check output of model
-    summary(fitSGM3)
-
-# SOC against species richness
-fitSOC3 <- brm(
-  mean_org_diff ~ meanSR,
-  synthDat)
-
-    # check model assumptions
-    pp_check(fitSOC3, type="scatter_avg") 
-    pp_check(fitSOC3, ndraws=50)
-    check_model(fitSOC3, check="linearity") 
-    check_model(fitSOC3, check="homogeneity")
-    plot(fitSOC3)
-    
-    # check output of model
-    summary(fitSOC3)
-
-# Leaching costs against species richness
-fitLeach3 <- brm(
-  leach_costs_mid ~ meanSR,
-  synthDat)
-
-    # check model assumptions
-    pp_check(fitLeach3, type="scatter_avg") 
-    pp_check(fitLeach3, ndraws=50)
-    check_model(fitLeach3, check="linearity") 
-    check_model(fitLeach3, check="homogeneity")
-    plot(fitLeach3)
-    
-    # check output of model
-    summary(fitLeach3)
-
-# Total Costs against species richness
-fitTotal3 <- brm(
-  costs_total_mid ~ meanSR,
-  synthDat)
-
-    # check model assumptions
-    pp_check(fitTotal3, type="scatter_avg") 
-    pp_check(fitTotal3, ndraws=50)
-    check_model(fitTotal3, check="linearity") 
-    check_model(fitTotal3, check="homogeneity")
-    plot(fitTotal3)
-    
-    # check output of model
-    summary(fitTotal3)
-
-
-```
-
-
 ```{r Realized Diversity without Monocultures, include=FALSE}
+
 # Biomass against species richness
-fitBiomassSR4 <- brm(
+fitBiomassReal <- brm(
   mean_biomass ~ meanSR,
   noMono)
 
@@ -334,7 +284,7 @@ fitBiomassSR4 <- brm(
     summary(fitBiomassSR4)
 
 # SGM against species richness
-fitSGM4 <- brm(
+fitSGMreal <- brm(
   SGM_mean ~ meanSR,
   noMono) 
 
@@ -349,7 +299,7 @@ fitSGM4 <- brm(
     summary(fitSGM4)
 
 # SOC against species richness
-fitSOC4 <- brm(
+fitSOCreal <- brm(
   mean_org_diff ~ meanSR,
   noMono)
 
@@ -364,7 +314,7 @@ fitSOC4 <- brm(
     summary(fitSOC4)
 
 # Leaching costs against species richness
-fitLeach4 <- brm(
+fitLeachReal <- brm(
   leach_costs_mid ~ meanSR,
   noMono)
 
@@ -379,7 +329,46 @@ fitLeach4 <- brm(
     summary(fitLeach4)
 
 # Total Costs against species richness
-fitTotal4 <- brm(
+fitTotalReal <- brm(
+  costs_total_mid ~ meanSR,
+  noMono)
+
+    # check model assumptions
+    pp_check(fitTotalReal, type="scatter_avg") 
+    pp_check(fitTotalReal, ndraws=50)
+    check_model(fitTotalReal, check="linearity") 
+    check_model(fitTotalReal, check="homogeneity")
+    plot(fitTotalReal)
+    
+    # check output of model
+    summary(fitTotalReal)
+
+shapiro.test(residuals(fitTotalReal)) # check normality of residuals
+
+    
+```
+
+### Sensitivity Analysis with different price scenarios
+
+```{r Realized Diversity without Monocultures, include=FALSE}
+
+# Low Total Costs against species richness
+fitTotalLo <- brm(
+  costs_total_mid ~ meanSR,
+  noMono)
+
+    # check model assumptions
+    pp_check(fitTotal4, type="scatter_avg") 
+    pp_check(fitTotal4, ndraws=50)
+    check_model(fitTotal4, check="linearity") 
+    check_model(fitTotal4, check="homogeneity")
+    plot(fitTotal4)
+    
+    # check output of model
+    summary(fitTotal4)
+
+# High Total Costs against species richness
+fitTotalHi <- brm(
   costs_total_mid ~ meanSR,
   noMono)
 
@@ -394,9 +383,8 @@ fitTotal4 <- brm(
     summary(fitTotal4)
 
     
-
-    
 ```
+
 
 ## Plotting
 ### Plot biomass against realized species richness
@@ -676,3 +664,164 @@ p7
 
 ```
 
+## Supplementary Analysis
+### With Monocultures
+
+```{r Sown Diversity WITH Monocultures, include=FALSE}
+
+# Biomass against species richness
+fitBiomassSR <- brm(
+  mean_biomass ~ log2(sowndiv),
+  synthDat)
+
+    # check model assumptions
+    pp_check(fitBiomassSR, type="scatter_avg") 
+    pp_check(fitBiomassSR, ndraws=50)
+    check_model(fitBiomassSR, check="linearity") 
+    check_model(fitBiomassSR, check="homogeneity")
+    plot(fitBiomassSR)
+    
+    # check output of model
+    summary(fitBiomassSR)
+
+# SGM against species richness
+fitSGM <- brm(
+  SGM_mean ~ log2(sowndiv),
+  synthDat) 
+
+    # check model assumptions 
+    pp_check(fitSGM, type="scatter_avg")
+    pp_check(fitSGM, ndraws=50)
+    check_model(fitSGM, check="linearity")
+    check_model(fitSGM, check="homogeneity")
+    plot(fitSGM)
+    
+    # check output of model
+    summary(fitSGM)
+
+# SOC against species richness
+fitSOC <- brm(
+  mean_org_diff ~ log2(sowndiv),
+  synthDat)
+
+    # check model assumptions
+    pp_check(fitSOC, type="scatter_avg") 
+    pp_check(fitSOC, ndraws=50)
+    check_model(fitSOC, check="linearity") 
+    check_model(fitSOC, check="homogeneity")
+    plot(fitSOC)
+    
+    # check output of model
+    summary(fitSOC)
+
+# Leaching costs against species richness
+fitLeach <- brm(
+  leach_costs_mid ~ log2(sowndiv),
+  synthDat)
+
+    # check model assumptions
+    pp_check(fitLeach, type="scatter_avg") 
+    pp_check(fitLeach, ndraws=50)
+    check_model(fitLeach, check="linearity") 
+    check_model(fitLeach, check="homogeneity")
+    plot(fitLeach)
+    
+    # check output of model
+    summary(fitLeach)
+
+# Total Costs against species richness
+fitTotal <- brm(
+  costs_total_mid ~ log2(sowndiv),
+  synthDat)
+
+    # check model assumptions
+    pp_check(fitTotal, type="scatter_avg") 
+    pp_check(fitTotal, ndraws=50)
+    check_model(fitTotal, check="linearity") 
+    check_model(fitTotal, check="homogeneity")
+    plot(fitTotal)
+    
+    # check output of model
+    summary(fitTotal)
+    
+```
+
+```{r Realized Diversity With Monocultures, include=FALSE}
+
+# Biomass against species richness
+fitBiomassSR3 <- brm(
+  mean_biomass ~ meanSR,
+  synthDat)
+
+    # check model assumptions
+    pp_check(fitBiomassSR3, type="scatter_avg") 
+    pp_check(fitBiomassSR3, ndraws=50)
+    check_model(fitBiomassSR3, check="linearity") 
+    check_model(fitBiomassSR3, check="homogeneity")
+    plot(fitBiomassSR3)
+    
+    # check output of model
+    summary(fitBiomassSR3)
+
+# SGM against species richness
+fitSGM3 <- brm(
+  SGM_mean ~ meanSR,
+  synthDat) 
+
+    # check model assumptions 
+    pp_check(fitSGM3, type="scatter_avg")
+    pp_check(fitSGM3, ndraws=50)
+    check_model(fitSGM3, check="linearity")
+    check_model(fitSGM3, check="homogeneity")
+    plot(fitSGM3)
+    
+    # check output of model
+    summary(fitSGM3)
+
+# SOC against species richness
+fitSOC3 <- brm(
+  mean_org_diff ~ meanSR,
+  synthDat)
+
+    # check model assumptions
+    pp_check(fitSOC3, type="scatter_avg") 
+    pp_check(fitSOC3, ndraws=50)
+    check_model(fitSOC3, check="linearity") 
+    check_model(fitSOC3, check="homogeneity")
+    plot(fitSOC3)
+    
+    # check output of model
+    summary(fitSOC3)
+
+# Leaching costs against species richness
+fitLeach3 <- brm(
+  leach_costs_mid ~ meanSR,
+  synthDat)
+
+    # check model assumptions
+    pp_check(fitLeach3, type="scatter_avg") 
+    pp_check(fitLeach3, ndraws=50)
+    check_model(fitLeach3, check="linearity") 
+    check_model(fitLeach3, check="homogeneity")
+    plot(fitLeach3)
+    
+    # check output of model
+    summary(fitLeach3)
+
+# Total Costs against species richness
+fitTotal3 <- brm(
+  costs_total_mid ~ meanSR,
+  synthDat)
+
+    # check model assumptions
+    pp_check(fitTotal3, type="scatter_avg") 
+    pp_check(fitTotal3, ndraws=50)
+    check_model(fitTotal3, check="linearity") 
+    check_model(fitTotal3, check="homogeneity")
+    plot(fitTotal3)
+    
+    # check output of model
+    summary(fitTotal3)
+
+
+```
