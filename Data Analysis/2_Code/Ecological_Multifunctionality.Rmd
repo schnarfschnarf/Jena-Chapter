@@ -24,6 +24,8 @@ library(lme4)
 library(ggplot2)
 library(patchwork)
 library(brms)
+library(performance)
+library(ggpmisc)
 ```
 
 ## Set up a theme

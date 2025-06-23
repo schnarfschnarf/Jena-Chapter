@@ -3,16 +3,29 @@
 ------------------------------------------------
 
 
-1) Ask for help with assessing the model fit and interpreting the model outputs
+1) Ask for help with assessing the model fit and interpreting the model outputs.
+	
+	--> Yuanyuan said the model assumptions were okay. She said to log transform the realized species richness, because of functional redundancy in the plots that causes 	the diversity-productivity relationship to be non linear. 
 
-2) From 2003 - 2007 there were 4 subsamples taken for the biomass measurements --> you have to correct your calculations accordingly
+2) Do the ecological MF analysis and check association with economic MF.
+	
+	--> Started to work on the script. Need to calculate the yearly averages for all the functions to do a standardization?
+	--> For ecological MF also include the root biomass?
+
+3) Check whether the nitrogen leaching data make sense 
+
+	--> Markus on vacation until 07.07.
 
 3) WRITE!!!!
 
+4) Pay for GSB abstract submission until 10.07.
 
-) For ecological MF also include the root biomass
 
-) Include stakeholder weighting? Alternatively include this in the discussion and stress that different agents prefer different ecosystem services
 
-) Discuss the importance of ecosystem services that can not be monetized so easily or at all.
+
+?) Include stakeholder weighting? Alternatively include this in the discussion and stress that different agents prefer different ecosystem services
+
+!) Discuss the importance of ecosystem services that can not be monetized so easily or at all.
+
+
 

@@ -180,14 +180,14 @@ fitBiomassSown <- brm(
   noMono)
 
     # check model assumptions
-    pp_check(fitBiomassSR2, type="scatter_avg") 
-    pp_check(fitBiomassSR2, ndraws=50)
-    check_model(fitBiomassSR2, check="linearity") 
-    check_model(fitBiomassSR2, check="homogeneity")
-    plot(fitBiomassSR2)
+    pp_check(fitBiomassSown, type="scatter_avg") 
+    pp_check(fitBiomassSown, ndraws=50)
+    check_model(fitBiomassSown, check="linearity") 
+    check_model(fitBiomassSown, check="homogeneity")
+    plot(fitBiomassSown)
     
     # check output of model
-    summary(fitBiomassSR2)
+    summary(fitBiomassSown)
 
 # SGM against species richness
 fitSGMsown <- brm(
@@ -195,14 +195,14 @@ fitSGMsown <- brm(
   noMono) 
 
     # check model assumptions 
-    pp_check(fitSGM2, type="scatter_avg")
-    pp_check(fitSGM2, ndraws=50)
-    check_model(fitSGM2, check="linearity")
-    check_model(fitSGM2, check="homogeneity")
-    plot(fitSGM2)
+    pp_check(fitSGMsown, type="scatter_avg")
+    pp_check(fitSGMsown, ndraws=50)
+    check_model(fitSGMsown, check="linearity")
+    check_model(fitSGMsown, check="homogeneity")
+    plot(fitSGMsown)
     
     # check output of model
-    summary(fitSGM2)
+    summary(fitSGMsown)
 
 # SOC against species richness
 fitSOCsown <- brm(
@@ -210,29 +210,29 @@ fitSOCsown <- brm(
   noMono)
 
     # check model assumptions
-    pp_check(fitSOC2, type="scatter_avg") 
-    pp_check(fitSOC2, ndraws=50)
-    check_model(fitSOC2, check="linearity") 
-    check_model(fitSOC2, check="homogeneity")
-    plot(fitSOC2)
+    pp_check(fitSOCsown, type="scatter_avg") 
+    pp_check(fitSOCsown, ndraws=50)
+    check_model(fitSOCsown, check="linearity") 
+    check_model(fitSOCsown, check="homogeneity")
+    plot(fitSOCsown)
     
     # check output of model
-    summary(fitSOC2)
+    summary(fitSOCsown)
 
 # Leaching costs against species richness
 fitLeachSown <- brm(
-  leach_costs_mid ~ log2(sowndiv),
+  log2(leach_costs_mid) ~ log2(sowndiv),
   noMono)
 
     # check model assumptions
-    pp_check(fitLeach2, type="scatter_avg") 
-    pp_check(fitLeach2, ndraws=50)
-    check_model(fitLeach2, check="linearity") 
-    check_model(fitLeach2, check="homogeneity")
-    plot(fitLeach2)
+    pp_check(fitLeachSown, type="scatter_avg") 
+    pp_check(fitLeachSown, ndraws=50)
+    check_model(fitLeachSown, check="linearity") 
+    check_model(fitLeachSown, check="homogeneity")
+    plot(fitLeachSown)
     
     # check output of model
-    summary(fitLeach2)
+    summary(fitLeachSown)
 
 # Total Costs against species richness
 fitTotalSown <- brm(
@@ -240,28 +240,14 @@ fitTotalSown <- brm(
   noMono)
 
     # check model assumptions
-    pp_check(fitTotal2, type="scatter_avg") 
-    pp_check(fitTotal2, ndraws=50)
-    check_model(fitTotal2, check="linearity") 
-    check_model(fitTotal2, check="homogeneity")
-    plot(fitTotal2)
+    pp_check(fitTotalSown, type="scatter_avg") 
+    pp_check(fitTotalSown, ndraws=50)
+    check_model(fitTotalSown, check="linearity") 
+    check_model(fitTotalSown, check="homogeneity")
+    plot(fitTotalSown)
     
     # check output of model
-    summary(fitTotal2)
-
-fitTotal2.1 <- brm(
-  bf(costs_total_mid ~ log2(sowndiv),
-     sigma ~ log2(sowndiv)),
-  noMono)
-
-    # check model assumptions
-    pp_check(fitTotal2.1, type="scatter_avg") 
-    pp_check(fitTotal2.1, ndraws=50)
-    check_model(fitTotal2.1, check="linearity") 
-    check_model(fitTotal2.1, check="homogeneity")
-    plot(fitTotal2.1)        
-
-    loo(fitTotal2, fitTotal4) # compare the two models
+    summary(fitTotalSown)
 
 ```
 
@@ -270,67 +256,67 @@ fitTotal2.1 <- brm(
 
 # Biomass against species richness
 fitBiomassReal <- brm(
-  mean_biomass ~ meanSR,
+  mean_biomass ~ log2(meanSR),
   noMono)
 
     # check model assumptions
-    pp_check(fitBiomassSR4, type="scatter_avg") 
-    pp_check(fitBiomassSR4, ndraws=50)
-    check_model(fitBiomassSR4, check="linearity") 
-    check_model(fitBiomassSR4, check="homogeneity")
-    plot(fitBiomassSR4)
+    pp_check(fitBiomassReal, type="scatter_avg") 
+    pp_check(fitBiomassReal, ndraws=50)
+    check_model(fitBiomassReal, check="linearity") 
+    check_model(fitBiomassReal, check="homogeneity")
+    plot(fitBiomassReal)
     
     # check output of model
-    summary(fitBiomassSR4)
+    summary(fitBiomassReal)
 
 # SGM against species richness
 fitSGMreal <- brm(
-  SGM_mean ~ meanSR,
+  SGM_mean ~ log2(meanSR),
   noMono) 
 
     # check model assumptions 
-    pp_check(fitSGM4, type="scatter_avg")
-    pp_check(fitSGM4, ndraws=50)
-    check_model(fitSGM4, check="linearity")
-    check_model(fitSGM4, check="homogeneity")
-    plot(fitSGM4)
+    pp_check(fitSGMreal, type="scatter_avg")
+    pp_check(fitSGMreal, ndraws=50)
+    check_model(fitSGMreal, check="linearity")
+    check_model(fitSGMreal, check="homogeneity")
+    plot(fitSGMreal)
     
     # check output of model
-    summary(fitSGM4)
+    summary(fitSGMreal)
 
 # SOC against species richness
 fitSOCreal <- brm(
-  mean_org_diff ~ meanSR,
+  mean_org_diff ~ log2(meanSR),
   noMono)
 
     # check model assumptions
-    pp_check(fitSOC4, type="scatter_avg") 
-    pp_check(fitSOC4, ndraws=50)
-    check_model(fitSOC4, check="linearity") 
-    check_model(fitSOC4, check="homogeneity")
-    plot(fitSOC4)
+    pp_check(fitSOCreal, type="scatter_avg") 
+    pp_check(fitSOCreal, ndraws=50)
+    check_model(fitSOCreal, check="linearity") 
+    check_model(fitSOCreal, check="homogeneity")
+    plot(fitSOCreal)
     
     # check output of model
-    summary(fitSOC4)
+    summary(fitSOCreal)
 
 # Leaching costs against species richness
 fitLeachReal <- brm(
-  leach_costs_mid ~ meanSR,
+  log2(leach_costs_mid) ~ log2(meanSR),
   noMono)
 
     # check model assumptions
-    pp_check(fitLeach4, type="scatter_avg") 
-    pp_check(fitLeach4, ndraws=50)
-    check_model(fitLeach4, check="linearity") 
-    check_model(fitLeach4, check="homogeneity")
-    plot(fitLeach4)
+    pp_check(fitLeachReal, type="scatter_avg") 
+    pp_check(fitLeachReal, ndraws=50)
+    check_model(fitLeachReal, check="linearity") 
+    check_model(fitLeachReal, check="homogeneity")
+    plot(fitLeachReal)
     
     # check output of model
-    summary(fitLeach4)
+    summary(fitLeachReal)
 
 # Total Costs against species richness
 fitTotalReal <- brm(
-  costs_total_mid ~ meanSR,
+  costs_total_mid ~ log2(meanSR),
   noMono)
 
     # check model assumptions
@@ -350,37 +336,37 @@ shapiro.test(residuals(fitTotalReal)) # check normality of residuals
 
 ### Sensitivity Analysis with different price scenarios
 
-```{r Realized Diversity without Monocultures, include=FALSE}
+```{r Sensitivity Analysis, include=FALSE}
 
 # Low Total Costs against species richness
 fitTotalLo <- brm(
-  costs_total_mid ~ meanSR,
+  costs_total_lo ~ log2(meanSR),
   noMono)
 
     # check model assumptions
-    pp_check(fitTotal4, type="scatter_avg") 
-    pp_check(fitTotal4, ndraws=50)
-    check_model(fitTotal4, check="linearity") 
-    check_model(fitTotal4, check="homogeneity")
-    plot(fitTotal4)
+    pp_check(fitTotalLo, type="scatter_avg") 
+    pp_check(fitTotalLo, ndraws=50)
+    check_model(fitTotalLo, check="linearity") 
+    check_model(fitTotalLo, check="homogeneity")
+    plot(fitTotalLo)
     
     # check output of model
-    summary(fitTotal4)
+    summary(fitTotalLo)
 
 # High Total Costs against species richness
 fitTotalHi <- brm(
-  costs_total_mid ~ meanSR,
+  costs_total_hi ~ log2(meanSR),
   noMono)
 
     # check model assumptions
-    pp_check(fitTotal4, type="scatter_avg") 
-    pp_check(fitTotal4, ndraws=50)
-    check_model(fitTotal4, check="linearity") 
-    check_model(fitTotal4, check="homogeneity")
+    pp_check(fitTotalHi, type="scatter_avg") 
+    pp_check(fitTotalHi, ndraws=50)
+    check_model(fitTotalHi, check="linearity") 
+    check_model(fitTotalHi, check="homogeneity")
     plot(fitTotal4)
     
     # check output of model
-    summary(fitTotal4)
+    summary(fitTotalHi)
 
     
 ```
@@ -389,8 +375,8 @@ fitTotalHi <- brm(
 ## Plotting
 ### Plot biomass against realized species richness
 ```{r Plotting}
-#check distribution of biomass data with monocultures
-p1 <- ggplot2::ggplot(synthDat,
+#check distribution of biomass data without monocultures and sowndiv
+p_sown_biomass <- ggplot2::ggplot(noMono,
                 aes(x = log2(sowndiv), y = mean_biomass)
                 ) +
   geom_point(
@@ -401,23 +387,24 @@ p1 <- ggplot2::ggplot(synthDat,
     size = 4
   ) +
    geom_smooth(
-    method = "lm"
+    method = "lm",
+    se = FALSE
   ) +
   labs(
     x = "log2(Sown Plant Diversity)",
     y = "Summed Biomass per Plot in 2022 (g)")
 
-p1
+p_sown_biomass
 
-ggsave("Biomass.png",
+ggsave("Biomass_sown_noMono.png",
        plot = last_plot(),
        device = "png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
 
-#check distribution of biomass data without monocultures
-p1_noMono <- ggplot2::ggplot(noMono,
-                aes(x = log2(sowndiv), y = mean_biomass)
+#check distribution of biomass data without monocultures and realdiv
+p_real_biomass <- ggplot2::ggplot(noMono,
+                aes(x = log2(meanSR), y = mean_biomass)
                 ) +
   geom_point(
     color = "#28a87d",
@@ -427,17 +414,24 @@ p1_noMono <- ggplot2::ggplot(noMono,
     size = 4
   ) +
    geom_smooth(
-    method = "lm"
+    method = "lm",
+    se = FALSE
   ) +
   labs(
-    x = "log2(Sown Plant Diversity)",
+    x = "log2(Realized Plant Diversity)",
     y = "Summed Biomass per Plot in 2022 (g)")
 
-p1_noMono
+p_real_biomass
 
-#check distribution of SGM data with monocultures
-p2 <- ggplot2::ggplot(synthDat,
-                aes(x = as.numeric(meanSR), y = SGM)
+ggsave("Biomass_real_noMono.png",
+       plot = last_plot(),
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+#check distribution of SGM data with monocultures and sowndiv
+p_sown_sgm <- ggplot2::ggplot(noMono,
+                aes(x = log2(sowndiv), y = SGM_mean)
                 ) +
   geom_point(
     color = "#28a87d",
@@ -447,23 +441,51 @@ p2 <- ggplot2::ggplot(synthDat,
     size = 4
   ) +
    geom_smooth(
-    method = "lm"
+    method = "lm",
+    se = FALSE
   ) +
   labs(
     x = "log2(Sown Plant Diversity)",
     y = "standard gross margin (€/ha)")
 
-p2
+p_sown_sgm
 
-ggsave("SGM.png",
+ggsave("SGM_sown_noMono.png",
+       plot = last_plot(),
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+#check distribution of SGM data without monocultures and realdiv
+p_real_sgm <- ggplot2::ggplot(noMono,
+                aes(x = log2(meanSR), y = SGM_mean)
+                ) +
+  geom_point(
+    color = "#28a87d",
+    alpha = .5,
+    shape = "X",
+    stroke = 1,
+    size = 4
+  ) +
+   geom_smooth(
+    method = "lm",
+    se = FALSE
+  ) +
+  labs(
+    x = "log2(Realized Plant Diversity)",
+    y = "standard gross margin (€/ha)")
+
+p_real_sgm
+
+ggsave("SGM_real_noMono.png",
        plot = last_plot(),
        device = "png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
 
 #check distribution of climate regulation cost data
-p3 <- ggplot2::ggplot(synthDat,
-                aes(x = log2(as.numeric(sowndiv)), y = SOC_costs)
+p_sown_soc <- ggplot2::ggplot(noMono,
+                aes(x = log2(as.numeric(sowndiv)), y = SOC_costs_mid)
                 ) +
   geom_point(
     color = "#28a87d",
@@ -473,17 +495,20 @@ p3 <- ggplot2::ggplot(synthDat,
     size = 4
   ) +
    geom_smooth(
-    method = "lm"
+    method = "lm",
+    se = FALSE
   ) +
   labs(
     x = "log2(Sown Plant Diversity)",
     y = "climate regulation costs/gains (€/ha)")
 
-ggsave("SOC.png", plot = last_plot(), device = "png", path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/", width = 10, height = 15, units = "cm", dpi = 300)
+p_sown_soc
 
-# check distribution of leaching costs data
-p4 <- ggplot2::ggplot(synthDat,
-                aes(x = log2(as.numeric(sowndiv)), y = leach_costs)
+ggsave("SOC_sown_noMono.png", plot = last_plot(), device = "png", path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/", width = 10, height = 15, units = "cm", dpi = 300)
+
+#check distribution of climate regulation cost data
+p_real_soc <- ggplot2::ggplot(noMono,
+                aes(x = log2(meanSR), y = SOC_costs_mid)
                 ) +
   geom_point(
     color = "#28a87d",
@@ -493,28 +518,90 @@ p4 <- ggplot2::ggplot(synthDat,
     size = 4
   ) +
    geom_smooth(
-    method = "lm"
+    method = "lm",
+    se = FALSE
+  ) +
+  labs(
+    x = "log2(Realized Plant Diversity)",
+    y = "climate regulation costs/gains (€/ha)")
+
+p_real_soc
+
+ggsave("SOC_real_noMono.png", plot = last_plot(), device = "png", path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/", width = 10, height = 15, units = "cm", dpi = 300)
+
+# check distribution of leaching costs data
+p_sown_leach <- ggplot2::ggplot(noMono,
+                aes(x = log2(sowndiv), y = leach_costs_mid)
+                ) +
+  geom_point(
+    color = "#28a87d",
+    alpha = .5,
+    shape = "X",
+    stroke = 1,
+    size = 4
+  ) +
+   geom_smooth(
+    method = "lm",
+    se = FALSE
   ) +
   labs(
     x = "log2(Sown Plant Diversity)",
     y = "leaching costs (€/ha/a)")
 
-ggsave("Leaching.png", plot = last_plot(), device = "png", path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/", width = 10, height = 15, units = "cm", dpi = 300)
+p_sown_leach
 
-# combine the above 4 plots in one grid
-p1 + p2 + p3 + p4 +
+ggsave("Leaching_mid_sown_noMono.png", plot = last_plot(), device = "png", path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/", width = 10, height = 15, units = "cm", dpi = 300)
+
+
+# check distribution of leaching costs data
+p_real_leach <- ggplot2::ggplot(noMono,
+                aes(x = log2(meanSR), y = leach_costs_mid)
+                ) +
+  geom_point(
+    color = "#28a87d",
+    alpha = .5,
+    shape = "X",
+    stroke = 1,
+    size = 4
+  ) +
+   geom_smooth(
+    method = "lm",
+    se = FALSE
+  ) +
+  labs(
+    x = "log2(Realized Plant Diversity)",
+    y = "leaching costs (€/ha/a)")
+
+p_real_leach
+
+ggsave("Leaching_mid_real_noMono.png", plot = last_plot(), device = "png", path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/", width = 10, height = 15, units = "cm", dpi = 300)
+
+# combine the sown plots in one grid
+p_services_sown <- p_sown_biomass + p_sown_sgm + p_sown_soc + p_sown_leach +
   plot_layout(ncol = 2) +
-  plot_annotation(title = "") &
+  plot_annotation(title = "Sown Plant Diversity against Biomass, SGM, SOC Costs and Leaching Costs") &
   theme(plot.title = element_text(size=20,hjust=0.5))
 
-ggsave("Single_Services.png",
+ggsave("Single_Services_sown.png",
+       plot = last_plot(),
+       bg = "white",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+# combine the plots for realized SR in one grid
+p_services_real <- p_real_biomass + p_real_sgm + p_real_soc + p_real_leach +
+  plot_layout(ncol = 2) +
+  plot_annotation(title = "Realized Plant Diversity against Biomass, SGM, SOC Costs and Leaching Costs") &
+  theme(plot.title = element_text(size=20,hjust=0.5))
+
+ggsave("Single_Services_real.png",
        plot = last_plot(),
        bg = "white",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
 
 #check distribution of mid total costs across sown diversity
-pCostsSown <- ggplot2::ggplot(noMono,
+p_sown_costs <- ggplot2::ggplot(noMono,
                 aes(x = log2(sowndiv), y = costs_total_mid)
                 ) +
   geom_point(
@@ -524,8 +611,8 @@ pCostsSown <- ggplot2::ggplot(noMono,
     size = 4
   ) +
   labs(
-    x = "",
-    y = ""
+    x = "log2(Sown Plant Diversity)",
+    y = "Total Costs (€/ha/a)"
     ) +
    geom_smooth(
     method = "lm",
@@ -539,11 +626,18 @@ pCostsSown <- ggplot2::ggplot(noMono,
     size = 5
   )
 
-pCostsSown
+p_sown_costs
+
+ggsave("Total_Costs_sown_noMono.png",
+       plot = p_sown_costs,
+       device = "png",
+       bg = "white",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
 
 #check distribution of mid total costs across realized diversity
-pCostsReal <- ggplot2::ggplot(noMono,
-                aes(x = meanSR, y = costs_total_mid)
+p_real_costs <- ggplot2::ggplot(noMono,
+                aes(x = log2(meanSR), y = costs_total_mid)
                 ) +
   geom_point(
     color = "#28a87d",
@@ -552,8 +646,8 @@ pCostsReal <- ggplot2::ggplot(noMono,
     size = 4
   ) +
   labs(
-    x = "",
-    y = ""
+    x = "log2(Realized Plant Diversity)",
+    y = "Total Costs (€/ha/a)"
     ) +
    geom_smooth(
     method = "lm",
@@ -567,10 +661,10 @@ pCostsReal <- ggplot2::ggplot(noMono,
     size = 5
   )
 
-pCostsReal
+p_real_costs
 
-ggsave("TotalCosts2.png",
-       plot = p5,
+ggsave("Total_Costs_real_noMono.png",
+       plot = p_real_costs,
        device = "png",
        bg = "white",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
@@ -616,53 +710,17 @@ p7 <- ggplot2::ggplot(noMono,
 
 p7
 
-
-# create boxplots for each factorial sowndiv and SGM
-#p1 <- ggplot2::ggplot(synthDat,
-#                aes(x = as.factor(sowndiv), y = SGM)
-#                ) +
-#  geom_boxplot(
-#  ) +
-#  labs(
-#    x = "Sown Plant Diversity",
-#    y = "SGM (€/ha)")
-
-
-# create boxplots for each factorial sowndiv and leaching costs
-#p2 <- ggplot2::ggplot(synthDat,
-#                aes(x = as.factor(sowndiv), y = leach_costs)
-#                ) +
-#  geom_boxplot(
-#  ) +
-#  labs(
-#    x = "Sown Plant Diversity",
-#    y = "Social costs of nitrogen leaching (€/ha/a)")
-
-
-
-# create boxplots for each factorial sowndiv and SOC costs
-#p3 <- ggplot2::ggplot(synthDat,
-#                aes(x = as.factor(sowndiv), y = SOC_costs)
-#                ) +
-#  geom_boxplot(
-#  ) +
-#  labs(
-#    x = "Sown Plant Diversity",
-#    y = "Social costs/benefits of climate regulation (€/ha/a)")
-
-
-
-# combine the three plots above in a grid
-#library(patchwork)
-#p1 + p2 + p3 +
-#  plot_layout(ncol = 3) +
-#  plot_annotation(title = "Costs and Benefits of Sown Plant Diversity") &
-#  theme(plot.title = element_text(size=20,hjust=0.5))
-
-#ggsave("Costs_Benefits.png", plot = last_plot(), device = "png", path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/", width = 10, height = 15, units = "cm", dpi = 300)
-
-
 ```
+
+
+
+
+
+
+
+
+
+
 
 ## Supplementary Analysis
 ### With Monocultures
