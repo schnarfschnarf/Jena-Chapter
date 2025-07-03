@@ -1,0 +1,81 @@
+---
+title: "Ecological Multifunctinality Analysis"
+author: "Marius Munschek"
+date: "2025-05-30"
+output: html_document
+---
+
+# Preface
+This R Script is intended to be used to calculate the ecological multifunctionality for (mostly) soil functions in the Jena experiment. I will focus on the following functions:
+- Biomass production above and below
+- Nitrogen leaching
+- Carbon sequestration 
+- 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preparation
+## Loading packages
+```{r Packages, include=FALSE}
+library(dplyr)
+library(readr)
+library(readxl)
+library(ggplot2)
+library(patchwork)
+library(brms)
+library(performance)
+library(ggpmisc)
+```
+
+## Set up a theme
+```{r include=FALSE}
+theme_set(theme_minimal(base_size = 14)+
+            theme(plot.title = element_text(size=13,hjust=0.5),
+                  axis.text = element_text(size = 7),
+                  axis.text.y = element_text(size = 13),
+                  axis.text.x = element_text(size = 13)))
+```
+
+## Load datasets and filter for relevant observations/measurements
+```{r Read Data, include=FALSE}
+# load synthesis dataset
+ecologicalMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/ecological_multifunctionality.xlsx")
+
+```
+
+
+### Multidiversity Index
+Here I want to integrate the Diversity metrics
+```{r Multidiversity}
+
+```
+
+## Statistical Models 
+Also single functions or just multifunctionality?
+```{r Biomass ~ SR}
+
+
+```
+
+
+```{r SOC ~ realized SR}
+
+```
+
+```{r N leaching ~ realized SR}
+
+```
+
+```{r HerbivoryAbove ~ Realized SR}
+
+```
+
+
+## Plotting
+### Plot biomass against realized species richness
+```{r Plotting}
+p1 
+
+```
+
