@@ -1,0 +1,170 @@
+{
+  "Id": 208,
+  "Title": "OTUdiversity_amf_dBEF",
+  "Description": "Alpha diversity indices of AMF OTUs in dBEF subplots",
+  "inUse": true,
+  "Structured": true,
+  "Variables": [
+    {
+      "Id": 1526,
+      "Label": "plot",
+      "Description": "ID of the plot",
+      "isOptional": true,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 1,
+        "Name": "string",
+        "Description": "String",
+        "SystemType": "String"
+      }
+    },
+    {
+      "Id": 1527,
+      "Label": "treatment",
+      "Description": "D1= without soil and plant history, D2= with soil, without plant history, D3= with soil and plant history",
+      "isOptional": true,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 1,
+        "Name": "string",
+        "Description": "String",
+        "SystemType": "String"
+      }
+    },
+    {
+      "Id": 1528,
+      "Label": "OTU_richness",
+      "Description": "Alpha diversity of OTUs (OTU richness)",
+      "isOptional": true,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 7,
+        "Name": "number",
+        "Description": "An 16 bit integer number",
+        "SystemType": "Int16"
+      }
+    },
+    {
+      "Id": 1530,
+      "Label": "Shannon",
+      "Description": "Shannon's diversity index, defined by formula H = [(n/N) x ln(n/N)] with n - number of individuals of one patricular species found and N - the total number of all individuals found",
+      "isOptional": true,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 1531,
+      "Label": "Simpson",
+      "Description": "Simpson's diversity index, defined implicitly by formula x = (n/N)^2 , with n - total nr of individuals of one particular species and N - total nr of all individuals found.",
+      "isOptional": true,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 1529,
+      "Label": "Chao1",
+      "Description": "Chao1 richness estimate, defined by formula R = s + a, with s - number of taxa observed and a - unknown number of species present in community but not observed",
+      "isOptional": true,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    },
+    {
+      "Id": 1533,
+      "Label": "Pielous_Evenness",
+      "Description": "Evenness index of community, defined by formula J = H / log(s), with J - Shannon Index and s - number of species found",
+      "isOptional": true,
+      "unit": {
+        "Id": 1,
+        "Name": "none",
+        "Description": "If no unit is used.",
+        "Dimension": {
+          "Name": "none",
+          "Description": "none",
+          "Specification": "If no unit is used."
+        },
+        "MeasurementSystem": "Unknown"
+      },
+      "dataType": {
+        "Id": 5,
+        "Name": "double",
+        "Description": "A real number",
+        "SystemType": "Double"
+      }
+    }
+  ]
+}
