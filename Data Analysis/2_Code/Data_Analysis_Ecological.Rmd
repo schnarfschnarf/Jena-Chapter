@@ -12,12 +12,12 @@ This R Script is intended to be used to calculate the ecological multifunctional
 - Carbon sequestration 
 - 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning=FALSE, message=FALSE, echo=TRUE, cache=TRUE, cache.lazy=FALSE, cache.path="cache/", out.width="100%", out.height="100%")
 ```
 
 # Preparation
 ## Loading packages
-```{r Packages, include=FALSE}
+```{r Packages}
 library(dplyr)
 library(readr)
 library(readxl)
@@ -29,18 +29,25 @@ library(ggpmisc)
 ```
 
 ## Set up a theme
-```{r include=FALSE}
-theme_set(theme_minimal(base_size = 14)+
-            theme(plot.title = element_text(size=13,hjust=0.5),
-                  axis.text = element_text(size = 7),
-                  axis.text.y = element_text(size = 13),
-                  axis.text.x = element_text(size = 13)))
+```{r Theme}
+theme_set(
+  theme_minimal(base_size = 14) +
+    theme(
+      plot.title = element_text(size = 13, hjust = 0.5),
+      axis.text = element_text(size = 7),
+      axis.text.y = element_text(size = 13),
+      axis.text.x = element_text(size = 13),
+      panel.background = element_rect(fill = "white", color = NA),
+      plot.background = element_rect(fill = "white", color = NA)
+    )
+)
 ```
 
 ## Load datasets and filter for relevant observations/measurements
-```{r Read Data, include=FALSE}
+```{r Read Data}
 # load synthesis dataset
-ecologicalMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/ecological_multifunctionality.xlsx")
+ecologicalMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality.xlsx")
+economicMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx")
 
 ```
 
@@ -51,31 +58,122 @@ Here I want to integrate the Diversity metrics
 
 ```
 
+## Plot the densities of the data
+```{r Densities}
+# check distribution of multifunctionality
+ggplot2::ggplot(ecologicalMF,
+                aes(x = multifunctionality)
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Ecological Multifunctionality",
+    y = "Density"
+  )
+
+# check the distribution of realized SR
+ggplot2::ggplot(ecologicalMF,
+                aes(x = meanSR)
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Mean Realized Plant Diversity",
+    y = "Density"
+  )
+
+```
+
+
 ## Statistical Models 
 Also single functions or just multifunctionality?
-```{r Biomass ~ SR}
+```{r MF ~ sowndiv}
+fitMFsown <- brm(
+  multifunctionality ~ log2(sowndiv),
+ ecologicalMF)
 
+#check model assumptions
+    pp_check(fitMFsown, type="scatter_avg") 
+    pp_check(fitMFsown, ndraws=50)
+    check_model(fitMFsown, check="linearity") 
+    check_model(fitMFsown, check="homogeneity")
+    plot(fitMFsown)
+
+# check model output
+summary(fitMFsown)
 
 ```
 
 
-```{r SOC ~ realized SR}
+```{r MF ~ realized SR}
+
+fitMFreal <- brm(
+  multifunctionality ~ log2(meanSR),
+  ecologicalMF)
+
+# check model assumptions
+    pp_check(fitMFreal, type="scatter_avg") 
+    pp_check(fitMFreal, ndraws=50)
+    check_model(fitMFreal, check="linearity") 
+    check_model(fitMFreal, check="homogeneity")
+    plot(fitMFreal)
+    
+#check model output
+summary(fitMFreal)
+
 
 ```
 
-```{r N leaching ~ realized SR}
+```{r correlation economic and ecological MF}
+# merge ecological and economic multifunctionality data
+joinedMF <- ecologicalMF %>%
+  left_join(economicMF, by = "plotcode") 
+
+# Correlation between economic and ecological multifunctionality
+cor.test(joinedMF$multifunctionality, joinedMF$costs_total_mid)
 
 ```
-
-```{r HerbivoryAbove ~ Realized SR}
-
-```
-
 
 ## Plotting
 ### Plot biomass against realized species richness
 ```{r Plotting}
-p1 
+#plot multifunctionality as a response to sowndiv
+ggplot(ecologicalMF, aes(x=log2(sowndiv), y=multifunctionality)) +
+  geom_point(
+    color = "#28a87d",
+    alpha = .5,
+    shape = "X",
+    stroke = 1,
+    size = 4
+  ) +
+   geom_smooth(
+    method = "lm",
+    se = FALSE
+  ) +
+  labs(title = "Ecological Multifunctionality vs. Sown Plant Diversity",
+       x = "Log2(Sown Plant Diversity)",
+       y = "Ecological Multifunctionality")
+
+# plot MF as a function of meanSR
+ggplot(ecologicalMF, aes(x=log2(meanSR), y=multifunctionality)) +
+    geom_point(
+    color = "#28a87d",
+    alpha = .5,
+    shape = "X",
+    stroke = 1,
+    size = 4
+  ) +
+   geom_smooth(
+    method = "lm",
+    se = FALSE
+  ) +
+  labs(title = "Multifunctionality vs. Realized Species Richness",
+       x = "Log2(Realized Species Richness)",
+       y = "Multifunctionality")
 
 ```
 

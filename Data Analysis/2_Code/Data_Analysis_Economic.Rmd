@@ -12,12 +12,12 @@ This R Script is intended to be used to calculate the economic multifunctionalit
 - Carbon sequestration
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning=FALSE, message=FALSE, echo=TRUE, fig.width=10, fig.height=6, dpi=300, cache=TRUE, cache.lazy=FALSE, cache.path="cache/", fig.path="figures/", out.width="100%", out.height="100%")
 ```
 
 # Preparation
 ## Loading packages
-```{r Packages, include=FALSE}
+```{r Packages}
 library(dplyr)
 library(readr)
 library(readxl)
@@ -30,7 +30,7 @@ library(ggpmisc)
 ```
 
 ## Set up a theme
-```{r include=FALSE}
+```{r Theme}
 theme_set(theme_classic(base_size = 14)+
             theme(plot.title = element_text(size=13,hjust=0.5),
                   axis.text = element_text(size = 7),
@@ -39,7 +39,7 @@ theme_set(theme_classic(base_size = 14)+
 ```
 
 ## Load datasets and filter for relevant observations/measurements
-```{r Read Data, include=FALSE}
+```{r Read Data}
 #load synthesis dataset
 synthDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/synthesized_means_data.xlsx")
 
@@ -63,7 +63,7 @@ noMono <- synthDat %>%
 
 
 ## Plot the densities of the data
-```{r Densities, include=FALSE}
+```{r Densities}
 
 # check distribution of sowndiv
 p1 <- ggplot2::ggplot(synthDat,
@@ -172,7 +172,7 @@ ggsave("Densities.png",
 
 ## Statistical Models 
 
-```{r Sown Diversity WITHOUT Monocultures, include=FALSE}
+```{r Sown Diversity WITHOUT Monocultures}
 
 # Biomass against species richness
 fitBiomassSown <- brm(
@@ -252,7 +252,7 @@ fitTotalSown <- brm(
 ```
 
 
-```{r Realized Diversity without Monocultures, include=FALSE}
+```{r Realized Diversity without Monocultures}
 
 # Biomass against species richness
 fitBiomassReal <- brm(
@@ -336,7 +336,7 @@ shapiro.test(residuals(fitTotalReal)) # check normality of residuals
 
 ### Sensitivity Analysis with different price scenarios
 
-```{r Sensitivity Analysis, include=FALSE}
+```{r Sensitivity Analysis}
 
 # Low Total Costs against species richness
 fitTotalLo <- brm(
@@ -711,12 +711,6 @@ p7 <- ggplot2::ggplot(noMono,
 p7
 
 ```
-
-
-
-
-
-
 
 
 

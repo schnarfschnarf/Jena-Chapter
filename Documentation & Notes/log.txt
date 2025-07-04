@@ -140,4 +140,13 @@ SIIIIICK
 03.07.25
 - started working at 9:15
 - advanced with ecological MF analysis script - almost finished - only biodiversity data is missing
-- 
+- started to watch the Terranova online course on landscape change
+- stopped working at 15:30
+
+04.07.25
+- started working at 10:00
+- started preparing for the KIT summer school
+- installed Docker
+- little bit of LinkedIn
+- worked on my scripts and cleaned them up, so they are knitted correctly
+- left work at 16:00

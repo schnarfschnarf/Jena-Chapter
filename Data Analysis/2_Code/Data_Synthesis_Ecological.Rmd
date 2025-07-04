@@ -8,12 +8,24 @@ output: html_document
 # Preface
 This R Script is to be used to load, explore, and synthesize the data for assessing the (soil) ecological multifunctionality in the Jena experiment and it's response to different levels of plant diversity. The following ecological functions were are incuded: Aboveground biomass production, C&N content in the soil, Realized Species Richness, nitrogen leaching (into the groundwater), pollination, above- and belowground herbivory (for belowground measured as energy fluxes in the food web), soil organic carbon (SOC), leaf dry matter content (LDMC), soil diversity, microbial biomass + respiration. 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warn = TRUE, 
+                      message = FALSE, 
+                      error = FALSE, 
+                      echo = TRUE, 
+                      cache = FALSE, 
+                      fig.width = 8, 
+                      fig.height = 6, 
+                      dpi = 300,
+                      out.width = "100%",
+                      fig.align = "center",
+                      comment = NA,
+                      tidy = TRUE,
+                      collapse = TRUE)
 ```
 
 # Preparation
 ## Loading packages
-```{r Packages, include=FALSE}
+```{r Packages}
 library(dplyr)
 library(readr)
 library(readxl)
@@ -187,8 +199,6 @@ realdiv <- SR %>%                    #calculate the mean realized SR for the yea
 
 SR <- distinct(SR, plotcode, sowndiv)
 
-realdiv <- filter(SR, year > 2018 & season == "Total" ) #keep only total SR from year 2018 onwards
-
 ```
 
 
@@ -198,6 +208,9 @@ leaching <- leaching %>%
 
 # standardize the leaching values
 leaching$leaching_standardized <- leaching$TNleaching_av / max(leaching$TNleaching_av)
+
+# higher values are worse, therefore the values have to be inverted
+leaching$leaching_standardized <- 1 - leaching$leaching_standardized
 
 ```
 
@@ -210,6 +223,9 @@ herbivoryMean <- herbivoryAbove %>%
             ungroup() %>%
             na.omit() %>%
             mutate(herbivory_standardized = meanHerb / max(meanHerb)) # standardize the herbivory values
+
+# higher values are worse, therefore the values have to be inverted
+herbivoryMean$herbivory_standardized <- 1 - herbivoryMean$herbivory_standardized
 
 ```
 
@@ -238,21 +254,21 @@ flowersMean <- flowers %>%
 
 ## Synthesize in one Dataset
 ```{r Data Synthesis}
-ecologicalMF <- biomassMeans %>% 
+# merge all datasets into one dataset
+
+ecologicalMF <- leaching %>% 
   left_join(microbialMean, by = join_by(plotcode)) %>% 
   left_join(rootsMean, by = join_by(plotcode)) %>% 
-  left_join(leaching, by = join_by(plotcode)) %>% 
+  left_join(biomassMeans, by = join_by(plotcode)) %>% 
   left_join(carbonMean, by = join_by(plotcode)) %>% 
   left_join(realdiv, by = join_by(plotcode)) %>%
   left_join(select(design, plotcode, block)) %>%
   left_join(SR, by = join_by(plotcode)) %>% 
   left_join(herbivoryMean, by = join_by(plotcode)) %>%
   left_join(pollinatorsMean, by = join_by(plotcode)) %>%
-  left_join(flowersMean, by = join_by(plotcode)) %>%
-  
-  filter(sowndiv < 60)
-  # merge the microbial and root data with the biomass data
+  left_join(flowersMean, by = join_by(plotcode))
 
+# calculate the ecological multifunctionality as the mean of the standardized values  
 ecologicalMF$multifunctionality <- rowMeans(
   ecologicalMF[, c(
     "biomass_standardized",
@@ -266,10 +282,10 @@ ecologicalMF$multifunctionality <- rowMeans(
     "herbivory_standardized"
   )],
   na.rm = TRUE
-) # calculate the ecological multifunctionality as the mean of the standardized values
+)
 
 # save the ecological multifunctionality dataset
-writexl::write_xlsx(ecologicalMF, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality.xlsx")
+# writexl::write_xlsx(ecologicalMF, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality.xlsx")
 
 
 ```

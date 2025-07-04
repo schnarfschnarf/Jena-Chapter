@@ -5,12 +5,9 @@
 
 
 1) Do the ecological MF analysis and check association with economic MF.
+
+	--> Should I calculate the correlation without including leaching, SOC and biomass in the ecological MF?
 	
-	--> Started to work on the script. Need to calculate the yearly averages for all the functions to do a standardization?
-	--> For ecological MF also include the root biomass?
-
-	--> Some values for microbial biomass + resp are really weird (-999999)
-
 2) WRITE!!!!
 
 
