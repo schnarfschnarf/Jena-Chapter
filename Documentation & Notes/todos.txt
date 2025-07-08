@@ -4,13 +4,13 @@
 
 
 
-1) Do the ecological MF analysis and check association with economic MF.
 
-	--> Should I calculate the correlation without including leaching, SOC and biomass in the ecological MF?
+
+1) Finalize the figures
+
+2) Finalize analysis (--> Include any single service figures and models???)
 	
-2) WRITE!!!!
-
-
+3) WRITE!!!!
 
 
 
@@ -21,9 +21,13 @@
 !) Discuss the importance of ecosystem services that can not be monetized so easily or at all.
 
 
+Done) Do the ecological MF analysis and check association with economic MF.
+
+	--> Should I calculate the correlation without including leaching, SOC and biomass in the ecological MF?
+
 Done) Check whether the nitrogen leaching data make sense 
 
-	--> Markus on vacation until 07.07.
+NOT DONE)	--> Markus on vacation until 07.07.
 
 
 Done) Ask for help with assessing the model fit and interpreting the model outputs.

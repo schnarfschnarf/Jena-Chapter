@@ -123,6 +123,10 @@ pollinators <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1
 #load data on flower cover
 flowers <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Pollinators/PollinatorObservation_Main_2011_id140.xlsx")
 
+#soil infiltration rates
+# infiltration <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Infiltration/367_2_data.xlsx") 
+
+
 #load LDMC data
 # ldmc <- read_csv("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/LDMC/Leaf_Root_traits_dbef_2021.csv")
 
@@ -131,7 +135,7 @@ flowers <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Dat
 
 #load data on enzyme activity?
 
-#soil infiltration rates
+
 
 ```
 
