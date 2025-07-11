@@ -166,3 +166,21 @@ SIIIIICK
 - checking for literature on grasslands, their composition and management 
 - left work at 16:30
 - 
+
+09.07.25
+- home office - started working at 09:30
+- don't know what I even did
+- stopped working at 13/14
+
+10.07.25
+- worked on the train to Stuttgart ~4h
+- literature research and manuscript
+
+11.07.25
+- home office in Stuttgart - started at 9:45
+- working on the figures
+- trying to understand the log transformation and how to revert the transformation for better model interpretation
+- made two plots: 1x the logarithmic relationship and og data; 1x marginal effect plot
+- --> ask Benjamin for feedback and if that makes sense
+- stopped working at 14:00
+- 

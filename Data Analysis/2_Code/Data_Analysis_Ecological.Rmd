@@ -26,6 +26,7 @@ library(patchwork)
 library(brms)
 library(performance)
 library(ggpmisc)
+library(marginaleffects)
 ```
 
 ## Set up a theme
