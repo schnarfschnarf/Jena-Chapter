@@ -183,4 +183,7 @@ SIIIIICK
 - made two plots: 1x the logarithmic relationship and og data; 1x marginal effect plot
 - --> ask Benjamin for feedback and if that makes sense
 - stopped working at 14:00
-- 
+
+14.07.25
+- Home office in Tübingen, started working at 11:00
+-

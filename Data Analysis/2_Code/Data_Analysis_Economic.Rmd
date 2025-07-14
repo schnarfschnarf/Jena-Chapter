@@ -31,11 +31,14 @@ library(marginaleffects)
 
 ## Set up a theme
 ```{r Theme}
-theme_set(theme_classic(base_size = 14)+
+theme_set(theme_minimal(base_size = 13)+
             theme(plot.title = element_text(size=13,hjust=0.5),
                   axis.text = element_text(size = 7),
                   axis.text.y = element_text(size = 13),
-                  axis.text.x = element_text(size = 13)))
+                  axis.text.x = element_text(size = 13),
+                  axis.line = element_line(color = "black", size = 0.5)
+                  )
+          )
 ```
 
 ## Load datasets and filter for relevant observations/measurements
@@ -314,7 +317,7 @@ fitLeachReal <- brm(
     # check output of model
     summary(fitLeachReal)
 
-# Total Costs against species richness
+# Total Costs against realized species richness
 fitTotalReal <- brm(
   costs_total_mid ~ log2(meanSR),
   noMono)
@@ -383,7 +386,7 @@ p_sown_biomass <- ggplot2::ggplot(noMono,
   geom_point(
     color = "#28a87d",
     alpha = .5,
-    shape = "X",
+    shape = 20,
     stroke = 1,
     size = 4
   ) +
@@ -393,7 +396,7 @@ p_sown_biomass <- ggplot2::ggplot(noMono,
   ) +
   labs(
     x = "log2(Sown Plant Diversity)",
-    y = "Summed Biomass per Plot in 2022 (g)")
+    y = "Mean Biomass per Plot in g (2004-2023)")
 
 p_sown_biomass
 
@@ -410,7 +413,7 @@ p_real_biomass <- ggplot2::ggplot(noMono,
   geom_point(
     color = "#28a87d",
     alpha = .5,
-    shape = "X",
+    shape = 20,
     stroke = 1,
     size = 4
   ) +
@@ -420,7 +423,7 @@ p_real_biomass <- ggplot2::ggplot(noMono,
   ) +
   labs(
     x = "log2(Realized Plant Diversity)",
-    y = "Summed Biomass per Plot in 2022 (g)")
+    y = "Mean Biomass per Plot in g (2004-2023)")
 
 p_real_biomass
 
@@ -437,7 +440,7 @@ p_sown_sgm <- ggplot2::ggplot(noMono,
   geom_point(
     color = "#28a87d",
     alpha = .5,
-    shape = "X",
+    shape = 20,
     stroke = 1,
     size = 4
   ) +
@@ -447,7 +450,7 @@ p_sown_sgm <- ggplot2::ggplot(noMono,
   ) +
   labs(
     x = "log2(Sown Plant Diversity)",
-    y = "standard gross margin (€/ha)")
+    y = "Mean Standard Gross Margin (€/ha/a) 2004 - 2023")
 
 p_sown_sgm
 
@@ -464,7 +467,7 @@ p_real_sgm <- ggplot2::ggplot(noMono,
   geom_point(
     color = "#28a87d",
     alpha = .5,
-    shape = "X",
+    shape = 20,
     stroke = 1,
     size = 4
   ) +
@@ -474,7 +477,7 @@ p_real_sgm <- ggplot2::ggplot(noMono,
   ) +
   labs(
     x = "log2(Realized Plant Diversity)",
-    y = "standard gross margin (€/ha)")
+    y = "Mean Standard Gross Margin (€/ha/a) 2004 - 2023")
 
 p_real_sgm
 
@@ -491,7 +494,7 @@ p_sown_soc <- ggplot2::ggplot(noMono,
   geom_point(
     color = "#28a87d",
     alpha = .5,
-    shape = "X",
+    shape = 20,
     stroke = 1,
     size = 4
   ) +
@@ -501,7 +504,7 @@ p_sown_soc <- ggplot2::ggplot(noMono,
   ) +
   labs(
     x = "log2(Sown Plant Diversity)",
-    y = "climate regulation costs/gains (€/ha)")
+    y = "climate regulation costs/benefits (€/ha/a)")
 
 p_sown_soc
 
@@ -514,7 +517,7 @@ p_real_soc <- ggplot2::ggplot(noMono,
   geom_point(
     color = "#28a87d",
     alpha = .5,
-    shape = "X",
+    shape = 20,
     stroke = 1,
     size = 4
   ) +
@@ -524,7 +527,7 @@ p_real_soc <- ggplot2::ggplot(noMono,
   ) +
   labs(
     x = "log2(Realized Plant Diversity)",
-    y = "climate regulation costs/gains (€/ha)")
+    y = "climate regulation costs/benefits (€/ha/a)")
 
 p_real_soc
 
@@ -537,7 +540,7 @@ p_sown_leach <- ggplot2::ggplot(noMono,
   geom_point(
     color = "#28a87d",
     alpha = .5,
-    shape = "X",
+    shape = 20,
     stroke = 1,
     size = 4
   ) +
@@ -547,7 +550,7 @@ p_sown_leach <- ggplot2::ggplot(noMono,
   ) +
   labs(
     x = "log2(Sown Plant Diversity)",
-    y = "leaching costs (€/ha/a)")
+    y = "Nitrogen Leaching Costs (€/ha/a)")
 
 p_sown_leach
 
@@ -561,7 +564,7 @@ p_real_leach <- ggplot2::ggplot(noMono,
   geom_point(
     color = "#28a87d",
     alpha = .5,
-    shape = "X",
+    shape = 20,
     stroke = 1,
     size = 4
   ) +
@@ -571,7 +574,7 @@ p_real_leach <- ggplot2::ggplot(noMono,
   ) +
   labs(
     x = "log2(Realized Plant Diversity)",
-    y = "leaching costs (€/ha/a)")
+    y = "Nitrogen Leaching Costs (€/ha/a)")
 
 p_real_leach
 
@@ -581,7 +584,7 @@ ggsave("Leaching_mid_real_noMono.png", plot = last_plot(), device = "png", path 
 p_services_sown <- p_sown_biomass + p_sown_sgm + p_sown_soc + p_sown_leach +
   plot_layout(ncol = 2) +
   plot_annotation(title = "Sown Plant Diversity against Biomass, SGM, SOC Costs and Leaching Costs") &
-  theme(plot.title = element_text(size=20,hjust=0.5))
+  theme(plot.title = element_text(size=13,hjust=0.5))
 
 ggsave("Single_Services_sown.png",
        plot = last_plot(),
@@ -593,7 +596,7 @@ ggsave("Single_Services_sown.png",
 p_services_real <- p_real_biomass + p_real_sgm + p_real_soc + p_real_leach +
   plot_layout(ncol = 2) +
   plot_annotation(title = "Realized Plant Diversity against Biomass, SGM, SOC Costs and Leaching Costs") &
-  theme(plot.title = element_text(size=20,hjust=0.5))
+  theme(plot.title = element_text(size=13,hjust=0.5))
 
 ggsave("Single_Services_real.png",
        plot = last_plot(),
@@ -609,11 +612,11 @@ p_sown_costs <- ggplot2::ggplot(noMono,
     color = "#28a87d",
     alpha = .5,
     stroke = 1,
-    size = 4
+    size = 2
   ) +
   labs(
     x = "log2(Sown Plant Diversity)",
-    y = "Total Costs (€/ha/a)"
+    y = "Mean Total Costs/Benefits (€/ha/a)"
     ) +
    geom_smooth(
     method = "lm",
@@ -644,11 +647,11 @@ p_real_costs <- ggplot2::ggplot(noMono,
     color = "#28a87d",
     alpha = .5,
     stroke = 1,
-    size = 4
+    size = 2
   ) +
   labs(
     x = "log2(Realized Plant Diversity)",
-    y = "Total Costs (€/ha/a)"
+    y = "Mean Total Costs/Benefits (€/ha/a)"
     ) +
    geom_smooth(
     method = "lm",
@@ -679,7 +682,7 @@ p6 <- ggplot2::ggplot(noMono,
     color = "#28a87d",
     alpha = .5,
     stroke = 1,
-    size = 4
+    size = 2
   ) +
   labs(
     x = "",
@@ -699,7 +702,7 @@ p7 <- ggplot2::ggplot(noMono,
     color = "#28a87d",
     alpha = .5,
     stroke = 1,
-    size = 4
+    size = 5
   ) +
   labs(
     x = "",
@@ -711,6 +714,11 @@ p7 <- ggplot2::ggplot(noMono,
 
 p7
 
+```
+
+
+### Marginal Effects and Fitted Model Plots
+```{r}
 
 
 # plot the marginal effects of the models

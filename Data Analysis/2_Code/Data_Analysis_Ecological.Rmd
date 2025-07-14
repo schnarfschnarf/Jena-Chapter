@@ -36,8 +36,8 @@ theme_set(
     theme(
       plot.title = element_text(size = 13, hjust = 0.5),
       axis.text = element_text(size = 7),
-      axis.text.y = element_text(size = 13),
-      axis.text.x = element_text(size = 13),
+      axis.text.y = element_text(size = 12),
+      axis.text.x = element_text(size = 12),
       panel.background = element_rect(fill = "white", color = NA),
       plot.background = element_rect(fill = "white", color = NA)
     )
@@ -137,19 +137,41 @@ joinedMF <- ecologicalMF %>%
 # Correlation between economic and ecological multifunctionality
 cor.test(joinedMF$multifunctionality, joinedMF$costs_total_mid)
 
+# plot the correlation
+corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
+  geom_point(
+    color = "#28a87d",
+    alpha = .5,
+    shape = 20,
+    stroke = 1,
+    size = 4
+  ) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Economic vs. Ecological Multifunctionality",
+       x = "Ecological Multifunctionality",
+       y = "Economic Multifunctionality (Costs/Benefits)")
+
+# save figure
+ggsave("Corr_EconomicMF_EcologicalMF.png",
+       plot = corrPlot,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
 ```
 
 ## Plotting
 ### Plot biomass against realized species richness
 ```{r Plotting}
 #plot multifunctionality as a response to sowndiv
-ggplot(ecologicalMF, aes(x=log2(sowndiv), y=multifunctionality)) +
+p1 <- ggplot(ecologicalMF, aes(x=log2(sowndiv), y=multifunctionality)) +
   geom_point(
     color = "#28a87d",
     alpha = .5,
-    shape = "X",
+    shape = 20,
     stroke = 1,
-    size = 4
+    size = 4,
+    position = position_jitter(w = 0.03, h = 0)
   ) +
    geom_smooth(
     method = "lm",
@@ -159,22 +181,40 @@ ggplot(ecologicalMF, aes(x=log2(sowndiv), y=multifunctionality)) +
        x = "Log2(Sown Plant Diversity)",
        y = "Ecological Multifunctionality")
 
+p1
+
+# save figure
+ggsave("EcologicalMF_sown_noMono.png",
+       plot = p1,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
 # plot MF as a function of meanSR
-ggplot(ecologicalMF, aes(x=log2(meanSR), y=multifunctionality)) +
+p2 <- ggplot(ecologicalMF, aes(x=log2(meanSR), y=multifunctionality)) +
     geom_point(
     color = "#28a87d",
     alpha = .5,
-    shape = "X",
+    shape = 20,
     stroke = 1,
-    size = 4
+    size = 4,
   ) +
    geom_smooth(
     method = "lm",
     se = FALSE
   ) +
-  labs(title = "Multifunctionality vs. Realized Species Richness",
+  labs(title = "Ecological Multifunctionality vs. Realized Species Richness",
        x = "Log2(Realized Species Richness)",
-       y = "Multifunctionality")
+       y = "Ecological Multifunctionality")
+
+p2
+
+# save figure
+ggsave("EcologicalMF_realizedSR_noMono.png",
+       plot = p2,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
 
 ```
 
