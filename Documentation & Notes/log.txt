@@ -186,4 +186,17 @@ SIIIIICK
 
 14.07.25
 - Home office in Tübingen, started working at 11:00
--
+- making plots more beautiful
+- stopped working at 14:30
+
+15.07.25
+- working on the train, started working at 09:00
+- continued writing the manuscript
+- compared Markus Langes leaching data with mine 
+- train arrived 13:30 (didn't work for at least 1 hour in train)
+- hainstraße at 14:00
+- JF and a little work until 15:30
+
+16.07.25
+- started working at 09:00 iDiv
+- improved the data analysis: standardization was wrong before, now it's a proper min-max normalization

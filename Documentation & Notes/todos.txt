@@ -2,17 +2,11 @@
 -----------  Jena Project To-Dos  --------------
 ------------------------------------------------
 
-
-
-
-
 1) Finalize the figures
 
 2) Finalize analysis (--> Include any single service figures and models???)
 	
 3) WRITE!!!!
-
-
 
 
 
@@ -26,10 +20,8 @@ Done) Do the ecological MF analysis and check association with economic MF.
 	--> Should I calculate the correlation without including leaching, SOC and biomass in the ecological MF?
 
 Done) Check whether the nitrogen leaching data make sense 
-
-NOT DONE)	--> Markus on vacation until 07.07.
-
+	Only two elements were different: Markus had two additional elements in his table that were missing in mine. I assume he did something wrong there, because 
+	strangely those two values were also the only two negative values in Markus table.
 
 Done) Ask for help with assessing the model fit and interpreting the model outputs.
-	
 	--> Yuanyuan said the model assumptions were okay. She said to log transform the realized species richness, because of functional redundancy in the plots that causes 	the diversity-productivity relationship to be non linear. 

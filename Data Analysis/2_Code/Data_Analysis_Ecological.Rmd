@@ -6,11 +6,8 @@ output: html_document
 ---
 
 # Preface
-This R Script is intended to be used to calculate the ecological multifunctionality for (mostly) soil functions in the Jena experiment. I will focus on the following functions:
-- Biomass production above and below
-- Nitrogen leaching
-- Carbon sequestration 
-- 
+This R Script is intended to be used to calculate the ecological multifunctionality for (mostly) soil functions in the Jena Experiment. 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning=FALSE, message=FALSE, echo=TRUE, cache=TRUE, cache.lazy=FALSE, cache.path="cache/", out.width="100%", out.height="100%")
 ```
@@ -47,11 +44,12 @@ theme_set(
 ## Load datasets and filter for relevant observations/measurements
 ```{r Read Data}
 # load synthesis dataset
-ecologicalMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality.xlsx")
-economicMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx")
+ecologicalMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality.xlsx") %>% 
+  filter(!is.na(sowndiv) & sowndiv < 60) # remove rows with NA in sowndiv and sowndiv greater than 16
+economicMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx") %>% 
+  filter(sowndiv > 1 & sowndiv < 60) # remove rows with sowndiv greater than 16
 
 ```
-
 
 ### Multidiversity Index
 Here I want to integrate the Diversity metrics
@@ -89,7 +87,6 @@ ggplot2::ggplot(ecologicalMF,
 
 ```
 
-
 ## Statistical Models 
 Also single functions or just multifunctionality?
 ```{r MF ~ sowndiv}
@@ -109,7 +106,6 @@ summary(fitMFsown)
 
 ```
 
-
 ```{r MF ~ realized SR}
 
 fitMFreal <- brm(
@@ -126,37 +122,6 @@ fitMFreal <- brm(
 #check model output
 summary(fitMFreal)
 
-
-```
-
-```{r correlation economic and ecological MF}
-# merge ecological and economic multifunctionality data
-joinedMF <- ecologicalMF %>%
-  left_join(economicMF, by = "plotcode") 
-
-# Correlation between economic and ecological multifunctionality
-cor.test(joinedMF$multifunctionality, joinedMF$costs_total_mid)
-
-# plot the correlation
-corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
-  geom_point(
-    color = "#28a87d",
-    alpha = .5,
-    shape = 20,
-    stroke = 1,
-    size = 4
-  ) +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Economic vs. Ecological Multifunctionality",
-       x = "Ecological Multifunctionality",
-       y = "Economic Multifunctionality (Costs/Benefits)")
-
-# save figure
-ggsave("Corr_EconomicMF_EcologicalMF.png",
-       plot = corrPlot,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
 
 ```
 
@@ -212,6 +177,98 @@ p2
 # save figure
 ggsave("EcologicalMF_realizedSR_noMono.png",
        plot = p2,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+```
+
+```{r correlation economic and ecological MF}
+# merge ecological and economic multifunctionality data
+joinedMF <- ecologicalMF %>%
+  left_join(economicMF, by = "plotcode")
+
+joinedMF %>% filter(sowndiv.y > 1)
+
+# Correlation between economic and ecological multifunctionality
+cor.test(joinedMF$multifunctionality, joinedMF$costs_total_mid)
+
+# plot the correlation
+corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
+  geom_point(
+    color = "#28a87d",
+    alpha = .5,
+    shape = 20,
+    stroke = 1,
+    size = 4
+  ) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Economic vs. Ecological Multifunctionality",
+       x = "Ecological Multifunctionality",
+       y = "Economic Multifunctionality (Costs/Benefits)")
+
+corrPlot
+
+# save figure
+ggsave("Corr_EconomicMF_EcologicalMF.png",
+       plot = corrPlot,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+### Marginal Effects and Fitted Model Plots
+# plot the marginal effects of the models
+delta_y <- function(x) {
+  0.44 * log2((x + 1) / x)
+}
+
+# Create a data frame for a range of x values
+x_vals <- seq(1, 20, by = 1)
+effects <- delta_y(x_vals)
+df <- data.frame(x = x_vals, delta_y = effects)
+
+# Plot
+marginal_plot <- ggplot(df, aes(x = x, y = delta_y)) +
+  geom_line(color = "blue", size = 1) +
+  labs(
+    title = "Marginal Effect of increasing Plant Species number by 1",
+    x = "Number of plant species (x)",
+    y = "Change in ecological multifunctionality"
+  ) +
+  theme_minimal()
+marginal_plot
+
+# save plot of marginal effects
+ggsave("Marginal_Effects_Ecological.png",
+       plot = marginal_plot,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+
+# plot data with logarithmic relationship
+# Create a new data frame for prediction
+x_seq <- seq(min(ecologicalMF$meanSR), max(ecologicalMF$meanSR), length.out = 100)
+pred_df <- data.frame(meanSR = x_seq)
+pred_df$predicted_y <- predict(fitMFreal, newdata = pred_df)
+
+# Plot: data + fitted curve
+fittedPlot <- ggplot(ecologicalMF, aes(x = meanSR, y = multifunctionality)) +
+  geom_point(color = "steelblue", alpha = 0.6) +  # raw data
+  geom_line(data = pred_df, aes(x = meanSR, y = pred_df$predicted_y[,"Estimate"]),
+            color = "darkgreen", size = 1.2) +    # model prediction
+  labs(
+    title = "",
+    x = "Mean Realized Species Richness",
+    y = "Ecological Multifunctionality",
+  ) +
+  theme_minimal()
+
+fittedPlot
+
+# save plot of fitted model over raw data
+ggsave("Fitted_Relationship_Over_Raw_Data_Ecological.png",
+       plot = fittedPlot,
        device = "png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
