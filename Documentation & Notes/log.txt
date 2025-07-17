@@ -200,3 +200,13 @@ SIIIIICK
 16.07.25
 - started working at 09:00 iDiv
 - improved the data analysis: standardization was wrong before, now it's a proper min-max normalization
+- updated the models and figures
+- little bit of writing
+- stopped working at 15:00
+
+17.07.25
+- started working at 10:00
+- Science symposium meeting with Zarah and co.
+- monthly meeting with Nico --> many adjustment to dataset again
+- started to incorporate the suggestions Nico made into my analysis
+-  

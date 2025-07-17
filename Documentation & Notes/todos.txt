@@ -3,12 +3,21 @@
 ------------------------------------------------
 
 1) Finalize the figures
+	- why are there negative values for log2(realized)? --> ecological MF ~ log2(meanSR) plot 
 
-2) Finalize analysis (--> Include any single service figures and models???)
+2) Finalize analysis 
+	- Include single service figures and models for economic MF in main part
+	- Include single services and functions for ecological MF in supplements
+	- Replace aboveground herbivory with belowground and aboveground herbivore control (Barnes 2020 and Amyntas 2025)
+	- Include Biomass stability (inverse variance) in ecological MF part
+	- correlation analysis: the one you did is only a sensitivity analysis for supplements; do additional one with non-redundant functions only
+
 	
 3) WRITE!!!!
-
-
+	- you have to justify why you included the functions and services you included
+	- define and invite core writing team: Nico, Marius, Marie, Bartosz, Martin, Vera (?)
+	- mention functions and references (data creators) in the main part of manuscript (detailed measurement Infos in the supplements)
+	- most important for methods: calculations and statistics, economic MF, ecological MF
 
 ?) Include stakeholder weighting? Alternatively include this in the discussion and stress that different agents prefer different ecosystem services
 
