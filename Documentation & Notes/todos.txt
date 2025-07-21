@@ -3,15 +3,10 @@
 ------------------------------------------------
 
 1) Finalize the figures
-	- why are there negative values for log2(realized)? --> ecological MF ~ log2(meanSR) plot 
+	- should be more or less finished, just check if everything is correct
 
 2) Finalize analysis 
-	- Include single service figures and models for economic MF in main part
 	- Include single services and functions for ecological MF in supplements
-	- Replace aboveground herbivory with belowground and aboveground herbivore control (Barnes 2020 and Amyntas 2025)
-	- Include Biomass stability (inverse variance) in ecological MF part
-	- correlation analysis: the one you did is only a sensitivity analysis for supplements; do additional one with non-redundant functions only
-
 	
 3) WRITE!!!!
 	- you have to justify why you included the functions and services you included
@@ -20,13 +15,18 @@
 	- most important for methods: calculations and statistics, economic MF, ecological MF
 
 ?) Include stakeholder weighting? Alternatively include this in the discussion and stress that different agents prefer different ecosystem services
+?) why are there negative SR values for log2(realized)? --> Because mean SR is below 1 and the 2nd log of values below 1 is negative.
 
 !) Discuss the importance of ecosystem services that can not be monetized so easily or at all.
 
+DONE) Include single service figures and models for economic MF in main part
 
+DONE) Include Biomass stability (inverse of the coefficient of variation: mean/variance) in ecological MF part
+
+DONE) Replace aboveground herbivory with belowground and aboveground herbivore control (Barnes 2020 and Amyntas 2025)
+´
 Done) Do the ecological MF analysis and check association with economic MF.
-
-	--> Should I calculate the correlation without including leaching, SOC and biomass in the ecological MF?
+	--> Do so without including leaching, SOC and biomass in the ecological MF
 
 Done) Check whether the nitrogen leaching data make sense 
 	Only two elements were different: Markus had two additional elements in his table that were missing in mine. I assume he did something wrong there, because 

@@ -209,4 +209,17 @@ SIIIIICK
 - Science symposium meeting with Zarah and co.
 - monthly meeting with Nico --> many adjustment to dataset again
 - started to incorporate the suggestions Nico made into my analysis
--  
+- stopped working at 17:00
+
+18.07.25
+- working on the train to Löhnberg
+- adapting the script to Nico's suggestions (analysis, and then also plots, check todos.txt for details)
+- ~ 3h worked
+
+21.07.25
+- started working at 10:15
+- first some email writing
+- improved the data analysis (included pathogen control)
+- calculated biomass stability, should be fine
+- updated the plots and models again
+- stopped working at 16:30

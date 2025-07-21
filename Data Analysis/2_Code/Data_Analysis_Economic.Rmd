@@ -44,7 +44,7 @@ theme_set(theme_minimal(base_size = 13)+
 ## Load datasets and filter for relevant observations/measurements
 ```{r Read Data}
 #load synthesis dataset
-synthDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/synthesized_means_data.xlsx")
+synthDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx")
 
 ```
 
@@ -64,114 +64,6 @@ noMono <- synthDat %>%
 
 ```
 
-
-## Plot the densities of the data
-```{r Densities}
-
-# check distribution of sowndiv
-p1 <- ggplot2::ggplot(synthDat,
-                aes(x = log2(sowndiv))
-                ) +
-  geom_density(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-  labs(
-    x = "log2(Sown Plant Diversity)",
-    y = "Density"
-  )
-
-p1
-
-# check distribution of realSR
-p2 <- ggplot2::ggplot(noMono,
-                aes(x = meanSR)
-                ) +
-  geom_density(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-  labs(
-    x = "Realized Species Richness",
-    y = "Density"
-  )
-
-p2
-
-p3 <- ggplot2::ggplot(synthDat,
-                aes(x = mean_biomass)
-                ) +
-  geom_density(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-  labs(
-    x = "Biomass (g)",
-    y = "Density"
-  )
-
-p4 <- ggplot2::ggplot(synthDat,
-                aes(x = SGM_mean)
-                ) +
-  geom_density(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-  labs(
-    x = "Standard Gross Margin (€/ha)",
-    y = "Density"
-  )
-
-p5 <- ggplot2::ggplot(synthDat,
-                aes(x = SOC_costs_mid)
-                ) +
-  geom_density(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-  labs(
-    x = "SOC Costs (€/ha)",
-    y = "Density"
-  )
-
-p6 <- ggplot2::ggplot(synthDat,
-                aes(x = leach_costs_mid)
-                ) +
-  geom_density(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-  labs(
-    x = "Leaching Costs (€/ha/a)",
-    y = "Density"
-  )
-
-p7 <- ggplot2::ggplot(synthDat,
-                aes(x = costs_total_mid)
-                ) +
-  geom_density(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-  labs(
-    x = "Total Costs (€/ha/a)",
-    y = "Density"
-  )
-
-
-# show all in one grid
-p1 + p2 + p3 + p4 + p5 + p6 + p7 +
-  plot_layout(ncol = 3) +
-  plot_annotation(title = "Densities of Sown Plant Diversity, Realized Species Richness, Biomass, SGM, SOC Costs, Leaching Costs and Total Costs") &
-  theme(plot.title = element_text(size=20,hjust=0.5))
-
-ggsave("Densities.png",
-       plot = last_plot(),
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
-```
 
 ## Statistical Models 
 
@@ -304,7 +196,7 @@ fitSOCreal <- brm(
 
 # Leaching costs against species richness
 fitLeachReal <- brm(
-  log2(leach_costs_mid) ~ log2(meanSR),
+  leach_costs_mid ~ log2(meanSR),
   noMono)
 
     # check model assumptions
@@ -475,6 +367,12 @@ p_real_sgm <- ggplot2::ggplot(noMono,
     method = "lm",
     se = FALSE
   ) +
+    stat_poly_eq(
+    aes(label = paste(..eq.label..)),
+    formula = y ~ x,
+    parse = TRUE,
+    size = 5
+  ) +
   labs(
     x = "log2(Realized Plant Diversity)",
     y = "Mean Standard Gross Margin (€/ha/a) 2004 - 2023")
@@ -521,6 +419,11 @@ p_real_soc <- ggplot2::ggplot(noMono,
     stroke = 1,
     size = 4
   ) +
+      stat_poly_eq(
+    aes(label = paste(..eq.label..)),
+    formula = y ~ x,
+    parse = TRUE,
+    size = 5) +
    geom_smooth(
     method = "lm",
     se = FALSE
@@ -568,6 +471,12 @@ p_real_leach <- ggplot2::ggplot(noMono,
     stroke = 1,
     size = 4
   ) +
+      stat_poly_eq(
+    aes(label = paste(..eq.label..)),
+    formula = y ~ x,
+    parse = TRUE,
+    size = 5
+      ) +
    geom_smooth(
     method = "lm",
     se = FALSE
@@ -593,7 +502,7 @@ ggsave("Single_Services_sown.png",
        dpi = 300)
 
 # combine the plots for realized SR in one grid
-p_services_real <- p_real_biomass + p_real_sgm + p_real_soc + p_real_leach +
+p_services_real <- p_real_sgm + p_real_soc + p_real_leach +
   plot_layout(ncol = 2) +
   plot_annotation(title = "Realized Plant Diversity against Biomass, SGM, SOC Costs and Leaching Costs") &
   theme(plot.title = element_text(size=13,hjust=0.5))
@@ -723,7 +632,7 @@ p7
 
 # plot the marginal effects of the models
 delta_y <- function(x) {
-  239 * log2((x + 1) / x)
+  191.68 * log2((x + 1) / x)
 }
 
 # Create a data frame for a range of x values
@@ -761,9 +670,9 @@ fittedPlot <- ggplot(noMono, aes(x = meanSR, y = costs_total_mid)) +
   geom_line(data = pred_df, aes(x = meanSR, y = pred_df$predicted_y[,"Estimate"]),
             color = "darkgreen", size = 1.2) +    # model prediction
   labs(
-    title = "Fitted Model Over Raw Data",
-    x = "Original Predictor",
-    y = "Response (y)"
+    title = "Economic Multifunctionality against Realized Plant Diversity",
+    x = "Realized Plant Diversity (meanSR)",
+    y = "Total Costs/Benefits (€/ha/a)"
   ) +
   theme_minimal()
 
@@ -775,10 +684,6 @@ ggsave("Fitted_Relationship_Over_Raw_Data.png",
        dpi = 300)
 
 ```
-
-
-
-
 
 ## Supplementary Analysis
 ### With Monocultures
@@ -939,5 +844,114 @@ fitTotal3 <- brm(
     # check output of model
     summary(fitTotal3)
 
+
+```
+
+
+## Plot the densities of the data
+```{r Densities}
+
+# check distribution of sowndiv
+p1 <- ggplot2::ggplot(synthDat,
+                aes(x = log2(sowndiv))
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "log2(Sown Plant Diversity)",
+    y = "Density"
+  )
+
+p1
+
+# check distribution of realSR
+p2 <- ggplot2::ggplot(noMono,
+                aes(x = meanSR)
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Realized Species Richness",
+    y = "Density"
+  )
+
+p2
+
+p3 <- ggplot2::ggplot(synthDat,
+                aes(x = mean_biomass)
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Biomass (g)",
+    y = "Density"
+  )
+
+p4 <- ggplot2::ggplot(synthDat,
+                aes(x = SGM_mean)
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Standard Gross Margin (€/ha)",
+    y = "Density"
+  )
+
+p5 <- ggplot2::ggplot(synthDat,
+                aes(x = SOC_costs_mid)
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "SOC Costs (€/ha)",
+    y = "Density"
+  )
+
+p6 <- ggplot2::ggplot(synthDat,
+                aes(x = leach_costs_mid)
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Leaching Costs (€/ha/a)",
+    y = "Density"
+  )
+
+p7 <- ggplot2::ggplot(synthDat,
+                aes(x = costs_total_mid)
+                ) +
+  geom_density(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Total Costs (€/ha/a)",
+    y = "Density"
+  )
+
+
+# show all in one grid
+p1 + p2 + p3 + p4 + p5 + p6 + p7 +
+  plot_layout(ncol = 3) +
+  plot_annotation(title = "Densities of Sown Plant Diversity, Realized Species Richness, Biomass, SGM, SOC Costs, Leaching Costs and Total Costs") &
+  theme(plot.title = element_text(size=20,hjust=0.5))
+
+ggsave("Densities.png",
+       plot = last_plot(),
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
 
 ```

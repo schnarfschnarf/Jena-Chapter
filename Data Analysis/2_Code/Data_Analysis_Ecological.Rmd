@@ -24,6 +24,7 @@ library(brms)
 library(performance)
 library(ggpmisc)
 library(marginaleffects)
+library(ggpubr)
 ```
 
 ## Set up a theme
@@ -45,15 +46,15 @@ theme_set(
 ```{r Read Data}
 # load synthesis dataset
 ecologicalMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality.xlsx") %>% 
-  filter(!is.na(sowndiv) & sowndiv < 60) # remove rows with NA in sowndiv and sowndiv greater than 16
+  filter(!is.na(sowndiv) & sowndiv < 60 & sowndiv > 1) # remove rows with NA in sowndiv and sowndiv greater than 16
+ecologicalMF_red <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality_reduced.xlsx") %>% 
+  filter(!is.na(sowndiv) & sowndiv < 60 & sowndiv > 1) # remove rows with NA in sowndiv and sowndiv greater than 16
 economicMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx") %>% 
   filter(sowndiv > 1 & sowndiv < 60) # remove rows with sowndiv greater than 16
 
-```
-
-### Multidiversity Index
-Here I want to integrate the Diversity metrics
-```{r Multidiversity}
+ecologicalMF$plotcode <- as.factor(ecologicalMF$plotcode)
+ecologicalMF_red$plotcode <- as.factor(ecologicalMF_red$plotcode)
+economicMF$plotcode <- as.factor(economicMF$plotcode)
 
 ```
 
@@ -142,6 +143,12 @@ p1 <- ggplot(ecologicalMF, aes(x=log2(sowndiv), y=multifunctionality)) +
     method = "lm",
     se = FALSE
   ) +
+   stat_poly_eq(
+    aes(label = paste(..eq.label.., sep = "~~~")),
+    formula = y ~ x,
+    parse = TRUE,
+    size = 5
+  ) +
   labs(title = "Ecological Multifunctionality vs. Sown Plant Diversity",
        x = "Log2(Sown Plant Diversity)",
        y = "Ecological Multifunctionality")
@@ -168,6 +175,12 @@ p2 <- ggplot(ecologicalMF, aes(x=log2(meanSR), y=multifunctionality)) +
     method = "lm",
     se = FALSE
   ) +
+   stat_poly_eq(
+    aes(label = paste(..eq.label.., sep = "~~~")),
+    formula = y ~ x,
+    parse = TRUE,
+    size = 5
+  ) +
   labs(title = "Ecological Multifunctionality vs. Realized Species Richness",
        x = "Log2(Realized Species Richness)",
        y = "Ecological Multifunctionality")
@@ -184,11 +197,10 @@ ggsave("EcologicalMF_realizedSR_noMono.png",
 ```
 
 ```{r correlation economic and ecological MF}
-# merge ecological and economic multifunctionality data
-joinedMF <- ecologicalMF %>%
-  left_join(economicMF, by = "plotcode")
-
-joinedMF %>% filter(sowndiv.y > 1)
+# merge reduced ecological and economic multifunctionality data
+joinedMF <- economicMF %>%
+  select(c(plotcode, costs_total_mid)) %>% 
+  left_join(ecologicalMF_red, by = "plotcode") 
 
 # Correlation between economic and ecological multifunctionality
 cor.test(joinedMF$multifunctionality, joinedMF$costs_total_mid)
@@ -202,6 +214,7 @@ corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
     stroke = 1,
     size = 4
   ) +
+  stat_cor(method = "pearson", label.x = 0.2, label.y = 2) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(title = "Economic vs. Ecological Multifunctionality",
        x = "Ecological Multifunctionality",
@@ -219,7 +232,7 @@ ggsave("Corr_EconomicMF_EcologicalMF.png",
 ### Marginal Effects and Fitted Model Plots
 # plot the marginal effects of the models
 delta_y <- function(x) {
-  0.44 * log2((x + 1) / x)
+  0.306 * log2((x + 1) / x)
 }
 
 # Create a data frame for a range of x values
@@ -274,4 +287,5 @@ ggsave("Fitted_Relationship_Over_Raw_Data_Ecological.png",
        dpi = 300)
 
 ```
-
+# Supplements
+## Plot the single functions
