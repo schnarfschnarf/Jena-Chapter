@@ -289,3 +289,25 @@ ggsave("Fitted_Relationship_Over_Raw_Data_Ecological.png",
 ```
 # Supplements
 ## Plot the single functions
+```{r Single functions}
+# plot aggregate stability as function of meanSR
+ggplot(ecologicalMF, aes(x=log2(sowndiv), y=aggregates_standardized)) +
+  geom_point(
+    color = "#28a87d",
+    alpha = .5,
+    shape = 20,
+    stroke = 1,
+    size = 4,
+    position = position_jitter(w = 0.03, h = 0)
+  ) +
+   geom_smooth(
+    method = "lm",
+    se = FALSE
+  ) +
+  labs(title = "Aggregate Stability vs. Realized Species Richness",
+       x = "Log2(Realized Species Richness)",
+       y = "Aggregate Stability")
+
+
+```
+

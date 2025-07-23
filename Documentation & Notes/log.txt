@@ -223,3 +223,18 @@ SIIIIICK
 - calculated biomass stability, should be fine
 - updated the plots and models again
 - stopped working at 16:30
+
+22.07.25
+- started working at 10:45
+- stopped working at 13:45
+- continued to work in the train at 14:00
+- worked for 2h in the train
+- I was mainly writing the method section that day
+
+23.07.25
+- started working at 10:00
+- added soil aggregate data from zarah (also merged her datasets and calculated the means)
+- updated my plots and models
+- talked to Benjamin --> my models are fine, assumptions are fine, using corr.test is actually better than lm
+- back transformation not necessary, I use conditional effects
+- stopped working at 16:30

@@ -3,14 +3,20 @@
 ------------------------------------------------
 
 1) Finalize the figures
-	- should be more or less finished, just check if everything is correct
+	- add the CI to the plots --> conditional effects function from brms package is perfect
+	- make them even nicer and publication ready (check the requirements from nature)
+	- breaks on x Axis should be 2,4,6,8,10,12
 
 2) Finalize analysis 
+	- Add block as random effect to your models (this could fuck up my conditional plots again, maybe there is the option to plot with or without random effect)
 	- Include single services and functions for ecological MF in supplements
-	
+	- rather take 2011 as SOC baseline year? 
+	- find out how whether aggregate data is correct and how to read it
+	- ask someone (marie or nico) if the conversion from kg/m³ to kg/(1/3m³) makes sense 
+
 3) WRITE!!!!
 	- you have to justify why you included the functions and services you included
-	- define and invite core writing team: Nico, Marius, Marie, Bartosz, Martin, Vera (?)
+	- invite core writing team: Nico, Marie, Bartosz, Martin, Vera (?)
 	- mention functions and references (data creators) in the main part of manuscript (detailed measurement Infos in the supplements)
 	- most important for methods: calculations and statistics, economic MF, ecological MF
 
@@ -18,6 +24,7 @@
 ?) why are there negative SR values for log2(realized)? --> Because mean SR is below 1 and the 2nd log of values below 1 is negative.
 
 !) Discuss the importance of ecosystem services that can not be monetized so easily or at all.
+
 
 DONE) Include single service figures and models for economic MF in main part
 

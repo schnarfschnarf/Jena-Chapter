@@ -71,7 +71,7 @@ noMono <- synthDat %>%
 
 # Biomass against species richness
 fitBiomassSown <- brm(
-  mean_biomass ~ log2(sowndiv),
+  mean_biomass ~ log2(sowndiv) + (1|block),
   noMono)
 
     # check model assumptions
@@ -129,7 +129,7 @@ fitLeachSown <- brm(
     # check output of model
     summary(fitLeachSown)
 
-# Total Costs against species richness
+# Total Costs against sowndiv
 fitTotalSown <- brm(
   costs_total_mid ~ log2(sowndiv),
   noMono)
@@ -143,6 +143,21 @@ fitTotalSown <- brm(
     
     # check output of model
     summary(fitTotalSown)
+    
+# Total costs against sowndiv with block as random effect 
+fitTotalSownBlock <- brm(
+  costs_total_mid ~ log2(sowndiv) + (1|block),
+  noMono)
+
+    # check model assumptions
+    pp_check(fitTotalSown, type="scatter_avg") 
+    pp_check(fitTotalSown, ndraws=50)
+    check_model(fitTotalSown, check="linearity") 
+    check_model(fitTotalSown, check="homogeneity")
+    plot(fitTotalSown)
+    
+    # check output of model
+    summary(fitTotalSownBlock)    
 
 ```
 
@@ -223,9 +238,6 @@ fitTotalReal <- brm(
     
     # check output of model
     summary(fitTotalReal)
-    comparisons(fitTotalReal)
-
-shapiro.test(residuals(fitTotalReal)) # check normality of residuals
 
     
 ```
@@ -273,7 +285,7 @@ fitTotalHi <- brm(
 ```{r Plotting}
 #check distribution of biomass data without monocultures and sowndiv
 p_sown_biomass <- ggplot2::ggplot(noMono,
-                aes(x = log2(sowndiv), y = mean_biomass)
+                aes(x = sowndiv, y = mean_biomass)
                 ) +
   geom_point(
     color = "#28a87d",
@@ -284,7 +296,8 @@ p_sown_biomass <- ggplot2::ggplot(noMono,
   ) +
    geom_smooth(
     method = "lm",
-    se = FALSE
+    se = FALSE,
+    formula = y ~ log2(x)
   ) +
   labs(
     x = "log2(Sown Plant Diversity)",
@@ -650,6 +663,8 @@ marginal_plot <- ggplot(df, aes(x = x, y = delta_y)) +
   ) +
   theme_minimal()
 
+marginal_plot
+
 # save plot of marginal effects
 ggsave("Marginal_Effects.png",
        plot = marginal_plot,
@@ -682,6 +697,8 @@ ggsave("Fitted_Relationship_Over_Raw_Data.png",
        device = "png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
+
+fittedPlot
 
 ```
 
