@@ -10,6 +10,8 @@ This R Script is intended to be used to calculate the ecological multifunctional
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning=FALSE, message=FALSE, echo=TRUE, cache=TRUE, cache.lazy=FALSE, cache.path="cache/", out.width="100%", out.height="100%")
+
+source("C:/Users/mm68tulo/Documents/R/functions/myfunctions.R")
 ```
 
 # Preparation
@@ -23,30 +25,19 @@ library(patchwork)
 library(brms)
 library(performance)
 library(ggpmisc)
-library(marginaleffects)
 library(ggpubr)
 ```
-
 ## Set up a theme
 ```{r Theme}
-theme_set(
-  theme_minimal(base_size = 14) +
-    theme(
-      plot.title = element_text(size = 13, hjust = 0.5),
-      axis.text = element_text(size = 7),
-      axis.text.y = element_text(size = 12),
-      axis.text.x = element_text(size = 12),
-      panel.background = element_rect(fill = "white", color = NA),
-      plot.background = element_rect(fill = "white", color = NA)
-    )
-)
+theme_set(theme_custom())
+
 ```
 
 ## Load datasets and filter for relevant observations/measurements
 ```{r Read Data}
 # load synthesis dataset
 ecologicalMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality.xlsx") %>% 
-  filter(!is.na(sowndiv) & sowndiv < 60 & sowndiv > 1) # remove rows with NA in sowndiv and sowndiv greater than 16
+  filter(!is.na(sowndiv) & sowndiv < 60) # remove rows with NA in sowndiv and sowndiv greater than 16
 ecologicalMF_red <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality_reduced.xlsx") %>% 
   filter(!is.na(sowndiv) & sowndiv < 60 & sowndiv > 1) # remove rows with NA in sowndiv and sowndiv greater than 16
 economicMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx") %>% 
@@ -71,7 +62,8 @@ ggplot2::ggplot(ecologicalMF,
   labs(
     x = "Ecological Multifunctionality",
     y = "Density"
-  )
+  ) +
+  expand_limits(x = 0, y = 0)
 
 # check the distribution of realized SR
 ggplot2::ggplot(ecologicalMF,
@@ -84,7 +76,7 @@ ggplot2::ggplot(ecologicalMF,
   labs(
     x = "Mean Realized Plant Diversity",
     y = "Density"
-  )
+  ) 
 
 ```
 
@@ -108,7 +100,6 @@ summary(fitMFsown)
 ```
 
 ```{r MF ~ realized SR}
-
 fitMFreal <- brm(
   multifunctionality ~ log2(meanSR),
   ecologicalMF)
@@ -122,7 +113,6 @@ fitMFreal <- brm(
     
 #check model output
 summary(fitMFreal)
-
 
 ```
 
@@ -173,7 +163,8 @@ p2 <- ggplot(ecologicalMF, aes(x=log2(meanSR), y=multifunctionality)) +
   ) +
    geom_smooth(
     method = "lm",
-    se = FALSE
+    se = FALSE,
+    color = "#287da8"
   ) +
    stat_poly_eq(
     aes(label = paste(..eq.label.., sep = "~~~")),
@@ -214,8 +205,8 @@ corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
     stroke = 1,
     size = 4
   ) +
-  stat_cor(method = "pearson", label.x = 0.2, label.y = 2) +
-  geom_smooth(method = "lm", se = FALSE) +
+  stat_cor(method = "pearson", label.x = 0.2, label.y = 700, size = 5) +
+  geom_smooth(method = "lm", se = F, color = "#287da8") +
   labs(title = "Economic vs. Ecological Multifunctionality",
        x = "Ecological Multifunctionality",
        y = "Economic Multifunctionality (Costs/Benefits)")
@@ -229,67 +220,39 @@ ggsave("Corr_EconomicMF_EcologicalMF.png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
 
-### Marginal Effects and Fitted Model Plots
-# plot the marginal effects of the models
-delta_y <- function(x) {
-  0.306 * log2((x + 1) / x)
-}
-
-# Create a data frame for a range of x values
-x_vals <- seq(1, 20, by = 1)
-effects <- delta_y(x_vals)
-df <- data.frame(x = x_vals, delta_y = effects)
-
-# Plot
-marginal_plot <- ggplot(df, aes(x = x, y = delta_y)) +
-  geom_line(color = "blue", size = 1) +
-  labs(
-    title = "Marginal Effect of increasing Plant Species number by 1",
-    x = "Number of plant species (x)",
-    y = "Change in ecological multifunctionality"
-  ) +
-  theme_minimal()
-marginal_plot
-
-# save plot of marginal effects
-ggsave("Marginal_Effects_Ecological.png",
-       plot = marginal_plot,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
-
-# plot data with logarithmic relationship
-# Create a new data frame for prediction
-x_seq <- seq(min(ecologicalMF$meanSR), max(ecologicalMF$meanSR), length.out = 100)
-pred_df <- data.frame(meanSR = x_seq)
-pred_df$predicted_y <- predict(fitMFreal, newdata = pred_df)
-
-# Plot: data + fitted curve
-fittedPlot <- ggplot(ecologicalMF, aes(x = meanSR, y = multifunctionality)) +
-  geom_point(color = "steelblue", alpha = 0.6) +  # raw data
-  geom_line(data = pred_df, aes(x = meanSR, y = pred_df$predicted_y[,"Estimate"]),
-            color = "darkgreen", size = 1.2) +    # model prediction
-  labs(
-    title = "",
-    x = "Mean Realized Species Richness",
-    y = "Ecological Multifunctionality",
-  ) +
-  theme_minimal()
-
-fittedPlot
-
-# save plot of fitted model over raw data
-ggsave("Fitted_Relationship_Over_Raw_Data_Ecological.png",
-       plot = fittedPlot,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
 ```
 # Supplements
+## Single Function Models
+```{r Model Single Functions}
+fitLeachReal
+
+fitBiomassReal
+
+fitMicbioReal
+
+fitMicresReal
+
+fitRootReal
+
+fitSOCReal
+
+fitPolReal
+
+fitAboveReaL
+
+fitBelowReal
+
+fitStabiReal
+
+fitAggReal
+
+
+
+```
+
+
 ## Plot the single functions
-```{r Single functions}
+```{r Plot Single functions}
 # plot aggregate stability as function of meanSR
 ggplot(ecologicalMF, aes(x=log2(sowndiv), y=aggregates_standardized)) +
   geom_point(

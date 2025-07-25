@@ -37,7 +37,8 @@ library(readxl)
 design <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Plot_Design/90_20_data.xlsx")
 
 #load data on realized species richness (ID = 487)
-SR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Realized_Species_Richness/487_3_data.xlsx")
+SR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Realized_Species_Richness/487_3_data.xlsx") %>% 
+  filter(year > 2004)
   #change data type for realized SR & sowndiv
   SR$realizedSR <- as.numeric(SR$realizedSR)
   SR$sowndiv <- as.numeric(SR$sowndiv)
@@ -93,7 +94,7 @@ pathogensAbove <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysi
   rename_at('plot', ~'plotcode') %>% # rename plot to plotcode
   mutate(plotcode = as.factor(plotcode))  # change plotcode to a factor
   
-pathogensBelow <- read_csv("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Herbivory_Fluxes/fluxes/fluxes1000_dir100.csv") %>% 
+pathogensBelow <- read_csv("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Herbivory_Fluxes/fluxes1000_dir100.csv") %>% 
   filter(Treatment == "Treatment3") %>%  # filter for treatment D3 (main experiment)
   rename_at('Plot', ~'plotcode') # rename Plot to plotcode
 
@@ -147,7 +148,6 @@ rootsMean <- roots %>%
 ### Calculate biomass stability
 ```{r Biomass Stability}
 # calculate the biomass stability as the inverse coefficient of variance of the biomass across years (CV^-1 = 1/CV)
-
 biomassStability <- biomassAnnual %>% 
   group_by(plotcode) %>% 
   summarise(biomass_stability = (mean(mean_biomass / sd(mean_biomass, na.rm = TRUE), na.rm = TRUE)), .groups = "drop") %>%

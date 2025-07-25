@@ -43,12 +43,12 @@ SR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Rea
 
 #load data on soil organic carbon (SOC) (2020: ID = 424 2011: ID = 254): 2011 is to compare the carbon content at the beginning of the experiment with the latest (2020) carbon content. 2020 data is the most recent year that includes bulk density measurements.
 carbon20 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/424_7_data.xlsx")
-carbon02 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/254_3_data.xlsx") 
+carbon11 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/254_3_data.xlsx") 
   # change data types
-  carbon02$N_Soil <- as.numeric(carbon02$N_Soil)
-  carbon02$Corg_Soil <- as.numeric(carbon02$Corg_Soil)
-  carbon02$Cinorg_Soil <- as.numeric(carbon02$Cinorg_Soil)
-  carbon02$BulkDensity_Soil <- as.numeric(carbon02$BulkDensity_Soil)
+  carbon11$N_Soil <- as.numeric(carbon11$N_Soil)
+  carbon11$Corg_Soil <- as.numeric(carbon11$Corg_Soil)
+  carbon11$Cinorg_Soil <- as.numeric(carbon11$Cinorg_Soil)
+  carbon11$BulkDensity_Soil <- as.numeric(carbon11$BulkDensity_Soil)
 
 #load data on nitrogen leaching (this should be in kg/ha per year)
 leaching <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/WaterN/Yearly_Leaching_Plot.xlsx") %>% 
@@ -76,7 +76,7 @@ biomassAnnual <- biomassAnnual %>%
   select(plotcode, year, mean_biomass, price, costs)  # select only relevant columns
   
 # calculate individual SGM for each year
-biomassAnnual$SGM_annual <- biomassAnnual$mean_biomass * 0.1 * biomassAnnual$price - biomassAnnual$costs 
+biomassAnnual$SGM_annual <- biomassAnnual$mean_biomass * 0.1 * biomassAnnual$price - biomassAnnual$costs # 0.1 = conversion from g/m² to dt/ha
 
 # sum up biomass for each plot and calculate the mean biomass and SGM across years
 biomassMeans <- biomassAnnual %>% 
@@ -90,7 +90,7 @@ biomassMeans <- biomassAnnual %>%
 
 ```{r soil carbon}
 # rename plot to plotcode and change data types 
-carbon02 <- carbon02 %>%
+carbon11 <- carbon11 %>%
   rename_at('plot', ~'plotcode') %>% 
   mutate(
     plotcode = as.factor(plotcode),
@@ -107,11 +107,11 @@ carbon20 <- carbon20 %>%
   )
 
 
-# create a new column with mean C across layers per plot for 2002
-carbon02_clean <- carbon02 %>% group_by(plotcode) %>% 
-                    mutate(mean_org_02 = mean(c_org), mean_inorg_02 = mean(c_inorg)) %>%
-                      distinct(plotcode, mean_org_02, mean_inorg_02) %>% 
-                      mutate(mean_C_02 = mean_org_02 + mean_inorg_02)
+# create a new column with mean C across layers per plot for 2011
+carbon11_clean <- carbon11 %>% group_by(plotcode) %>% 
+                    mutate(mean_org_11 = mean(c_org), mean_inorg_11 = mean(c_inorg)) %>%
+                      distinct(plotcode, mean_org_11, mean_inorg_11) %>% 
+                      mutate(mean_C_11 = mean_org_11 + mean_inorg_11)
 
 # create a new column with mean C across layers per plot for 2020
 carbon20_clean <- carbon20 %>% group_by(plotcode) %>% 
@@ -123,15 +123,15 @@ carbon20_clean <- carbon20 %>% group_by(plotcode) %>%
 ```
 
 ```{r Species Richness data}
-
+# calculate the mean realized SR for the years 2003-2019
 realdiv <- SR %>%                    #calculate the mean realized SR for the years 2003-2019
+  filter(year > 2010) %>% 
   group_by(plotcode) %>% 
   mutate(meanSR = mean(realizedSR, na.rm = TRUE)) %>% 
   ungroup() %>%
   distinct(plotcode, meanSR)
 
 SR <- distinct(SR, plotcode, sowndiv)
-
 ```
 
 
@@ -153,7 +153,7 @@ leachingMean$leach_costs_hi <- leachingMean$av_leaching * 20 *(-1)
 ```{r Data Synthesis}
 synthDat <- biomassMeans %>% # merge the biomass and the realized SR data
   left_join(SR, by = join_by(plotcode)) %>%
-  left_join(carbon02_clean, by = join_by(plotcode)) %>% 
+  left_join(carbon11_clean, by = join_by(plotcode)) %>% 
   left_join(carbon20_clean, by = join_by(plotcode)) %>% 
   left_join(select(design, plotcode, block)) %>% 
   left_join(leachingMean, by = join_by(plotcode))  %>%
@@ -163,7 +163,7 @@ synthDat$block <- as.factor(synthDat$block) # change block to a factor
 synthDat$plotcode <- as.factor(synthDat$plotcode)  # change plotcode to a factor
   
 # create a column with carbon difference between 2002 and 2020
-synthDat$mean_org_diff <- synthDat$mean_org_20 - synthDat$mean_org_02
+synthDat$mean_org_diff <- synthDat$mean_org_20 - synthDat$mean_org_11
 
 # create a column with social costs of carbon
 synthDat$SOC_costs_mid <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 195 / 12 # mid price scenario (SOC value multiplied with bulk de
@@ -173,6 +173,6 @@ synthDat$SOC_costs_hi <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 100
 synthDat$costs_total_mid <- synthDat$SOC_costs_mid + synthDat$leach_costs_mid + synthDat$SGM_mean
 
 # save the synthesized dataset
- writexl::write_xlsx(synthDat, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx")
+writexl::write_xlsx(synthDat, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx")
 
 ```

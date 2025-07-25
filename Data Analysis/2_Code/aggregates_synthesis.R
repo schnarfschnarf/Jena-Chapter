@@ -16,16 +16,16 @@ winter25 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Da
 mean_aggregates <- spring24 %>% 
   group_by(Plotcode) %>%
   summarise(
-    mean_spring = mean(agg_overall, na.rm = TRUE),
+    mean_spring = mean(WSA, na.rm = TRUE),
     .groups = 'drop'
   )
 
 mean_winter <- winter25 %>% 
   group_by(Plotcode) %>%
-  summarise(mean_winter = mean(agg_overall, na.rm = TRUE), .groups = 'drop')
+  summarise(mean_winter = mean(WSA, na.rm = TRUE), .groups = 'drop')
 
-mean_aggregates$mean_august <- august24$agg_overall
-mean_aggregates$mean_november <- november24$agg_overall
+mean_aggregates$mean_august <- august24$Mean_WSA
+mean_aggregates$mean_november <- november24$Mean_WSA
 mean_aggregates$mean_winter <- mean_winter$mean_winter
 
 # calculate mean across seasons

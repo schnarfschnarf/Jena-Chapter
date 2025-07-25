@@ -8,10 +8,9 @@
 	- breaks on x Axis should be 2,4,6,8,10,12
 
 2) Finalize analysis 
-	- Add block as random effect to your models (this could fuck up my conditional plots again, maybe there is the option to plot with or without random effect)
 	- Include single services and functions for ecological MF in supplements
-	- rather take 2011 as SOC baseline year? 
-	- find out how whether aggregate data is correct and how to read it
+	- for pollination and meanSR it doesn't make sense to build the meanSr only from 2011 onwards, because pollination was measured before 2011
+	- find out how whether aggregate data is correct and how to read it --> WSA is what Zarah is interested in
 	- ask someone (marie or nico) if the conversion from kg/m³ to kg/(1/3m³) makes sense 
 
 3) WRITE!!!!
@@ -25,6 +24,9 @@
 
 !) Discuss the importance of ecosystem services that can not be monetized so easily or at all.
 
+DONE) replace 2002 with 2011 as SOC baseline year (for the remaining data, I also took the years from 2011 onwards)  
+
+DONE) Add block as random effect to your models
 
 DONE) Include single service figures and models for economic MF in main part
 
