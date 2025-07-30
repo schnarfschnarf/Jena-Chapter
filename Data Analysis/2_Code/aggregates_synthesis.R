@@ -31,7 +31,7 @@ mean_aggregates$mean_winter <- mean_winter$mean_winter
 # calculate mean across seasons
 mean_aggregates <- mean_aggregates %>%
   mutate(
-    mean_all = rowMeans(select(., starts_with("mean_")), na.rm = TRUE)
+    mean_agg = rowMeans(select(., starts_with("mean_")), na.rm = TRUE)
   )
 
 # Save the final dataset

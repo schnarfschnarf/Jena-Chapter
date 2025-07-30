@@ -174,6 +174,7 @@ ggsave("Densities.png",
 # SGM against species richness
 fitSGMsown <- brm(
   SGM_mean ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
   noMono) 
 
     # check model assumptions 
@@ -189,6 +190,7 @@ fitSGMsown <- brm(
 # SOC against species richness
 fitSOCsown <- brm(
   mean_org_diff ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
   noMono)
 
     # check model assumptions
@@ -204,6 +206,7 @@ fitSOCsown <- brm(
 # Leaching costs against species richness
 fitLeachSown <- brm(
   leach_costs_mid ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
   noMono)
 
     # check model assumptions
@@ -219,6 +222,7 @@ fitLeachSown <- brm(
 # Total Costs against sowndiv
 fitTotalSown <- brm(
   costs_total_mid ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
   noMono)
 
     # check model assumptions
@@ -327,7 +331,7 @@ ggsave("SGM_real_noMono.png",
 
 
 #SOC costs without monocultures and mean realized diversity
-c_real_soc <- conditional_effects(fitSOCreal)
+c_real_soc <- conditional_effects(fitSOCReal)
 plot_real_soc_data <- c_real_soc[[1]]
   
 p_real_soc <- ggplot() +
@@ -418,125 +422,109 @@ ggsave("total_real_noMono.png",
 
 ### Plot sown diversity effect
 ```{r}
-#plot effect of sowndiv on mean SGM
-p_sown_sgm <- ggplot2::ggplot(noMono,
-                aes(x = log2(sowndiv), y = SGM_mean)
-                ) +
-  geom_point(
-    color = "#28a87d",
-    alpha = .5,
-    shape = 20,
-    stroke = 1,
-    size = 4
-  ) +
-   geom_smooth(
-    method = "lm",
-    se = FALSE
-  ) +
-  labs(
-    x = "log2(Sown Plant Diversity)",
-    y = "Mean Standard Gross Margin (€/ha/a) 2004 - 2023")
+#SGM data without monocultures and sowndiv
+c_sown_sgm <- conditional_effects(fitSGMsown)
+plot_sown_sgm_data <- c_sown_sgm[[1]]
+  
+p_sown_sgm <- ggplot() +
+  geom_point(data = noMono, aes(x = sowndiv, y = SGM_mean), 
+             alpha = 0.4, color = "#28a87d") +
+   # Model-estimated effect
+  geom_line(data = plot_sown_sgm_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
+
+  # Credible interval ribbon
+  geom_ribbon(data = plot_sown_sgm_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
+              fill = "#287da8", alpha = 0.2) +
+  labs(x = "Sown plant diversity", y = "Mean SGM (€/ha/year)") +
+  scale_x_continuous(breaks = c(2, 4, 8, 16))
 
 p_sown_sgm
 
 ggsave("SGM_sown_noMono.png",
-       plot = last_plot(),
+       plot = p_sown_sgm,
        device = "png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
 
-#check distribution of climate regulation cost data
-p_sown_soc <- ggplot2::ggplot(noMono,
-                aes(x = log2(as.numeric(sowndiv)), y = SOC_costs_mid)
-                ) +
-  geom_point(
-    color = "#28a87d",
-    alpha = .5,
-    shape = 20,
-    stroke = 1,
-    size = 4
-  ) +
-   geom_smooth(
-    method = "lm",
-    se = FALSE
-  ) +
-  labs(
-    x = "log2(Sown Plant Diversity)",
-    y = "climate regulation costs/benefits (€/ha/a)")
+
+#SOC costs without monocultures and mean sownized diversity
+c_sown_soc <- conditional_effects(fitSOCsown)
+plot_sown_soc_data <- c_sown_soc[[1]]
+  
+p_sown_soc <- ggplot() +
+  geom_point(data = noMono, aes(x = sowndiv, y = SOC_costs_mid), 
+             alpha = 0.4, color = "#28a87d") +
+   # Model-estimated effect
+  geom_line(data = plot_sown_soc_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
+
+  # Credible interval ribbon
+  geom_ribbon(data = plot_sown_soc_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
+              fill = "#287da8", alpha = 0.2) +
+  labs(x = "Sown plant diversity", y = "Costs/benefits due to SOC loss/increase (€/ha/year)") +
+  scale_x_continuous(breaks = c(2, 4, 8, 16)) +
+  scale_y_continuous(breaks = c(-500, -250, 0, 250, 500, 750))
 
 p_sown_soc
 
-ggsave("SOC_sown_noMono.png", plot = last_plot(), device = "png", path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/", width = 10, height = 15, units = "cm", dpi = 300)
+ggsave("SOC_sown_noMono.png",
+       plot = p_sown_soc,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
 
-# check distribution of leaching costs data
-p_sown_leach <- ggplot2::ggplot(noMono,
-                aes(x = log2(sowndiv), y = leach_costs_mid)
-                ) +
-  geom_point(
-    color = "#28a87d",
-    alpha = .5,
-    shape = 20,
-    stroke = 1,
-    size = 4
-  ) +
-   geom_smooth(
-    method = "lm",
-    se = FALSE
-  ) +
-  labs(
-    x = "log2(Sown Plant Diversity)",
-    y = "Nitrogen Leaching Costs (€/ha/a)")
+#Leaching costs without monocultures and mean sownized diversity
+c_sown_leach <- conditional_effects(fitLeachSown)
+plot_sown_leach_data <- c_sown_leach[[1]]
+  
+p_sown_leach <- ggplot() +
+  geom_point(data = noMono, aes(x = sowndiv, y = leach_costs_mid), 
+             alpha = 0.4, color = "#28a87d") +
+   # Model-estimated effect
+  geom_line(data = plot_sown_leach_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
+
+  # Credible interval ribbon
+  geom_ribbon(data = plot_sown_leach_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
+              fill = "#287da8", alpha = 0.2) +
+  labs(x = "Sown plant diversity", y = "Social costs of nitrogen leaching") +
+  scale_x_continuous(breaks = c(2, 4, 8, 16))
 
 p_sown_leach
 
-ggsave("Leaching_mid_sown_noMono.png", plot = last_plot(), device = "png", path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/", width = 10, height = 15, units = "cm", dpi = 300)
-
-# combine the sown plots in one grid
-p_services_sown <- p_sown_sgm + p_sown_soc + p_sown_leach +
-  plot_layout(ncol = 2) +
-  plot_annotation(title = "Sown Plant Diversity against Biomass, SGM, SOC Costs and Leaching Costs") &
-  theme(plot.title = element_text(size=13,hjust=0.5))
-
-ggsave("Single_Services_sown.png",
-       plot = last_plot(),
-       bg = "white",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
-#check distribution of mid total costs across sown diversity
-p_sown_costs <- ggplot2::ggplot(noMono,
-                aes(x = log2(sowndiv), y = costs_total_mid)
-                ) +
-  geom_point(
-    color = "#28a87d",
-    alpha = .5,
-    stroke = 1,
-    size = 2
-  ) +
-  labs(
-    x = "log2(Sown Plant Diversity)",
-    y = "Mean Total Costs/Benefits (€/ha/a)"
-    ) +
-   geom_smooth(
-    method = "lm",
-    se = FALSE,
-    color = "blue"
-  ) +
-  stat_poly_eq(
-    aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")),
-    formula = y ~ x,
-    parse = TRUE,
-    size = 5
-  )
-
-p_sown_costs
-
-ggsave("Total_Costs_sown_noMono.png",
-       plot = p_sown_costs,
+ggsave("Leach_sown_noMono.png",
+       plot = p_sown_leach,
        device = "png",
-       bg = "white",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
+
+
+#economic MF without monocultures and mean sownized diversity
+c_sown_total <- conditional_effects(fitTotalSown)
+plot_sown_total_data <- c_sown_total[[1]]
+  
+p_sown_total <- ggplot() +
+  geom_point(data = noMono, aes(x = sowndiv, y = costs_total_mid), 
+             alpha = 0.4, color = "#28a87d") +
+   # Model-estimated effect
+  geom_line(data = plot_sown_total_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
+  
+  # add line at y = 0
+  geom_hline(yintercept = 0, color = "grey90", linewidth = 0.8, linetype = 1, alpha = .5) +
+
+  # Credible interval ribbon
+  geom_ribbon(data = plot_sown_total_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
+              fill = "#287da8", alpha = 0.2) +
+  labs(x = "Sown plant diversity", y = "Economic multifunctionality (€/ha/year)") +
+  scale_x_continuous(breaks = c(2, 4, 8, 16)) +
+  scale_y_continuous(breaks = c(-500, -250, 0, 250, 500, 750))
+
+p_sown_total
+
+ggsave("total_sown_noMono.png",
+       plot = p_sown_total,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
 ```
 
 ## Supplementary Analysis

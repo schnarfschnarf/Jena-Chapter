@@ -239,11 +239,11 @@ pollinatorsMean <- pollinators %>%
 ```{r Aggregates}
 # standardize the mean aggregate stability values
 aggregates <- aggregates %>% 
-  mutate(aggregates_standardized = (mean_all - min(mean_all)) / (max(mean_all) - min(mean_all))) # standardize the values
+  mutate(aggregates_standardized = (mean_agg - min(mean_agg)) / (max(mean_agg) - min(mean_agg))) # standardize the values
 
 # remove columns you don't need
 aggregates <- aggregates %>% 
-  select(plotcode, aggregates_standardized)
+  select(plotcode, aggregates_standardized, mean_agg)
 
 ```
 

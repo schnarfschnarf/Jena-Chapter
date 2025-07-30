@@ -3,14 +3,10 @@
 ------------------------------------------------
 
 1) Finalize the figures
-	- add the CI to the plots --> conditional effects function from brms package is perfect
-	- make them even nicer and publication ready (check the requirements from nature)
-	- breaks on x Axis should be 2,4,6,8,10,12
 
 2) Finalize analysis 
 	- Include single services and functions for ecological MF in supplements
-	- for pollination and meanSR it doesn't make sense to build the meanSr only from 2011 onwards, because pollination was measured before 2011
-	- find out how whether aggregate data is correct and how to read it --> WSA is what Zarah is interested in
+	- for pollination and meanSR it doesn't make sense to build the meanSR only from 2011 onwards, because pollination was measured before 2011
 	- ask someone (marie or nico) if the conversion from kg/m³ to kg/(1/3m³) makes sense 
 
 3) WRITE!!!!
@@ -23,6 +19,11 @@
 ?) why are there negative SR values for log2(realized)? --> Because mean SR is below 1 and the 2nd log of values below 1 is negative.
 
 !) Discuss the importance of ecosystem services that can not be monetized so easily or at all.
+
+
+DONE) make them even nicer and publication ready (check the requirements from nature) 
+	add the CI to the plots --> conditional effects function from brms package is perfect
+	breaks on x Axis should be 2,4,6,8,10,12
 
 DONE) replace 2002 with 2011 as SOC baseline year (for the remaining data, I also took the years from 2011 onwards)  
 

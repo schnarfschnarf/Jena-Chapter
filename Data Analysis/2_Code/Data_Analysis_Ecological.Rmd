@@ -9,7 +9,9 @@ output: html_document
 This R Script is intended to be used to calculate the ecological multifunctionality for (mostly) soil functions in the Jena Experiment. 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(warning=FALSE, message=FALSE, echo=TRUE, cache=TRUE, cache.lazy=FALSE, cache.path="cache/", out.width="100%", out.height="100%")
+library(ragg)
+
+knitr::opts_chunk$set(warning=FALSE, message=FALSE, echo=TRUE, cache=TRUE, cache.lazy=FALSE, cache.path="cache/", out.width="100%", out.height="100%", dev = "ragg_png")
 
 source("C:/Users/mm68tulo/Documents/R/functions/myfunctions.R")
 ```
@@ -37,7 +39,7 @@ theme_set(theme_custom())
 ```{r Read Data}
 # load synthesis dataset
 ecologicalMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality.xlsx") %>% 
-  filter(!is.na(sowndiv) & sowndiv < 60) # remove rows with NA in sowndiv and sowndiv greater than 16
+  filter(!is.na(sowndiv) & sowndiv < 60 & sowndiv > 1) # remove rows with NA in sowndiv and sowndiv greater than 16
 ecologicalMF_red <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality_reduced.xlsx") %>% 
   filter(!is.na(sowndiv) & sowndiv < 60 & sowndiv > 1) # remove rows with NA in sowndiv and sowndiv greater than 16
 economicMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx") %>% 
@@ -45,6 +47,8 @@ economicMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_
 
 ecologicalMF$plotcode <- as.factor(ecologicalMF$plotcode)
 ecologicalMF_red$plotcode <- as.factor(ecologicalMF_red$plotcode)
+ecologicalMF$block <- as.factor(ecologicalMF$block)
+ecologicalMF_red$block <- as.factor(ecologicalMF_red$block)
 economicMF$plotcode <- as.factor(economicMF$plotcode)
 
 ```
@@ -84,7 +88,8 @@ ggplot2::ggplot(ecologicalMF,
 Also single functions or just multifunctionality?
 ```{r MF ~ sowndiv}
 fitMFsown <- brm(
-  multifunctionality ~ log2(sowndiv),
+  multifunctionality ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
  ecologicalMF)
 
 #check model assumptions
@@ -101,7 +106,8 @@ summary(fitMFsown)
 
 ```{r MF ~ realized SR}
 fitMFreal <- brm(
-  multifunctionality ~ log2(meanSR),
+  multifunctionality ~ log2(meanSR) + (1|block),
+  control = list(adapt_delta = 0.95),
   ecologicalMF)
 
 # check model assumptions
@@ -117,11 +123,15 @@ summary(fitMFreal)
 ```
 
 ## Plotting
-### Plot biomass against realized species richness
+### Plot multifunctionality against species richness
 ```{r Plotting}
 #plot multifunctionality as a response to sowndiv
-p1 <- ggplot(ecologicalMF, aes(x=log2(sowndiv), y=multifunctionality)) +
-  geom_point(
+c_sown_mf <- conditional_effects(fitMFsown)
+plot_sown_mf_data <- c_sown_mf[[1]]
+
+p_sown_mf <- ggplot() +
+  geom_point(data = ecologicalMF,
+             aes(x = sowndiv, y=multifunctionality),
     color = "#28a87d",
     alpha = .5,
     shape = 20,
@@ -129,58 +139,54 @@ p1 <- ggplot(ecologicalMF, aes(x=log2(sowndiv), y=multifunctionality)) +
     size = 4,
     position = position_jitter(w = 0.03, h = 0)
   ) +
-   geom_smooth(
-    method = "lm",
-    se = FALSE
-  ) +
-   stat_poly_eq(
-    aes(label = paste(..eq.label.., sep = "~~~")),
-    formula = y ~ x,
-    parse = TRUE,
-    size = 5
-  ) +
-  labs(title = "Ecological Multifunctionality vs. Sown Plant Diversity",
-       x = "Log2(Sown Plant Diversity)",
-       y = "Ecological Multifunctionality")
+  # Model-estimated effect
+  geom_line(data = plot_sown_mf_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
+  # Credible interval ribbon
+  geom_ribbon(data = plot_sown_mf_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
+              fill = "#287da8", alpha = 0.2) +
+  labs(title = "",
+       x = "Sown plant diversity",
+       y = "Ecological multifunctionality") +
+  scale_x_continuous(breaks = c(1,2,4,8,16))
 
-p1
+p_sown_mf
 
 # save figure
 ggsave("EcologicalMF_sown_noMono.png",
-       plot = p1,
+       plot = p_sown_mf,
        device = "png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 # plot MF as a function of meanSR
-p2 <- ggplot(ecologicalMF, aes(x=log2(meanSR), y=multifunctionality)) +
-    geom_point(
+c_real_mf <- conditional_effects(fitMFreal)
+plot_real_mf_data <- c_real_mf[[1]]
+
+p_real_mf <- ggplot() +
+  geom_point(data = ecologicalMF,
+             aes(x = meanSR, y=multifunctionality),
     color = "#28a87d",
     alpha = .5,
     shape = 20,
     stroke = 1,
     size = 4,
+    position = position_jitter(w = 0.03, h = 0)
   ) +
-   geom_smooth(
-    method = "lm",
-    se = FALSE,
-    color = "#287da8"
-  ) +
-   stat_poly_eq(
-    aes(label = paste(..eq.label.., sep = "~~~")),
-    formula = y ~ x,
-    parse = TRUE,
-    size = 5
-  ) +
-  labs(title = "Ecological Multifunctionality vs. Realized Species Richness",
-       x = "Log2(Realized Species Richness)",
-       y = "Ecological Multifunctionality")
+  # Model-estimated effect
+  geom_line(data = plot_real_mf_data, aes(x = meanSR, y = estimate__), color = "blue", size = .8, alpha = .6) +
+  # Credible interval ribbon
+  geom_ribbon(data = plot_real_mf_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
+              fill = "#287da8", alpha = 0.2) +
+  labs(title = "",
+       x = "Mean realized plant diversity",
+       y = "Ecological multifunctionality") +
+  scale_x_continuous(breaks = c(2,4,6,8,10,12))
 
-p2
-
+p_real_mf
 # save figure
 ggsave("EcologicalMF_realizedSR_noMono.png",
-       plot = p2,
+       plot = p_real_mf,
        device = "png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
@@ -207,9 +213,10 @@ corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
   ) +
   stat_cor(method = "pearson", label.x = 0.2, label.y = 700, size = 5) +
   geom_smooth(method = "lm", se = F, color = "#287da8") +
-  labs(title = "Economic vs. Ecological Multifunctionality",
-       x = "Ecological Multifunctionality",
-       y = "Economic Multifunctionality (Costs/Benefits)")
+  labs(title = "",
+       x = "Ecological multifunctionality",
+       y = "Economic multifunctionality (€/ha/year)") +
+  scale_y_continuous(breaks = c(-500, -250, 0, 250, 500, 750))
 
 corrPlot
 
@@ -224,38 +231,84 @@ ggsave("Corr_EconomicMF_EcologicalMF.png",
 # Supplements
 ## Single Function Models
 ```{r Model Single Functions}
-fitLeachReal
+fitLeachReal <- brm(
+  av_leaching ~ log2(sowndiv) + (1|block),
+ ecologicalMF)
 
-fitBiomassReal
+summary(fitLeachReal)
 
-fitMicbioReal
+fitBiomassReal <- brm(
+  mean_biomass ~ log2(sowndiv) + (1|block),
+ ecologicalMF)
 
-fitMicresReal
+summary(fitBiomassReal)
 
-fitRootReal
+fitMicbioReal <- brm(
+  mean_micbiomass ~ log2(sowndiv) + (1|block),
+ ecologicalMF)
 
-fitSOCReal
+summary(fitMicbioReal)
 
-fitPolReal
+fitMicresReal <- brm(
+  mean_micrespiration ~ log2(sowndiv) + (1|block),
+ ecologicalMF)
 
-fitAboveReaL
+summary(fitMicresReal)
 
-fitBelowReal
+fitRootReal <- brm(
+  mean_root_biomass ~ log2(sowndiv) + (1|block),
+ ecologicalMF)
 
-fitStabiReal
+summary(fitRootReal)
 
-fitAggReal
+fitSOCReal <- brm(
+  SOC_overall_mean ~ log2(sowndiv) + (1|block),
+ ecologicalMF)
 
+summary(fitSOCReal)
 
+fitPolReal <- brm(
+  mean_diversity ~ log2(sowndiv) + (1|block),
+ ecologicalMF)
+
+summary(fitPolReal)
+
+fitAboveReaL <- brm(
+  mean_above_control ~ log2(sowndiv) + (1|block),
+ ecologicalMF)
+
+summary(fitAboveReaL)
+
+fitBelowReal <- brm(
+  mean_below_control ~ log2(sowndiv) + (1|block),
+ ecologicalMF)
+
+summary(fitBelowReal)
+
+fitStabiReal <- brm(
+  biomass_stability ~ log2(sowndiv) + (1|block),
+ ecologicalMF)
+
+summary(fitStabiReal)
+
+fitAggReal <- brm(
+  mean_agg ~ log2(sowndiv) + (1|block),
+ ecologicalMF)
+
+summary(fitAggReal)
 
 ```
 
 
 ## Plot the single functions
 ```{r Plot Single functions}
-# plot aggregate stability as function of meanSR
-ggplot(ecologicalMF, aes(x=log2(sowndiv), y=aggregates_standardized)) +
-  geom_point(
+#plot biomass as a response to sowndiv
+c_sown_biomass <- conditional_effects(fitMFsown)
+plot_sown_mf_data <- c_sown_mf[[1]]
+
+p_sown_mf <- ggplot() +
+  geom_point(data = ecologicalMF,
+             aes(x = sowndiv, y=multifunctionality),
     color = "#28a87d",
     alpha = .5,
     shape = 20,
@@ -263,14 +316,24 @@ ggplot(ecologicalMF, aes(x=log2(sowndiv), y=aggregates_standardized)) +
     size = 4,
     position = position_jitter(w = 0.03, h = 0)
   ) +
-   geom_smooth(
-    method = "lm",
-    se = FALSE
-  ) +
-  labs(title = "Aggregate Stability vs. Realized Species Richness",
-       x = "Log2(Realized Species Richness)",
-       y = "Aggregate Stability")
+  # Model-estimated effect
+  geom_line(data = plot_sown_mf_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
+  # Credible interval ribbon
+  geom_ribbon(data = plot_sown_mf_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
+              fill = "#287da8", alpha = 0.2) +
+  labs(title = "",
+       x = "Sown plant diversity",
+       y = "Ecological multifunctionality") +
+  scale_x_continuous(breaks = c(1,2,4,8,16))
 
+p_sown_mf
+
+# save figure
+ggsave("EcologicalMF_sown_noMono.png",
+       plot = p_sown_mf,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
 
 ```
 
