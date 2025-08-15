@@ -3,8 +3,9 @@
 ------------------------------------------------
 
 1) Finalize the figures
-
-2) Finalize analysis 
+	- make figures for sensitivity analysis?
+2) Finalize analysis
+	- Include sensitivity analysis! 
 	- Include single services and functions for ecological MF in supplements
 	- for pollination and meanSR it doesn't make sense to build the meanSR only from 2011 onwards, because pollination was measured before 2011
 	- ask someone (marie or nico) if the conversion from kg/m³ to kg/(1/3m³) makes sense 
