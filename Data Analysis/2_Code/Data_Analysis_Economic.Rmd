@@ -393,19 +393,32 @@ ggsave("Single_Services_real.png",
 #economic MF without monocultures and mean realized diversity
 c_real_total <- conditional_effects(fitTotalReal)
 plot_real_total_data <- c_real_total[[1]]
+
+c_real_total_lo <- conditional_effects(fitTotalLo)
+plot_real_total_data_lo <- c_real_total_lo[[1]]
+
+c_real_total_hi <- conditional_effects(fitTotalHi)
+plot_real_total_data_hi <- c_real_total_hi[[1]]
   
 p_real_total <- ggplot() +
   geom_point(data = noMono, aes(x = meanSR, y = costs_total_mid), 
              alpha = 0.4, color = "#28a87d") +
    # Model-estimated effect
-  geom_line(data = plot_real_total_data, aes(x = meanSR, y = estimate__), color = "blue", size = .8, alpha = .6) +
+  geom_line(data = plot_real_total_data, aes(x = meanSR, y = estimate__), color = "blue", size = 1, alpha = .6) +
+  geom_line(data = plot_real_total_data_lo, aes(x = meanSR, y = estimate__), color = "green", linewidth = .8, alpha = .6) +
+  geom_line(data = plot_real_total_data_hi, aes(x = meanSR, y = estimate__), color = "yellow", linewidth = .8, alpha = .6) +
   
   # add line at y = 0
   geom_hline(yintercept = 0, color = "grey90", linewidth = 0.8, linetype = 1, alpha = .5) +
 
   # Credible interval ribbon
-  geom_ribbon(data = plot_real_total_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
+
+#    geom_ribbon(data = plot_real_total_data_lo, aes(x = meanSR, ymin = lower__, ymax = upper__), 
+#              fill = "green", alpha = 0.2) +
+#      geom_ribbon(data = plot_real_total_data_hi, aes(x = meanSR, ymin = lower__, ymax = upper__), 
+#              fill = "yellow", alpha = 0.2) +
+    geom_ribbon(data = plot_real_total_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
+              fill = "#287da8", alpha = 0.4) +
   labs(x = "Mean realized plant diversity", y = "Economic multifunctionality (€/ha/a)") +
   scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12)) +
   scale_y_continuous(breaks = c(-500, -250, 0, 250, 500, 750))
@@ -692,7 +705,7 @@ fitTotal3 <- brm(
 ```{r Sensitivity Analysis}
 # Low Total Costs against species richness
 fitTotalLo <- brm(
-  costs_total_lo ~ log2(meanSR),
+  costs_total_lo ~ log2(meanSR) + (1|block),
   noMono)
 
     # check model assumptions
@@ -707,7 +720,7 @@ fitTotalLo <- brm(
 
 # High Total Costs against species richness
 fitTotalHi <- brm(
-  costs_total_hi ~ log2(meanSR),
+  costs_total_hi ~ log2(meanSR) + (1|block),
   noMono)
 
     # check model assumptions
