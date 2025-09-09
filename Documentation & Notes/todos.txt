@@ -2,25 +2,34 @@
 -----------  Jena Project To-Dos  --------------
 ------------------------------------------------
 
+0.01) Ask Nico again about George Brown and the perspectives paper
+
+0.1) write review for peerj
+
+0.2) Science symposium
+
+
+
+
 1) Finalize the figures
-	- make figures for sensitivity analysis?
+	- update figures according to comments, create legends, add descriptions
+
 2) Finalize analysis
-	- Include sensitivity analysis! 
-	- Include single services and functions for ecological MF in supplements
-	- for pollination and meanSR it doesn't make sense to build the meanSR only from 2011 onwards, because pollination was measured before 2011
-	- ask someone (marie or nico) if the conversion from kg/m³ to kg/(1/3m³) makes sense 
+	- calculate mean benefit / costs of gaining or loosing a species 
 
 3) WRITE!!!!
-	- you have to justify why you included the functions and services you included
-	- invite core writing team: Nico, Marie, Bartosz, Martin, Vera (?)
-	- mention functions and references (data creators) in the main part of manuscript (detailed measurement Infos in the supplements)
-	- most important for methods: calculations and statistics, economic MF, ecological MF
+	- work through the comments
+	- think about a deadline and invite co-authors for a personal meeting to discuss changes
 
-?) Include stakeholder weighting? Alternatively include this in the discussion and stress that different agents prefer different ecosystem services
-?) why are there negative SR values for log2(realized)? --> Because mean SR is below 1 and the 2nd log of values below 1 is negative.
+HALF-DONE) Include sensitivity analysis
 
-!) Discuss the importance of ecosystem services that can not be monetized so easily or at all.
+DONE) Mentioned the importance of ecosystem services that can not be monetized so easily or at all.
 
+DONE) mention functions and references (data creators) in the main part of manuscript (detailed measurement Infos in the supplements)
+
+DONE) most important for methods: calculations and statistics, economic MF, ecological MF
+
+DONE) invite core writing team: Nico, Marie, Bartosz, Martin, Vera
 
 DONE) make them even nicer and publication ready (check the requirements from nature) 
 	add the CI to the plots --> conditional effects function from brms package is perfect
