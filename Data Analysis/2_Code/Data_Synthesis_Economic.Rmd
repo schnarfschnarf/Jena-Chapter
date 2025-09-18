@@ -57,9 +57,13 @@ leaching <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Da
   mutate(plotcode = as.factor(plotcode)) # change plotcode to a factor
 ```
 
-## Data wrangling
-Before the individual datasets can be merged, they have to be harmonized. Additionally for some datasets, aggregated values have to be calculated. 
+## Data wrangling & calculations
+Before the individual datasets can be merged, they have to be harmonized. Additionally for some datasets, aggregated values have to be calculated.
+Monetary values for individual ecosystem services will be calculated.
 ```{r Biomass data}
+# calculate variable costs per dt (before we only had costs per hectare)
+SGMS$var_costs <- SGMS$costs/SGMS$yield
+
 # calculate biomass for each year per plot and average across subsamples
 biomassAnnual <- biomassDat %>% 
   filter(year > 2010) %>% 
@@ -73,20 +77,33 @@ biomassAnnual$year <- as.factor(biomassAnnual$year) # change year to a factor
 # merge annual biomass data with the SGMs dataset
 biomassAnnual <- biomassAnnual %>% 
   left_join(SGMS, by = join_by(year)) %>% 
-  select(plotcode, year, mean_biomass, price, costs)  # select only relevant columns
+  select(plotcode, year, mean_biomass, price, var_costs)  # select only relevant columns
   
-# calculate individual SGM for each year
-biomassAnnual$SGM_annual <- biomassAnnual$mean_biomass * 0.1 * biomassAnnual$price - biomassAnnual$costs # 0.1 = conversion from g/m² to dt/ha
+# calculate individual profit for each year
+biomassAnnual$profit_annual <- biomassAnnual$mean_biomass * 0.1 * (biomassAnnual$price - biomassAnnual$var_costs) # 0.1 = conversion from g/m² to dt/ha
 
-# sum up biomass for each plot and calculate the mean biomass and SGM across years
+# calculate the biomass stability as the inverse coefficient of variance of the biomass across years (CV = SD/mean)
+biomassAnnual <- biomassAnnual %>% 
+  group_by(plotcode) %>% 
+  mutate(CV = (sd(mean_biomass)/mean(mean_biomass))^(-1)) 
+
+# sum up biomass for each plot and calculate the mean biomass and mean profit across years
 biomassMeans <- biomassAnnual %>% 
   group_by(plotcode) %>% 
   summarise(
     mean_biomass = mean(mean_biomass, na.rm = TRUE), 
-    SGM_mean = mean(SGM_annual, na.rm = TRUE), 
+    profit_mean = mean(profit_annual, na.rm = TRUE),
+    CV = mean(CV, na.rm = TRUE),
     .groups = "drop"
   )
+
+# calculate insurance value with profit, CV and risk aversion coefficient (taken from Rommel & Sagebiel et al., 2023)
+biomassMeans$RP <- biomassMeans$profit_mean - (biomassMeans$profit_mean * ((1+biomassMeans$CV)^2)^(-0.109))
+
+biomassMeans$insurance <- biomassMeans$profit_mean* ((1+min(biomassMeans$CV)^2)^(-0.109)-((1+biomassMeans$CV)^2)^(-0.109))
+
 ```
+
 
 ```{r soil carbon}
 # rename plot to plotcode and change data types 
@@ -167,10 +184,10 @@ synthDat$mean_org_diff <- synthDat$mean_org_20 - synthDat$mean_org_11
 
 # create a column with social costs of carbon
 synthDat$SOC_costs_mid <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 195 / 12 # mid price scenario (SOC value multiplied with bulk de
-synthDat$SOC_costs_lo <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 70 / 12 # low price scenario - ETS price
+synthDat$SOC_costs_lo <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 75 / 12 # low price scenario - ETS price
 synthDat$SOC_costs_hi <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 268.64 / 12 # high price scenario
 # add up all the costs for total value
-synthDat$costs_total_mid <- synthDat$SOC_costs_mid + synthDat$leach_costs_mid + synthDat$SGM_mean
+synthDat$costs_total_mid <- synthDat$SOC_costs_mid + synthDat$leach_costs_mid + synthDat$profit_mean
 
 # save the synthesized dataset
 writexl::write_xlsx(synthDat, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx")

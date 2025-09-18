@@ -49,10 +49,10 @@ Change data types and filter for relevant observations.
 synthDat$plotcode <- as.factor(synthDat$plotcode) #change the plotcode to a factor
 
 # add up all the low costs for lower total value
-synthDat$costs_total_lo <- synthDat$SOC_costs_lo + synthDat$leach_costs_lo + synthDat$SGM_mean
+synthDat$costs_total_lo <- synthDat$SOC_costs_lo + synthDat$leach_costs_lo + synthDat$profit_mean
 
 # add up all the high costs for higher total value
-synthDat$costs_total_hi <- synthDat$SOC_costs_hi + synthDat$leach_costs_hi + synthDat$SGM_mean
+synthDat$costs_total_hi <- synthDat$SOC_costs_hi + synthDat$leach_costs_hi + synthDat$profit_mean
 
 noMono <- synthDat %>% 
   filter(sowndiv > 1) #filter out monocultures
@@ -105,14 +105,14 @@ p3 <- ggplot2::ggplot(synthDat,
   )
 
 p4 <- ggplot2::ggplot(synthDat,
-                aes(x = SGM_mean)
+                aes(x = profit_mean)
                 ) +
   geom_density(
     fill = "#28a87d",
     alpha = .5
   ) +
   labs(
-    x = "Standard Gross Margin (€/ha)",
+    x = "Operating Profit (€/ha)",
     y = "Density"
   )
 
@@ -156,7 +156,7 @@ p7 <- ggplot2::ggplot(synthDat,
 # show all in one grid
 p1 + p2 + p3 + p4 + p5 + p6 + p7 +
   plot_layout(ncol = 3) +
-  plot_annotation(title = "Densities of Sown Plant Diversity, Realized Species Richness, Biomass, SGM, SOC Costs, Leaching Costs and Total Costs") &
+  plot_annotation(title = "Densities of Sown Plant Diversity, Realized Species Richness, Biomass, Profit, SOC Costs, Leaching Costs and Total Costs") &
   theme(plot.title = element_text(size=20,hjust=0.5))
 
 ggsave("Densities.png",
@@ -171,21 +171,21 @@ ggsave("Densities.png",
 ## Statistical Models
 ### sowndiv without Monocultures
 ```{r Sown Diversity WITHOUT Monocultures}
-# SGM against species richness
-fitSGMsown <- brm(
-  SGM_mean ~ log2(sowndiv) + (1|block),
+# Profit against species richness
+fitProfitsown <- brm(
+  profit_mean ~ log2(sowndiv) + (1|block),
   control = list(adapt_delta = 0.95),
   noMono) 
 
     # check model assumptions 
-    pp_check(fitSGMsown, type="scatter_avg")
-    pp_check(fitSGMsown, ndraws=50)
-    check_model(fitSGMsown, check="linearity")
-    check_model(fitSGMsown, check="homogeneity")
-    plot(fitSGMsown)
+    pp_check(fitProfitsown, type="scatter_avg")
+    pp_check(fitProfitsown, ndraws=50)
+    check_model(fitProfitsown, check="linearity")
+    check_model(fitProfitsown, check="homogeneity")
+    plot(fitProfitsown)
     
     # check output of model
-    summary(fitSGMsown)
+    summary(fitProfitsown)
 
 # SOC against species richness
 fitSOCsown <- brm(
@@ -239,20 +239,20 @@ fitTotalSown <- brm(
 
 ### Realized Diversity without Monocultures
 ```{r Realized Diversity without Monocultures}
-# SGM against species richness
-fitSGMreal <- brm(
-  SGM_mean ~ log2(meanSR) + (1|block),
+# Profit against species richness
+fitProfitreal <- brm(
+  profit_mean ~ log2(meanSR) + (1|block),
   noMono) 
 
     # check model assumptions 
-    pp_check(fitSGMreal, type="scatter_avg")
-    pp_check(fitSGMreal, ndraws=50)
-    check_model(fitSGMreal, check="linearity")
-    check_model(fitSGMreal, check="homogeneity")
-    plot(fitSGMreal)
+    pp_check(fitProfitreal, type="scatter_avg")
+    pp_check(fitProfitreal, ndraws=50)
+    check_model(fitProfitreal, check="linearity")
+    check_model(fitProfitreal, check="homogeneity")
+    plot(fitProfitreal)
     
     # check output of model
-    summary(fitSGMreal)
+    summary(fitProfitreal)
 
 # SOC against species richness
 fitSOCreal <- brm(
@@ -305,26 +305,28 @@ fitTotalReal <- brm(
 ## Plotting
 ### Plot realized species diversity effects
 ```{r Plotting}
-#SGM data without monocultures and realdiv
-c_real_sgm <- conditional_effects(fitSGMreal)
-plot_real_sgm_data <- c_real_sgm[[1]]
+#Profit data without monocultures and realdiv
+c_real_Profit <- conditional_effects(fitProfitreal)
+plot_real_Profit_data <- c_real_Profit[[1]]
   
-p_real_sgm <- ggplot() +
-  geom_point(data = noMono, aes(x = meanSR, y = SGM_mean), 
+p_real_Profit <- ggplot() +
+  geom_point(data = noMono, aes(x = meanSR, y = profit_mean), 
              alpha = 0.4, color = "#28a87d") +
    # Model-estimated effect
-  geom_line(data = plot_real_sgm_data, aes(x = meanSR, y = estimate__), color = "blue", size = .8, alpha = .6) +
+  geom_line(data = plot_real_Profit_data, aes(x = meanSR, y = estimate__), color = "blue", size = .8, alpha = .6) +
 
   # Credible interval ribbon
-  geom_ribbon(data = plot_real_sgm_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
+  geom_ribbon(data = plot_real_Profit_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
               fill = "#287da8", alpha = 0.2) +
-  labs(x = "Mean realized plant diversity", y = "Mean SGM (€/ha/a) 2011 - 2023") +
-  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12))
+  labs(x = "Mean realized plant diversity", y = "Mean operating profit (€/ha/a)") +
+  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12)) +
+  scale_y_continuous(breaks = c(50, 100, 150, 200, 250))
+  
 
-p_real_sgm
+p_real_Profit
 
-ggsave("SGM_real_noMono.png",
-       plot = p_real_sgm,
+ggsave("Profit_real_noMono.png",
+       plot = p_real_Profit,
        device = "png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
@@ -380,8 +382,8 @@ ggsave("Leach_real_noMono.png",
        dpi = 300)
 
 # combine the plots for realized SR in one grid
-p_services_real <- p_real_sgm + p_real_soc + p_real_leach +
-  plot_annotation(title = "Realized Plant Diversity against Biomass, SGM, SOC Costs and Leaching Costs") &
+p_services_real <- p_real_Profit + p_real_soc + p_real_leach +
+  plot_annotation(title = "Realized Plant Diversity against Biomass, Profit, SOC Costs and Leaching Costs") &
   theme(plot.title = element_text(size=13,hjust=0.5))
 
 ggsave("Single_Services_real.png",
@@ -435,26 +437,26 @@ ggsave("total_real_noMono.png",
 
 ### Plot sown diversity effect
 ```{r}
-#SGM data without monocultures and sowndiv
-c_sown_sgm <- conditional_effects(fitSGMsown)
-plot_sown_sgm_data <- c_sown_sgm[[1]]
+#Profit data without monocultures and sowndiv
+c_sown_Profit <- conditional_effects(fitProfitsown)
+plot_sown_Profit_data <- c_sown_Profit[[1]]
   
-p_sown_sgm <- ggplot() +
-  geom_point(data = noMono, aes(x = sowndiv, y = SGM_mean), 
+p_sown_Profit <- ggplot() +
+  geom_point(data = noMono, aes(x = sowndiv, y = profit_mean), 
              alpha = 0.4, color = "#28a87d") +
    # Model-estimated effect
-  geom_line(data = plot_sown_sgm_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
+  geom_line(data = plot_sown_Profit_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
 
   # Credible interval ribbon
-  geom_ribbon(data = plot_sown_sgm_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
+  geom_ribbon(data = plot_sown_Profit_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
               fill = "#287da8", alpha = 0.2) +
-  labs(x = "Sown plant diversity", y = "Mean SGM (€/ha/year)") +
+  labs(x = "Sown plant diversity", y = "Mean Profit (€/ha/year)") +
   scale_x_continuous(breaks = c(2, 4, 8, 16))
 
-p_sown_sgm
+p_sown_Profit
 
-ggsave("SGM_sown_noMono.png",
-       plot = p_sown_sgm,
+ggsave("Profit_sown_noMono.png",
+       plot = p_sown_Profit,
        device = "png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
@@ -559,20 +561,20 @@ fitBiomassSR <- brm(
     # check output of model
     summary(fitBiomassSR)
 
-# SGM against species richness
-fitSGM <- brm(
-  SGM_mean ~ log2(sowndiv),
+# Profit against species richness
+fitProfit <- brm(
+  profit_mean ~ log2(sowndiv),
   synthDat) 
 
     # check model assumptions 
-    pp_check(fitSGM, type="scatter_avg")
-    pp_check(fitSGM, ndraws=50)
-    check_model(fitSGM, check="linearity")
-    check_model(fitSGM, check="homogeneity")
-    plot(fitSGM)
+    pp_check(fitProfit, type="scatter_avg")
+    pp_check(fitProfit, ndraws=50)
+    check_model(fitProfit, check="linearity")
+    check_model(fitProfit, check="homogeneity")
+    plot(fitProfit)
     
     # check output of model
-    summary(fitSGM)
+    summary(fitProfit)
 
 # SOC against species richness
 fitSOC <- brm(
@@ -638,20 +640,20 @@ fitBiomassSR3 <- brm(
     # check output of model
     summary(fitBiomassSR3)
 
-# SGM against species richness
-fitSGM3 <- brm(
-  SGM_mean ~ meanSR + (1|block),
+# Profit against species richness
+fitProfit3 <- brm(
+  profit_mean ~ meanSR + (1|block),
   synthDat) 
 
     # check model assumptions 
-    pp_check(fitSGM3, type="scatter_avg")
-    pp_check(fitSGM3, ndraws=50)
-    check_model(fitSGM3, check="linearity")
-    check_model(fitSGM3, check="homogeneity")
-    plot(fitSGM3)
+    pp_check(fitProfit3, type="scatter_avg")
+    pp_check(fitProfit3, ndraws=50)
+    check_model(fitProfit3, check="linearity")
+    check_model(fitProfit3, check="homogeneity")
+    plot(fitProfit3)
     
     # check output of model
-    summary(fitSGM3)
+    summary(fitProfit3)
 
 # SOC against species richness
 fitSOC3 <- brm(

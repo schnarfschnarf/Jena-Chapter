@@ -4,11 +4,13 @@
 
 0.01) Ask Nico again about George Brown and the perspectives paper
 
-0.1) write review for peerj
+0.1) Science symposium
 
-0.2) Science symposium
+0.2) Polycrisis paper 
 
+0.3) Plan trip to Canada and make booking --> speak to travel administation if possible to combine with Columbia stay
 
+0.4) Apply for EAERE winter school
 
 
 1) Finalize the figures
@@ -20,6 +22,7 @@
 3) WRITE!!!!
 	- work through the comments
 	- think about a deadline and invite co-authors for a personal meeting to discuss changes
+
 
 HALF-DONE) Include sensitivity analysis
 
