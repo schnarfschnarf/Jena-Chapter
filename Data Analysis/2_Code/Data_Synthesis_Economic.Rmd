@@ -187,7 +187,7 @@ synthDat$SOC_costs_mid <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10
 synthDat$SOC_costs_lo <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 75 / 12 # low price scenario - ETS price
 synthDat$SOC_costs_hi <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 268.64 / 12 # high price scenario
 # add up all the costs for total value
-synthDat$costs_total_mid <- synthDat$SOC_costs_mid + synthDat$leach_costs_mid + synthDat$profit_mean
+synthDat$costs_total_mid <- synthDat$SOC_costs_mid + synthDat$leach_costs_mid + synthDat$profit_mean # + synthDat$insurance
 
 # save the synthesized dataset
 writexl::write_xlsx(synthDat, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx")
