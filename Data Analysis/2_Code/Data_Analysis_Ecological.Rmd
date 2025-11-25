@@ -32,23 +32,20 @@ library(ggpubr)
 ## Set up a theme
 ```{r Theme}
 theme_set(theme_custom())
-
 ```
 
 ## Load datasets and filter for relevant observations/measurements
 ```{r Read Data}
 # load synthesis dataset
-ecologicalMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality.xlsx") %>% 
-  filter(!is.na(sowndiv) & sowndiv < 60 & sowndiv > 1) # remove rows with NA in sowndiv and sowndiv greater than 16
-ecologicalMF_red <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality_reduced.xlsx") %>% 
+ecologicalMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality_reduced.xlsx") %>% 
   filter(!is.na(sowndiv) & sowndiv < 60) # remove rows with NA in sowndiv and sowndiv greater than 16
-economicMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx") %>% 
+economicMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF_final.xlsx") %>% 
   filter(sowndiv < 60) # remove rows with sowndiv greater than 16
 
 ecologicalMF$plotcode <- as.factor(ecologicalMF$plotcode)
-ecologicalMF_red$plotcode <- as.factor(ecologicalMF_red$plotcode)
+ecologicalMF$plotcode <- as.factor(ecologicalMF$plotcode)
 ecologicalMF$block <- as.factor(ecologicalMF$block)
-ecologicalMF_red$block <- as.factor(ecologicalMF_red$block)
+ecologicalMF$block <- as.factor(ecologicalMF$block)
 economicMF$plotcode <- as.factor(economicMF$plotcode)
 
 ```
@@ -146,13 +143,13 @@ p_sown_mf <- ggplot() +
               fill = "#287da8", alpha = 0.2) +
   labs(title = "",
        x = "Sown plant diversity",
-       y = "Ecological multifunctionality") +
+       y = "Ecological multifunctionality w/o unit") +
   scale_x_continuous(breaks = c(1,2,4,8,16))
 
 p_sown_mf
 
 # save figure
-ggsave("EcologicalMF_sown_noMono.png",
+ggsave("EcologicalMF_sown.png",
        plot = p_sown_mf,
        device = "png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
@@ -197,7 +194,7 @@ ggsave("EcologicalMF_realizedSR_noMono.png",
 # merge reduced ecological and economic multifunctionality data
 joinedMF <- economicMF %>%
   select(c(plotcode, costs_total_mid)) %>% 
-  left_join(ecologicalMF_red, by = "plotcode") 
+  left_join(ecologicalMF, by = "plotcode") 
 
 # Correlation between economic and ecological multifunctionality
 cor.test(joinedMF$multifunctionality, joinedMF$costs_total_mid)
@@ -218,8 +215,8 @@ corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
   labs(title = "",
        x = "Ecological multifunctionality",
        y = "Economic multifunctionality (€/ha/year)") +
-  scale_x_continuous(breaks = c(0.1,0.2, 0.3, 0.4, 0.4, 0.5, 0.6)) +
-  scale_y_continuous(breaks = c(-1000, -500, 0, 500, 1000, 1500))
+  scale_x_continuous(breaks = c(0.1, 0.2, 0.3, 0.4, 0.4, 0.5, 0.6, 0.7)) +
+  scale_y_continuous(breaks = c(-1500, -750, 0, 750, 1500))
 
 corrPlot
 

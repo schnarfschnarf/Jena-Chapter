@@ -38,12 +38,8 @@ theme_set(theme_custom())
 ## Load datasets and filter for relevant observations/measurements
 ```{r Read Data}
 #load synthesis dataset
-synthDat_alt <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx") %>% 
-  filter(sowndiv < 60) %>%  #remove rows with NA in sowndiv and sowndiv greater than 16
-  mutate(block = as.factor(block))
-
-synthDat <- synthDat %>% 
-  filter(sowndiv < 60) %>%  #remove rows with NA in sowndiv and sowndiv greater than 16
+synthDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF_final.xlsx") %>% 
+  filter(sowndiv < 60) %>%  #remove 60 species plots
   mutate(block = as.factor(block))
 ```
 
@@ -67,8 +63,8 @@ noMono <- synthDat %>%
 ## Plot the densities of the data
 ```{r Exploratory Plotting}
 # check distribution
-p1 <- ggplot2::ggplot(synthDat_alt,
-                aes(x = SOC_costs_alt)
+p1 <- ggplot2::ggplot(synthDat,
+                aes(x = SOC_costs_mid)
                 ) +
   geom_density(
     fill = "#28a87d",
@@ -81,7 +77,7 @@ p1 <- ggplot2::ggplot(synthDat_alt,
 
 p1
 
-p2 <- ggplot2::ggplot(synthDat_alt,
+p2 <- ggplot2::ggplot(synthDat,
                 aes(x = sowndiv, y = profit_mean)
                 ) +
   geom_point(
@@ -93,8 +89,8 @@ p2 <- ggplot2::ggplot(synthDat_alt,
     color = "blue"
   ) +
   labs(
-    x = "Plant Diversity",
-    y = "profit 2010 - 2020"
+    x = "Sown Plant Diversity",
+    y = "Mean annual profit"
   )
 p2
 
@@ -133,7 +129,7 @@ p4 <- ggplot2::ggplot(synthDat,
 
 p4
 
-p5 <- ggplot2::ggplot(synthDat_alt,
+p5 <- ggplot2::ggplot(synthDat,
                 aes(x = sowndiv, y = SOC_costs_mid)
                 ) +
   geom_point(
@@ -190,7 +186,9 @@ ggsave("InsuranceDeviation.png",
 ```{r Sown Diversity WITH Monocultures, include=FALSE}
 # Profit against sown plant diversity
 fitProfit <- brm(
-  profit_mean ~ log2(sowndiv),
+  profit_mean ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 3000,
   synthDat) 
 
     # check model assumptions 
@@ -205,7 +203,9 @@ fitProfit <- brm(
 
 # SOC against sown plant diversity
 fitSOC <- brm(
-  SOC_costs_mid ~ log2(sowndiv),
+  SOC_costs_mid ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 3000,
   synthDat)
 
     # check model assumptions
@@ -220,7 +220,9 @@ fitSOC <- brm(
 
 # Leaching costs against sown plant diversity
 fitLeach <- brm(
-  leach_costs_mid ~ log2(sowndiv),
+  leach_costs_mid ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 3000,
   synthDat)
 
     # check model assumptions
@@ -235,7 +237,9 @@ fitLeach <- brm(
 
 # Insurance value against sown plant diversity
 fitInsurance <- brm(
-  insurance ~log2(sowndiv),
+  insurance ~log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 3000,
   synthDat
 )    
     
@@ -250,16 +254,11 @@ fitInsurance <- brm(
     summary(fitInsurance)
     
     
-fitRP <-  brm(
-  RP ~log2(sowndiv),
-  synthDat
-)       
-
-
-    
-# Total Costs against sown plant diversity (2005 baseline)
+# Total Costs (medium) against sown plant diversity
 fitTotal <- brm(
-  costs_total_mid ~ log2(sowndiv),
+  costs_total_mid ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 3000,
   synthDat)
 
     # check model assumptions
@@ -271,21 +270,6 @@ fitTotal <- brm(
     
     # check output of model
     summary(fitTotal)
-    
-# Total Costs against sown plant diversity (2010 baseline)
-fitTotal_alt <- brm(
-  costs_total_mid ~ log2(sowndiv),
-  synthDat_alt)
-
-    # check model assumptions
-    pp_check(fitTotal, type="scatter_avg") 
-    pp_check(fitTotal, ndraws=50)
-    check_model(fitTotal, check="linearity") 
-    check_model(fitTotal, check="homogeneity")
-    plot(fitTotal)
-    
-    # check output of model
-    summary(fitTotal_alt) 
     
 ```
 
@@ -421,9 +405,9 @@ p_sown_soc <- ggplot() +
   # Credible interval ribbon
   geom_ribbon(data = plot_sown_soc_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
               fill = "#287da8", alpha = 0.2) +
-  labs(x = "Sown plant diversity", y = "Social costs/benefits of SOC sequestration (€/ha/year)") +
+  labs(x = "Sown plant diversity", y = "Social costs of SOC sequestration (€/ha/year)") +
   scale_x_continuous(breaks = c(1,2, 4, 8, 16)) +
-  scale_y_continuous(breaks = c(-1000, -500, 0, 500, 1000))
+  scale_y_continuous(breaks = c(-1500,-1000, -500, 0, 500, 1000))
 
 p_sown_soc
 
@@ -446,7 +430,7 @@ p_sown_leach <- ggplot() +
   # Credible interval ribbon
   geom_ribbon(data = plot_sown_leach_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
               fill = "#287da8", alpha = 0.2) +
-  labs(x = "Sown plant diversity", y = "Social costs of nitrogen leaching") +
+  labs(x = "Sown plant diversity", y = "Social costs of NO3-N leaching (€/ha/year)") +
   scale_x_continuous(breaks = c(1,2, 4, 8, 16)) +
   scale_y_continuous(breaks = c(-125, -100, -75, -50, -25))
 
@@ -521,11 +505,11 @@ p_sown_total <- ggplot() +
               fill = "#287da8", alpha = 0.2) +
   labs(x = "Sown plant diversity", y = "Economic multifunctionality (€/ha/year)") +
   scale_x_continuous(breaks = c(1,2, 4, 8, 16)) +
-  scale_y_continuous(breaks = c(-1000, -500, 0, 500, 1000, 1500))
+  scale_y_continuous(breaks = c(-1500, -1000, -500, 0, 500, 1000))
 
 p_sown_total
 
-ggsave("05baseline_total_sown.png",
+ggsave("total_sown.png",
        plot = p_sown_total,
        device = "png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",

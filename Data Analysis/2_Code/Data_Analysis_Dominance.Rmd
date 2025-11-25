@@ -119,12 +119,12 @@ dom_bio_a$profit_annual <- dom_bio_a$sum_biomass * (dom_bio_a$price - dom_bio_a$
 
 # calculate the biomass stability as the coefficient of variance of the biomass across years (CV = SD/mean)
 dom_bio_a <- dom_bio_a %>% 
-  group_by(`Experimental plot`) %>% 
+  group_by(plotcode) %>% 
   mutate(CV = (sd(sum_biomass)/mean(sum_biomass))) 
 
 # sum up biomass for each plot and calculate the mean biomass and mean profit across years. (calculating "mean of CV" doesn't change it's value on plot level, because the CV was already the same for every year per plot)
 dom_bio_final <- dom_bio_a %>% 
-  group_by(`Experimental plot`) %>% 
+  group_by(plotcode) %>% 
   summarise(
     mean_biomass = mean(sum_biomass, na.rm = TRUE),
     profit_mean = mean(profit_annual, na.rm = TRUE),
@@ -138,7 +138,7 @@ dom_bio_final$RP <- dom_bio_final$profit_mean - dom_bio_final$CE
 
 # merge biomass data with design data
 dom_bio_final <- dom_bio_final %>% # merge the biomass and the realized SR data
-  left_join(design, by = join_by(`Experimental plot`))
+  left_join(design, by = join_by(plotcode))
 
 # define quadratic relationship between biodiversity and insurance value
   quad <- lm(CV ~ sowndiv + I(sowndiv^2), dom_bio_final)

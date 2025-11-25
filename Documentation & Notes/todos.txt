@@ -23,6 +23,8 @@
 	- create equations
 	- work through remaining comments and red markups
 	- mention the term "transgressive overyielding" (look at Günay et al. 2013, on Mic Biomass)
+ 	- update hay price source
+	- update description of model parameters in the methods (also increased delta and iteration for main analysis = sown div))
 
 
 !!!!! SEND AROUND EMAIL TO ALL CO-AUTHORS (INCL. YUANYUAN) ON BEGINNING OF DECEMBER AND SET DEADLINE TO COMMENT AND REVIEW TO 14 DAYS !!!!!
