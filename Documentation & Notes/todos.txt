@@ -2,29 +2,37 @@
 -----------  Jena Project To-Dos  --------------
 ------------------------------------------------
 
-0.01) Ask Nico again about George Brown and the perspectives paper
-
-0.1) Science symposium
-
-0.2) Polycrisis paper 
-
-0.3) Plan trip to Canada and make booking --> speak to travel administation if possible to combine with Columbia stay
-
-0.4) Apply for EAERE winter school
+ Polycrisis paper -> Give more feedback on current draft
 
 
-1) Finalize the figures
-	- update figures according to comments, create legends, add descriptions
+!) Finalize the figures
+	- update figures according to comments, create legends, add descriptions 1
+	- include figure with main and dominance effects in the same plot
+	- draw transgressive overyielding line in the plot?
 
-2) Finalize analysis
-	- calculate mean benefit / costs of gaining or loosing a species 
+!) Finalize methods
+	- maybe this is already sufficient, and I can ask the data contributors to check and refine at the end?
 
-3) WRITE!!!!
-	- work through the comments
-	- think about a deadline and invite co-authors for a personal meeting to discuss changes
+!) Finalize analysis 
+	- include small analysis of dominance experiment (Box with 400 words max)
+	- calculate yearly SOC change for dominance and for main exp to compare (adapt to same year), same for biomass
+	- update aggregate analysis with new dataset
 
+!) WRITE!!!!
+	- include the missing references
+	- create equations
+	- work through remaining comments and red markups
+	- mention the term "transgressive overyielding" (look at Günay et al. 2013, on Mic Biomass)
+
+
+!!!!! SEND AROUND EMAIL TO ALL CO-AUTHORS (INCL. YUANYUAN) ON BEGINNING OF DECEMBER AND SET DEADLINE TO COMMENT AND REVIEW TO 14 DAYS !!!!!
+	 
 
 HALF-DONE) Include sensitivity analysis
+
+DONE) check whether SOC is calculated as a yearly price
+
+DONE) set baseline year for all functions as early as possible
 
 DONE) Mentioned the importance of ecosystem services that can not be monetized so easily or at all.
 

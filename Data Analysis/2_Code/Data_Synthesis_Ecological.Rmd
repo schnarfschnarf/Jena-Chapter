@@ -37,39 +37,18 @@ library(readxl)
 design <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Plot_Design/90_20_data.xlsx")
 
 #load data on realized species richness (ID = 487)
-SR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Realized_Species_Richness/487_3_data.xlsx") %>% 
-  filter(year > 2004)
+SR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Realized_Species_Richness/487_3_data.xlsx")
   #change data type for realized SR & sowndiv
   SR$realizedSR <- as.numeric(SR$realizedSR)
   SR$sowndiv <- as.numeric(SR$sowndiv)
 
-#load data on aboveground biomass production (ID = 624) 
-biomassDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/624_9_data.xlsx")
-  biomassDat$plotcode <- as.factor(biomassDat$plotcode) # change plotcode to a factor
-
 #load data on root biomass production (ID = 714) 
 roots <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Root Biomass_03-24/714_4_data.xlsx") %>% 
-  filter(year > 2010) %>% 
   rename_at('plot', ~'plotcode') # rename plot to plotcode
 
 roots$plotcode <- as.factor(roots$plotcode) # change plotcode to a factor
 roots$year <- as.factor(roots$year) # change year to a factor  
 roots$root.bm <- as.numeric(roots$root.bm) # change root biomass values to numeric
-
-#load data on soil CN (2020: ID = 424; 2017: ID = 179; 2014: ID = 175; 2011: ID = 254; 2002 - 2008: ID = 278, ): 
-carbon20 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/424_7_data.xlsx")
-carbon17 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/179_5_data.xlsx")
-carbon14 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/175_6_data.xlsx")
-carbon11 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/254_3_data.xlsx")
-
-# change data types
-carbon11$BulkDensity_Soil <- as.numeric(carbon11$BulkDensity_Soil)
-carbon17$Cinorg_Soil <- as.numeric(carbon17$Cinorg_Soil)
-carbon17$Corg_Soil <- as.numeric(carbon17$Corg_Soil)
-
-# merge the 2011, 2014, 2017 and 2020 datasets
-carbonAll <- bind_rows(carbon11, carbon14, carbon17, carbon20)
-carbonAll$plot <- as.factor(carbonAll$plot) # change plot to a factor
 
 # load data on microbial biomass and respiration from 2002 to 2020 (ID = 78), 2021 (ID = 240) (and 2022 (ID = 398) they measured for two different soil layers, so I rather not include this)
 microbial1 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/MicBiomass_MicRespiration_03-20/78_5_data.xlsx")
@@ -98,42 +77,19 @@ pathogensBelow <- read_csv("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis
   filter(Treatment == "Treatment3") %>%  # filter for treatment D3 (main experiment)
   rename_at('Plot', ~'plotcode') # rename Plot to plotcode
 
-#load data on nitrogen leaching (this should be in kg/ha per year)
-leaching <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/WaterN/Yearly_Leaching_Plot.xlsx") %>% 
-  filter(year > 2010) %>%  # filter for years after 2010
-  rename_at('plot', ~'plotcode') %>% # rename plot to plotcode
-  mutate(plotcode = as.factor(plotcode)) # change plotcode to a factor
-
 #load data on pollinators
 pollinators <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Pollinators/423_3_data.xlsx") %>% 
   mutate(species_richness = as.numeric(species_richness)) # change species richness to numeric
 
 #load data on aggregate stability
-aggregates <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Aggregates/mean_aggregates.xlsx") %>% 
-  rename_at('Plotcode', ~'plotcode') %>% # rename lotcode to plotcode
-  mutate(plotcode = as.factor(plotcode)) # change plotcode to a factor
-
+aggregates <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Aggregates/FINAL_WSA_JE_0-10_May2025_ZJ.xlsx", sheet = 2) %>% 
+  rename_at('Plotcode', ~'plotcode') %>%  # rename Plotcode to plotcode
+  mutate(WSA = as.numeric(`WSA (%)`))
 ```
 
 ## Data wrangling
 Before the individual datasets can be merged, they have to be harmonized. Additionally for some datasets, aggregated values have to be calculated. 
 ```{r Biomass data}
-# calculate biomass for each year per plot and average across subsamples
-biomassAnnual <- biomassDat %>% 
-  filter(year > 2010) %>% 
-  group_by(plotcode, year, subsample) %>%
-  summarise(sum_biomass = sum(biomass, na.rm = TRUE), .groups = "drop") %>% 
-  group_by(plotcode, year) %>%
-  summarise(mean_biomass = mean(sum_biomass, na.rm = TRUE), .groups = "drop")
-
-biomassAnnual$year <- as.factor(biomassAnnual$year) # change year to a factor
-
-# sum up biomass for each plot and calculate the mean biomass across years
-biomassMeans <- biomassAnnual %>% 
-  group_by(plotcode) %>% 
-  summarise(mean_biomass = mean(mean_biomass, na.rm = TRUE), .groups = "drop") %>% 
-  mutate(biomass_standardized = (mean_biomass - min(mean_biomass)) / (max(mean_biomass) - min(mean_biomass))) # standardize the biomass values
-
 # calculate mean biomass for root dataset
 rootsMean <- roots %>% 
   group_by(plotcode) %>% 
@@ -145,20 +101,9 @@ rootsMean <- roots %>%
 
 ```
 
-### Calculate biomass stability
-```{r Biomass Stability}
-# calculate the biomass stability as the inverse coefficient of variance of the biomass across years (CV^-1 = 1/CV)
-biomassStability <- biomassAnnual %>% 
-  group_by(plotcode) %>% 
-  summarise(biomass_stability = (mean(mean_biomass / sd(mean_biomass, na.rm = TRUE), na.rm = TRUE)), .groups = "drop") %>%
-  mutate(biomass_stability_standardized = (biomass_stability - min(biomass_stability)) / (max(biomass_stability) - min(biomass_stability))) # standardize the biomass stability values
-
-```
-
-
 ```{r Microbial data}
 microbialMean <- microbial %>%
-  filter(basal_respiration >= 0, year > 2010) %>%  # filter out negative values and years before 2010
+  filter(basal_respiration >= 0) %>%  # filter out negative values and years before 2010
   group_by(plotcode) %>% 
   mutate(mean_micbiomass = mean(soil_microbial_biomass_C, na.rm = T), mean_micrespiration = mean(basal_respiration, na.rm = T)
          ) %>% 
@@ -171,18 +116,6 @@ microbialMean <- microbial %>%
 
 ```
 
-```{r soil carbon}
-# create a new column with mean C across layers per plot for all years
-carbonMean <- carbonAll %>% group_by(plot) %>% 
-                      mutate(SOC_overall_mean = mean(Corg_Soil, na.rm = TRUE)) %>% 
-                      rename_at('plot', ~'plotcode') %>% 
-                      distinct(plotcode, SOC_overall_mean) %>%
-                      ungroup() %>%
-                      mutate(SOC_standardized = (SOC_overall_mean - min(SOC_overall_mean)) / (max(SOC_overall_mean) - min(SOC_overall_mean))
-                             ) # standardize the values
-  
-```
-
 ```{r Species Richness data}
 realdiv <- SR %>% #calculate the mean realized SR for the years 2003-2019
   group_by(plotcode) %>% 
@@ -193,22 +126,6 @@ realdiv <- SR %>% #calculate the mean realized SR for the years 2003-2019
 SR <- distinct(SR, plotcode, sowndiv)
 
 ```
-
-
-```{r leaching}
-leachingMean <- leaching %>% 
-            summarise(av_leaching = mean(leach_y, na.rm = TRUE), .by = plotcode) # calculate the mean leaching per plot
-
-leachingMean$av_leaching <- leachingMean$av_leaching / 100 # convert from g/m2 to kg/ha
-
-# standardize the leaching values
-leachingMean$leaching_standardized <- (leachingMean$av_leaching - min(leachingMean$av_leaching)) / (max(leachingMean$av_leaching) - min(leachingMean$av_leaching))
-
-# higher values are worse, therefore the values have to be inverted
-leachingMean$leaching_standardized <- 1 - leachingMean$leaching_standardized
-
-```
-
 
 ```{r Pathogen control}
 # calculate the mean aboveground pathogen control per plot
@@ -237,36 +154,18 @@ pollinatorsMean <- pollinators %>%
 ```  
 
 ```{r Aggregates}
-# standardize the mean aggregate stability values
-aggregates <- aggregates %>% 
-  mutate(aggregates_standardized = (mean_agg - min(mean_agg)) / (max(mean_agg) - min(mean_agg))) # standardize the values
-
-# remove columns you don't need
-aggregates <- aggregates %>% 
-  select(plotcode, aggregates_standardized, mean_agg)
+aggregatesMean <- aggregates %>% 
+  group_by(plotcode) %>% 
+  mutate(mean_WSA = mean(WSA, na.rm =T)) %>% 
+  distinct(plotcode, mean_WSA) %>% 
+  ungroup %>% 
+  mutate(stand_WSA = (mean_WSA - min(mean_WSA)) / (max(mean_WSA) - min(mean_WSA))) # standardize the values
 
 ```
 
-
 ## Synthesize in one Dataset
 ```{r Data Synthesis}
-# merge all datasets into one dataset
-ecologicalMF <- leachingMean %>% 
-  left_join(microbialMean, by = join_by(plotcode)) %>% 
-  left_join(rootsMean, by = join_by(plotcode)) %>% 
-  left_join(biomassMeans, by = join_by(plotcode)) %>% 
-  left_join(carbonMean, by = join_by(plotcode)) %>% 
-  left_join(realdiv, by = join_by(plotcode)) %>%
-  left_join(select(design, plotcode, block)) %>%
-  left_join(SR, by = join_by(plotcode)) %>% 
-  left_join(pollinatorsMean, by = join_by(plotcode)) %>%
-  left_join(pathogensAboveMean, by = join_by(plotcode)) %>%
-  left_join(pathogensBelowMean, by = join_by(plotcode)) %>% 
-  left_join(biomassStability, by = join_by(plotcode)) %>% 
-  left_join(aggregates, by = join_by(plotcode))
-
-
-ecologicalMF_red <- microbialMean %>% 
+ecologicalMF <- microbialMean %>% 
   left_join(rootsMean, by = join_by(plotcode)) %>% 
   left_join(realdiv, by = join_by(plotcode)) %>%
   left_join(select(design, plotcode, block)) %>%
@@ -274,47 +173,26 @@ ecologicalMF_red <- microbialMean %>%
   left_join(pollinatorsMean, by = join_by(plotcode)) %>%
   left_join(pathogensAboveMean, by = join_by(plotcode)) %>%
   left_join(pathogensBelowMean, by = join_by(plotcode)) %>% 
-  left_join(biomassStability, by = join_by(plotcode)) %>% 
-  left_join(aggregates, by = join_by(plotcode))
+  left_join(aggregatesMean, by = join_by(plotcode)) %>% 
+  filter(sowndiv < 60)
 
 # calculate the ecological multifunctionality as the mean of the standardized values  
 ecologicalMF$multifunctionality <- rowMeans(
   ecologicalMF[, c(
-    "biomass_standardized",
-    "micbiomass_standardized",
-    "root_biomass_standardized",
-    "SOC_standardized",
-    "leaching_standardized",
-    "micrespiration_standardized",
-    "mean_div_standardized",
-    "above_pathogen_control_standardized",
-    "below_pathogen_control_standardized",
-    "biomass_stability_standardized",
-    "aggregates_standardized"
-  )],
-  na.rm = TRUE
-)
-
-# calculate the ecological multifunctionality for the reduced dataset as the mean of the standardized values  
-ecologicalMF_red$multifunctionality <- rowMeans(
-  ecologicalMF_red[, c(
     "micbiomass_standardized",
     "root_biomass_standardized",
     "micrespiration_standardized",
     "mean_div_standardized",
     "above_pathogen_control_standardized",
     "below_pathogen_control_standardized",
-    "biomass_stability_standardized",
-    "aggregates_standardized"
+    "stand_WSA"
   )],
   na.rm = TRUE
 )
 
-# save the ecological multifunctionality dataset
-writexl::write_xlsx(ecologicalMF, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality.xlsx")
 
-#save the reduced ecological multifunctionality dataset
-writexl::write_xlsx(ecologicalMF_red, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality_reduced.xlsx")
+#save the ecological multifunctionality dataset
+writexl::write_xlsx(ecologicalMF, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality_reduced.xlsx")
 
 ```
 

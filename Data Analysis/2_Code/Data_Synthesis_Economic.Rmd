@@ -26,170 +26,170 @@ library(readxl)
 # load data on plot design (needed for 'block code')
 design <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Plot_Design/90_20_data.xlsx")
 
-#load data on aboveground biomass production (ID = 624) 
-biomassDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/624_9_data.xlsx")
-  biomassDat$plotcode <- as.factor(biomassDat$plotcode) # change plotcode to a factor
-
-# load data on SGMs 
-SGMS <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/SGMs.xlsx") %>% 
-  filter(year > 2010)
-  SGMS$year <- as.factor(SGMS$year) # change year to a factor
-
 #load data on realized species richness (ID = 487)
-SR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Realized_Species_Richness/487_3_data.xlsx")
+SR <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Realized_Species_Richness/487_3_data.xlsx") 
   #change data type for realized SR & sowndiv
   SR$realizedSR <- as.numeric(SR$realizedSR)
   SR$sowndiv <- as.numeric(SR$sowndiv)
 
-#load data on soil organic carbon (SOC) (2020: ID = 424 2011: ID = 254): 2011 is to compare the carbon content at the beginning of the experiment with the latest (2020) carbon content. 2020 data is the most recent year that includes bulk density measurements.
+#load data on aboveground biomass production (ID = 624) 
+biomassDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/624_9_data.xlsx")  %>%  # remove sowndiv = 60 plots 
+  filter(!plotcode %in% c("B4A01", "B3A14", "B2A03", "B1A22")) %>% 
+  filter(year > 2002)
+  biomassDat$plotcode <- as.factor(biomassDat$plotcode)
+
+  # load data on SGMs 
+SGMS <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/SGMs.xlsx")
+  SGMS$year <- as.factor(SGMS$year) # change year to a factor
+
+#load data on soil organic carbon (SOC) (2020: ID = 424 ). 2020 data is the most recent year that includes bulk density measurements.
 carbon20 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/424_7_data.xlsx")
-carbon11 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/254_3_data.xlsx") 
+
+# load 2002 SOC data as a baseline
+carbon02 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/278_2_data.xlsx") %>% 
+  filter(year == 2002)
+  
   # change data types
-  carbon11$N_Soil <- as.numeric(carbon11$N_Soil)
-  carbon11$Corg_Soil <- as.numeric(carbon11$Corg_Soil)
-  carbon11$Cinorg_Soil <- as.numeric(carbon11$Cinorg_Soil)
-  carbon11$BulkDensity_Soil <- as.numeric(carbon11$BulkDensity_Soil)
+  carbon02$Corg_Soil <- as.numeric(carbon02$Corg_Soil)
+  carbon02$BulkDensity_Soil <- as.numeric(carbon02$BulkDensity_Soil)
 
 #load data on nitrogen leaching (this should be in kg/ha per year)
 leaching <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/WaterN/Yearly_Leaching_Plot.xlsx") %>% 
-  filter(year > 2010) %>%  # filter for years after 2010
   rename_at('plot', ~'plotcode') %>% # rename plot to plotcode
-  mutate(plotcode = as.factor(plotcode)) # change plotcode to a factor
+  mutate(plotcode = as.factor(plotcode)) %>% 
+  filter(!plotcode %in% c("B4A01", "B3A14", "B2A03", "B1A22"))  
 ```
+
 
 ## Data wrangling & calculations
 Before the individual datasets can be merged, they have to be harmonized. Additionally for some datasets, aggregated values have to be calculated.
 Monetary values for individual ecosystem services will be calculated.
 ```{r Biomass data}
-# calculate variable costs per dt (before we only had costs per hectare)
-SGMS$var_costs <- SGMS$costs/SGMS$yield
-
 # calculate biomass for each year per plot and average across subsamples
 biomassAnnual <- biomassDat %>% 
-  filter(year > 2010) %>% 
   group_by(plotcode, year, subsample) %>%
   summarise(sum_biomass = sum(biomass, na.rm = TRUE), .groups = "drop") %>% 
   group_by(plotcode, year) %>%
-  summarise(mean_biomass = mean(sum_biomass, na.rm = TRUE), .groups = "drop")
+  summarise(biomass_mean = mean(sum_biomass, na.rm = TRUE)* 0.01 , .groups = "drop") # convert to ton per hectare (*0.01)
 
-biomassAnnual$year <- as.factor(biomassAnnual$year) # change year to a factor
+biomassAnnual$year <- as.factor(biomassAnnual$year) 
 
 # merge annual biomass data with the SGMs dataset
 biomassAnnual <- biomassAnnual %>% 
   left_join(SGMS, by = join_by(year)) %>% 
-  select(plotcode, year, mean_biomass, price, var_costs)  # select only relevant columns
+  select(plotcode, year, biomass_mean, price, costs_ha, costs_ton)  # select only relevant columns
   
-# calculate individual profit for each year
-biomassAnnual$profit_annual <- biomassAnnual$mean_biomass * 0.1 * (biomassAnnual$price - biomassAnnual$var_costs) # 0.1 = conversion from g/m² to dt/ha
+# calculate yearly operating profit (€/ha/a)
+biomassAnnual$profit_annual <- biomassAnnual$biomass_mean * (biomassAnnual$price - biomassAnnual$costs_ton)
 
-# calculate the biomass stability as the inverse coefficient of variance of the biomass across years (CV = SD/mean)
+# calculate the biomass stability as the coefficient of variance of the biomass across years (CV = SD/mean)
 biomassAnnual <- biomassAnnual %>% 
   group_by(plotcode) %>% 
-  mutate(CV = (sd(mean_biomass)/mean(mean_biomass))^(-1)) 
+  mutate(CV = (sd(biomass_mean)/mean(biomass_mean))) 
 
-# sum up biomass for each plot and calculate the mean biomass and mean profit across years
+# sum up biomass for each plot and calculate the mean biomass and mean profit across years. (calculating "mean of CV" doesn't change it's value on plot level, because the CV was already the same for every year per plot)
 biomassMeans <- biomassAnnual %>% 
   group_by(plotcode) %>% 
   summarise(
-    mean_biomass = mean(mean_biomass, na.rm = TRUE), 
-    profit_mean = mean(profit_annual, na.rm = TRUE),
+    biomass_mean = mean(biomass_mean, na.rm = TRUE),
+    profit_mean = median(profit_annual, na.rm = TRUE),
     CV = mean(CV, na.rm = TRUE),
     .groups = "drop"
   )
 
-# calculate insurance value with profit, CV and risk aversion coefficient (taken from Rommel & Sagebiel et al., 2023)
-biomassMeans$RP <- biomassMeans$profit_mean - (biomassMeans$profit_mean * ((1+biomassMeans$CV)^2)^(-0.109))
-
-biomassMeans$insurance <- biomassMeans$profit_mean* ((1+min(biomassMeans$CV)^2)^(-0.109)-((1+biomassMeans$CV)^2)^(-0.109))
+# calculate certainty equivalent (CE) and risk premium (RP) with profit, CV and risk aversion coefficient (taken from Rommel & Sagebiel et al., 2023)
+biomassMeans$CE <- biomassMeans$profit_mean * (1+(biomassMeans$CV)^2)^(-0.6)
+biomassMeans$RP <- biomassMeans$profit_mean - biomassMeans$CE
 
 ```
 
 
 ```{r soil carbon}
 # rename plot to plotcode and change data types 
-carbon11 <- carbon11 %>%
-  rename_at('plot', ~'plotcode') %>% 
-  mutate(
-    plotcode = as.factor(plotcode),
-    c_org = as.numeric(Corg_Soil),
-    c_inorg = as.numeric(Cinorg_Soil)
-  )
-  
+carbon02 <- carbon02 %>%
+  rename_at('plot', ~'plotcode')
+
 carbon20 <- carbon20 %>%
-  rename_at('plot', ~'plotcode') %>%
-  mutate(
-    plotcode = as.factor(plotcode),
-    c_org = as.numeric(Corg_Soil),
-    c_inorg = as.numeric(Cinorg_Soil)
-  )
+  rename_at('plot', ~'plotcode')
 
+# create a new column with mean C across layers per plot for 2004 & 2006
+carbon02_clean <- carbon02 %>% group_by(plotcode) %>% 
+                    mutate(mean_org_02 = mean(Corg_Soil), mean_bulk = mean(BulkDensity_Soil)) %>%
+                      distinct(plotcode, mean_org_02, mean_bulk)
 
-# create a new column with mean C across layers per plot for 2011
-carbon11_clean <- carbon11 %>% group_by(plotcode) %>% 
-                    mutate(mean_org_11 = mean(c_org), mean_inorg_11 = mean(c_inorg)) %>%
-                      distinct(plotcode, mean_org_11, mean_inorg_11) %>% 
-                      mutate(mean_C_11 = mean_org_11 + mean_inorg_11)
-
-# create a new column with mean C across layers per plot for 2020
+# create a new column with mean C across layers per plot for 2017 & 2020
 carbon20_clean <- carbon20 %>% group_by(plotcode) %>% 
-                      mutate(mean_org_20 = mean(c_org), mean_inorg_20 = mean(c_inorg), mean_bulk = mean(BulkDensity_Soil)) %>%
-                      distinct(plotcode, mean_org_20, mean_inorg_20, mean_bulk) %>% 
-                      mutate(mean_C_20 = mean_org_20 + mean_inorg_20)
+                    mutate(mean_org_20 = mean(Corg_Soil), mean_bulk = mean(BulkDensity_Soil)) %>%
+                      distinct(plotcode, mean_org_20, mean_bulk)
 
-  
+
+# create a column with mid SOC value for beginning and end
+carbon02_clean$SOC_costs_mid_02 <- carbon02_clean$mean_org_02 * carbon02_clean$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 300 
+carbon20_clean$SOC_costs_mid_20 <- carbon20_clean$mean_org_20 * carbon20_clean$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 300 
 ```
 
 ```{r Species Richness data}
-# calculate the mean realized SR for the years 2003-2019
-realdiv <- SR %>%                    #calculate the mean realized SR for the years 2003-2019
-  filter(year > 2010) %>% 
+# calculate the mean realized SR for the years 2003-2022
+realdiv <- SR %>% 
   group_by(plotcode) %>% 
   mutate(meanSR = mean(realizedSR, na.rm = TRUE)) %>% 
   ungroup() %>%
   distinct(plotcode, meanSR)
 
-SR <- distinct(SR, plotcode, sowndiv)
+SR <- distinct(SR, plotcode, sowndiv) %>% mutate(sowndiv = as.numeric(sowndiv))
 ```
 
 
 ```{r leaching}
+# calculate the mean annual leaching per plot across years
 leachingMean <- leaching %>% 
-            summarise(av_leaching = mean(leach_y, na.rm = TRUE), .by = plotcode)
-   # calculate the mean leaching per plot
+            summarise(leaching_mean = mean(leach_y, na.rm = TRUE)/100, .by = plotcode)
 
-leachingMean$av_leaching <- leachingMean$av_leaching / 100 # convert from g/m2 to kg/ha  
-  
 # calculate the costs in €/ha/a for each plot
-
-leachingMean$leach_costs_lo <- leachingMean$av_leaching * 6.3 *(-1)
-leachingMean$leach_costs_mid <- leachingMean$av_leaching * 11.23 *(-1)
-leachingMean$leach_costs_hi <- leachingMean$av_leaching * 20 *(-1)
+leachingMean$leach_costs_lo <- leachingMean$leaching_mean * 5 *(-1)
+leachingMean$leach_costs_mid <- leachingMean$leaching_mean * 11.23 *(-1)
+leachingMean$leach_costs_hi <- leachingMean$leaching_mean * 20 *(-1)
 ```
 
 ## Synthesize in one Dataset
 ```{r Data Synthesis}
 synthDat <- biomassMeans %>% # merge the biomass and the realized SR data
   left_join(SR, by = join_by(plotcode)) %>%
-  left_join(carbon11_clean, by = join_by(plotcode)) %>% 
-  left_join(carbon20_clean, by = join_by(plotcode)) %>% 
+  left_join(carbon02_clean, by = join_by(plotcode)) %>% 
+  left_join(carbon20_clean, by = join_by(plotcode)) %>%
   left_join(select(design, plotcode, block)) %>% 
   left_join(leachingMean, by = join_by(plotcode))  %>%
-  left_join(realdiv, by = join_by(plotcode))
+  left_join(realdiv, by = join_by(plotcode)) 
+  
 
 synthDat$block <- as.factor(synthDat$block) # change block to a factor
 synthDat$plotcode <- as.factor(synthDat$plotcode)  # change plotcode to a factor
-  
-# create a column with carbon difference between 2002 and 2020
-synthDat$mean_org_diff <- synthDat$mean_org_20 - synthDat$mean_org_11
 
-# create a column with social costs of carbon
-synthDat$SOC_costs_mid <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 195 / 12 # mid price scenario (SOC value multiplied with bulk de
-synthDat$SOC_costs_lo <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 75 / 12 # low price scenario - ETS price
-synthDat$SOC_costs_hi <- synthDat$mean_org_diff * synthDat$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 268.64 / 12 # high price scenario
+
+  # define quadratic relationship between biodiversity and insurance value
+  quad <- lm(CV ~ sowndiv + I(sowndiv^2), synthDat)
+
+  # calculate dCV/dSR
+  dCVdSR <- function(SR) {
+  c <- coef(quad)
+  c[2] + 2 * c[3] * SR
+}
+  
+  # insurance value like in Martin's code
+  synthDat <- synthDat %>% 
+    mutate(dCVdSR = dCVdSR(sowndiv),
+         insurance = sowndiv * dCVdSR * (-1))
+ 
+# create a column with social costs of carbon (for different pricing scenarios)
+synthDat$SOC_costs_mid <- (synthDat$SOC_costs_mid_20 - synthDat$SOC_costs_mid_02) /17
+synthDat$SOC_costs_lo <- (synthDat$SOC_costs_mid_20 - synthDat$SOC_costs_mid_02) / 17 / 4 # price is only 75€ per ton which is 25% of 300
+synthDat$SOC_costs_hi <- (synthDat$SOC_costs_mid_20 - synthDat$SOC_costs_mid_02) / 17 / 0.375 # price is 800€ per ton 
+
 # add up all the costs for total value
 synthDat$costs_total_mid <- synthDat$SOC_costs_mid + synthDat$leach_costs_mid + synthDat$profit_mean # + synthDat$insurance
 
 # save the synthesized dataset
-writexl::write_xlsx(synthDat, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx")
+writexl::write_xlsx(synthDat, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF_final.xlsx")
+writexl::write_xlsx(carbon02_clean, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/carbon02_dom.xlsx")
 
 ```

@@ -41,9 +41,9 @@ theme_set(theme_custom())
 ecologicalMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality.xlsx") %>% 
   filter(!is.na(sowndiv) & sowndiv < 60 & sowndiv > 1) # remove rows with NA in sowndiv and sowndiv greater than 16
 ecologicalMF_red <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality_reduced.xlsx") %>% 
-  filter(!is.na(sowndiv) & sowndiv < 60 & sowndiv > 1) # remove rows with NA in sowndiv and sowndiv greater than 16
+  filter(!is.na(sowndiv) & sowndiv < 60) # remove rows with NA in sowndiv and sowndiv greater than 16
 economicMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF.xlsx") %>% 
-  filter(sowndiv > 1 & sowndiv < 60) # remove rows with sowndiv greater than 16
+  filter(sowndiv < 60) # remove rows with sowndiv greater than 16
 
 ecologicalMF$plotcode <- as.factor(ecologicalMF$plotcode)
 ecologicalMF_red$plotcode <- as.factor(ecologicalMF_red$plotcode)
@@ -202,6 +202,8 @@ joinedMF <- economicMF %>%
 # Correlation between economic and ecological multifunctionality
 cor.test(joinedMF$multifunctionality, joinedMF$costs_total_mid)
 
+cor.test(biomassMeans$mean_biomass, rootsMean$mean_root_biomass)
+
 # plot the correlation
 corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
   geom_point(
@@ -211,12 +213,13 @@ corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
     stroke = 1,
     size = 4
   ) +
-  stat_cor(method = "pearson", label.x = 0.2, label.y = 700, size = 5) +
+  stat_cor(method = "pearson", label.x = 0.1, label.y = 1600, size = 5) +
   geom_smooth(method = "lm", se = F, color = "#287da8") +
   labs(title = "",
        x = "Ecological multifunctionality",
        y = "Economic multifunctionality (€/ha/year)") +
-  scale_y_continuous(breaks = c(-500, -250, 0, 250, 500, 750))
+  scale_x_continuous(breaks = c(0.1,0.2, 0.3, 0.4, 0.4, 0.5, 0.6)) +
+  scale_y_continuous(breaks = c(-1000, -500, 0, 500, 1000, 1500))
 
 corrPlot
 

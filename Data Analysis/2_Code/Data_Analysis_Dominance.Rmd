@@ -1,0 +1,288 @@
+---
+title: "Sub-Analysis of the dominance experiment"
+author: "Marius Munschek"
+date: "2025-11-06"
+output: html_document
+---
+
+# Preface
+This R Script is intended to be used to calculate the economic multifunctionality of the Jena dominance Experiment. this serves as a sensitivity analysis for the main experiment to prove that my findings hold true, even when only considering the 9 most productive and dominant plant species of the experiment.
+
+```{r setup, include=FALSE}
+library(ragg)
+
+knitr::opts_chunk$set(warning=FALSE, message=FALSE, echo=TRUE, cache=TRUE, cache.lazy=FALSE, cache.path="cache/", out.width="100%", out.height="100%", dev = "ragg_png")
+
+source("C:/Users/mm68tulo/Documents/R/functions/myfunctions.R")
+```
+
+# Preparation
+## Loading packages
+```{r Packages}
+library(dplyr)
+library(readr)
+library(readxl)
+library(ggplot2)
+library(patchwork)
+library(brms)
+library(performance)
+library(ggpmisc)
+library(ggpubr)
+```
+
+## Set up a theme
+```{r Theme}
+theme_set(theme_custom())
+```
+
+## Load datasets and filter for relevant observations/measurements
+```{r Biomass Data}
+#  load biomass data from 2005 to 2017
+path <- "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/dom_plantBiomass_2002to2015"
+dom_bio_2002 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2002.tab"), skip = 38, show_col_types = FALSE) %>% filter(Repl == "mean")
+dom_bio_2003 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2003.tab"), skip = 38, show_col_types = FALSE) %>% filter(Repl == "mean")
+dom_bio_2004 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2004.tab"), skip = 40, show_col_types = FALSE) %>% filter(Repl == "mean")
+dom_bio_2005 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2005.tab"), skip = 38, show_col_types = FALSE) %>% filter(Repl == "mean")
+dom_bio_2006 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2006.tab"), skip = 38, show_col_types = FALSE) %>% filter(Repl == "mean")
+dom_bio_2007 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2007.tab"), skip = 38, show_col_types = FALSE) %>% filter(Repl == "mean")
+dom_bio_2008 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2008.tab"), skip = 38, show_col_types = FALSE) %>% filter(Repl == "mean")
+dom_bio_2009 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2009.tab"), skip = 33, show_col_types = FALSE)
+dom_bio_2010 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2010.tab"), skip = 33, show_col_types = FALSE)
+dom_bio_2011 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2011.tab"), skip = 33, show_col_types = FALSE)
+dom_bio_2012 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2012.tab"), skip = 33, show_col_types = FALSE)
+dom_bio_2013 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2013.tab"), skip = 33, show_col_types = FALSE)
+dom_bio_2014 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2014.tab"), skip = 33, show_col_types = FALSE)
+dom_bio_2015 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2015.tab"), skip = 33, show_col_types = FALSE)
+dom_bio_2017 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/dom_plantBiomass_2017/376_12_data.xlsx") %>% 
+  select(c(Plot, bm)) %>% 
+  rename(`Experimental plot` = Plot, `Sown plant biom [g/m**2]` = bm)
+
+
+# merge Biomass files from 2005 to 2015
+dom_bio <- bind_rows(
+  mutate(dom_bio_2002, year = 2002),
+  mutate(dom_bio_2003, year = 2003),
+  mutate(dom_bio_2004, year = 2004),
+  mutate(dom_bio_2005, year = 2005),
+  mutate(dom_bio_2006, year = 2006),
+  mutate(dom_bio_2007, year = 2007),
+  mutate(dom_bio_2008, year = 2008),
+  mutate(dom_bio_2009, year = 2009),
+  mutate(dom_bio_2010, year = 2010),
+  mutate(dom_bio_2011, year = 2011),
+  mutate(dom_bio_2012, year = 2012),
+  mutate(dom_bio_2013, year = 2013),
+  mutate(dom_bio_2014, year = 2014),
+  mutate(dom_bio_2015, year = 2015),
+  mutate(dom_bio_2017, year = 2017)
+)
+  
+# load data on hay prices and costs
+SGMS <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/SGMs.xlsx") %>% 
+  filter(year < 2016 | year == 2017)
+  SGMS$year <- as.factor(SGMS$year) # change year to a factor
+
+# get the number of sown species
+design <- dom_bio_2005 %>%
+  mutate(
+    sowndiv = apply(select(., 9:17), 1, function(x) sum(!is.na(x)))
+  ) %>%
+  select(`Experimental plot`, sowndiv) %>%
+  distinct() %>% 
+  rename_at('Experimental plot', ~'plotcode')
+
+# calculate biomass for each year per plot and average across sub samples
+dom_bio_a <- dom_bio %>% 
+  filter(`Sown plant biom [g/m**2]` >= 0) %>%
+  group_by(`Experimental plot`, year) %>%
+  summarise(sum_biomass = sum(`Sown plant biom [g/m**2]`, na.rm = TRUE) * 0.01, .groups = "drop")
+
+# merge with profit data
+dom_bio_a <- dom_bio_a %>% 
+  left_join(SGMS, by = join_by(year)) %>% 
+  rename_at('Experimental plot', ~'plotcode')
+
+```
+
+```{r Carbon Data}
+# load data on soil organic carbon from 2017 (corg is in milligrams per gram)
+dom_soc <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/dom_SOC_2017/carbon_dom.xlsx")  %>% 
+  left_join(design, by = join_by(plotcode))
+ 
+```
+
+
+## Calculate Profit and Insurance
+```{r}
+# calculate yearly operating profit (€/ha/a)
+dom_bio_a$profit_annual <- dom_bio_a$sum_biomass * (dom_bio_a$price - dom_bio_a$costs_ton)
+
+# calculate the biomass stability as the coefficient of variance of the biomass across years (CV = SD/mean)
+dom_bio_a <- dom_bio_a %>% 
+  group_by(`Experimental plot`) %>% 
+  mutate(CV = (sd(sum_biomass)/mean(sum_biomass))) 
+
+# sum up biomass for each plot and calculate the mean biomass and mean profit across years. (calculating "mean of CV" doesn't change it's value on plot level, because the CV was already the same for every year per plot)
+dom_bio_final <- dom_bio_a %>% 
+  group_by(`Experimental plot`) %>% 
+  summarise(
+    mean_biomass = mean(sum_biomass, na.rm = TRUE),
+    profit_mean = mean(profit_annual, na.rm = TRUE),
+    CV = mean(CV, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# calculate certainty equivalent (CE) and risk premium (RP) with profit, CV and risk aversion coefficient (taken from Rommel & Sagebiel et al., 2023)
+dom_bio_final$CE <- dom_bio_final$profit_mean * (1+(dom_bio_final$CV)^2)^(-0.6)
+dom_bio_final$RP <- dom_bio_final$profit_mean - dom_bio_final$CE
+
+# merge biomass data with design data
+dom_bio_final <- dom_bio_final %>% # merge the biomass and the realized SR data
+  left_join(design, by = join_by(`Experimental plot`))
+
+# define quadratic relationship between biodiversity and insurance value
+  quad <- lm(CV ~ sowndiv + I(sowndiv^2), dom_bio_final)
+
+  # calculate dCV/dSR
+  dCVdSR <- function(SR) {
+  c <- coef(quad)
+  c[2] + 2 * c[3] * SR
+}
+  
+  # insurance value like in Martin's code
+  dom_bio_final <- dom_bio_final %>% 
+    mutate(dCVdSR = dCVdSR(sowndiv),
+         insurance = sowndiv * dCVdSR * (-1))
+
+```
+
+
+## Descriptive plots
+```{r Descriptive plots}
+# check the relationship between diversity and productivity
+ggplot2::ggplot(dom_bio_final,
+                aes(x = sowndiv, y = profit_mean)
+                ) +
+  geom_point(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Sown Plant Diversity",
+    y = "Expected Profit (€/ha/year)") +
+  scale_x_continuous(breaks = c(1,2,3, 4,6,9))
+
+
+# check the relationship between CV and productivity
+ggplot2::ggplot(dom_bio_final,
+                aes(x = sowndiv, y = insurance)
+                ) +
+  geom_point(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Species Diversity",
+    y = "Stability") +
+  scale_x_continuous(breaks = c(1,2,3, 4,6,9))
+
+# check the relationship between plot-aggregated-SOC and sowndiv
+ggplot2::ggplot(dom_soc,
+                aes(x = sowndiv, y = Corg_diff)
+                ) +
+  geom_point(
+    fill = "#28a87d",
+    alpha = .5
+  ) +
+  labs(
+    x = "Species Diversity",
+    y = "Difference in SOC plotwise")  +
+  scale_x_continuous(breaks = c(1,2,3, 4,6,9))
+
+```
+
+## Statistical models
+```{r Linear models}
+fitProfit <- brm(
+  profit_mean ~ log2(sowndiv),
+  dom_bio_final) 
+
+    # check model assumptions 
+    pp_check(fitProfit, type="scatter_avg")
+    pp_check(fitProfit, ndraws=50)
+    check_model(fitProfit, check="linearity")
+    check_model(fitProfit, check="homogeneity")
+    plot(fitProfit)
+    
+    # check output of model
+    summary(fitProfit)
+    
+fitCorg <- brm(
+  Corg_diff ~ log2(sowndiv),
+  dom_soc)
+
+# check model assumptions 
+    pp_check(fitCorg, type="scatter_avg")
+    pp_check(fitCorg, ndraws=50)
+    check_model(fitCorg, check="linearity")
+    check_model(fitCorg, check="homogeneity")
+    plot(fitCorg)
+    
+    # check output of model
+    summary(fitCorg)
+
+```
+## Final plots
+```{r Plots with effect sizes}
+#Profit data with monocultures and sowndiv
+c_Profit <- conditional_effects(fitProfit)
+plot_Profit_data <- c_Profit[[1]]
+  
+p_Profit <- ggplot() +
+  geom_point(data = dom_bio_final, aes(x = sowndiv, y = profit_mean), 
+             alpha = 0.4, color = "#28a87d") +
+   # Model-estimated effect
+  geom_line(data = plot_Profit_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
+
+  # Credible interval ribbon
+  geom_ribbon(data = plot_Profit_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
+              fill = "#287da8", alpha = 0.2) +
+  labs(x = "Sown plant diversity", y = "Operating profit (€/ha/year)") +
+  scale_x_continuous(breaks = c(1,2,3, 4,6,9))
+
+p_Profit
+
+
+#Profit data with monocultures and sowndiv
+c_Corg <- conditional_effects(fitCorg)
+plot_Corg_data <- c_Corg[[1]]
+  
+p_Corg <- ggplot() +
+  geom_point(data = dom_soc, aes(x = sowndiv, y = Corg_diff), 
+             alpha = 0.4, color = "#28a87d") +
+   # Model-estimated effect
+  geom_line(data = plot_Corg_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
+
+  # Credible interval ribbon
+  geom_ribbon(data = plot_Corg_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
+              fill = "#287da8", alpha = 0.2) +
+  labs(x = "Sown plant diversity", y = "SOC net loss/gain") +
+  scale_x_continuous(breaks = c(1,2,3, 4,6,9))
+
+p_Corg
+
+ggsave("Corg_dominance.png",
+       plot = p_Corg,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+ggsave("Profit_dominance.png",
+       plot = p_Profit,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+
+```
+
