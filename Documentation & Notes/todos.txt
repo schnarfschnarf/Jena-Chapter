@@ -6,24 +6,22 @@
 
 
 !) Finalize the figures
-	- update figures according to comments, create legends, add descriptions 1
-	- include figure with main and dominance effects in the same plot
+	- update figures according to comments, create legends, add descriptions
 	- draw transgressive overyielding line in the plot?
 
 !) Finalize methods
-	- maybe this is already sufficient, and I can ask the data contributors to check and refine at the end?
+	- this is more or less finished
 
 !) Finalize analysis 
 	- include small analysis of dominance experiment (Box with 400 words max)
-	- calculate yearly SOC change for dominance and for main exp to compare (adapt to same year), same for biomass
 	- update aggregate analysis with new dataset
+- finalize this f***ing insurance analysis
 
 !) WRITE!!!!
 	- include the missing references
 	- create equations
 	- work through remaining comments and red markups
 	- mention the term "transgressive overyielding" (look at Günay et al. 2013, on Mic Biomass)
- 	- update hay price source
 	- update description of model parameters in the methods (also increased delta and iteration for main analysis = sown div))
 
 
@@ -31,6 +29,12 @@
 	 
 
 HALF-DONE) Include sensitivity analysis
+
+DONE) update hay price source (Landesbetrieb Landwirtschaft Hessen, German Authority for agricultural education and advisory.
+
+DONE) calculate yearly SOC change for dominance and for main exp to compare (adapt to same year), same for biomass
+
+DONE) include figure with main and dominance effects in the same plot 
 
 DONE) check whether SOC is calculated as a yearly price
 

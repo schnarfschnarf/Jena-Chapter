@@ -79,7 +79,7 @@ dom_bio <- bind_rows(
   
 # load data on hay prices and costs
 SGMS <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/SGMs.xlsx") %>% 
-  filter(year < 2016 | year == 2017)
+  filter(year < 2018)
   SGMS$year <- as.factor(SGMS$year) # change year to a factor
 
 # get the number of sown species
@@ -106,7 +106,7 @@ dom_bio_a <- dom_bio_a %>%
 
 ```{r Carbon Data}
 # load data on soil organic carbon from 2017 (corg is in milligrams per gram)
-dom_soc <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/dom_SOC_2017/carbon_dom.xlsx")  %>% 
+dom_soc <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/dom_SOC_2017/carbon17_dom.xlsx")  %>% 
   left_join(design, by = join_by(plotcode))
  
 ```
@@ -219,7 +219,7 @@ fitProfit <- brm(
     
 fitCorg <- brm(
   Corg_diff ~ log2(sowndiv),
-  dom_soc)
+  dom_bio_final)
 
 # check model assumptions 
     pp_check(fitCorg, type="scatter_avg")
@@ -234,7 +234,7 @@ fitCorg <- brm(
 ```
 ## Final plots
 ```{r Plots with effect sizes}
-#Profit data with monocultures and sowndiv
+#Profit and sowndiv
 c_Profit <- conditional_effects(fitProfit)
 plot_Profit_data <- c_Profit[[1]]
   
@@ -252,31 +252,7 @@ p_Profit <- ggplot() +
 
 p_Profit
 
-
-#Profit data with monocultures and sowndiv
-c_Corg <- conditional_effects(fitCorg)
-plot_Corg_data <- c_Corg[[1]]
-  
-p_Corg <- ggplot() +
-  geom_point(data = dom_soc, aes(x = sowndiv, y = Corg_diff), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_Corg_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
-
-  # Credible interval ribbon
-  geom_ribbon(data = plot_Corg_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(x = "Sown plant diversity", y = "SOC net loss/gain") +
-  scale_x_continuous(breaks = c(1,2,3, 4,6,9))
-
-p_Corg
-
-ggsave("Corg_dominance.png",
-       plot = p_Corg,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
+#save plot
 ggsave("Profit_dominance.png",
        plot = p_Profit,
        device = "png",
@@ -284,5 +260,176 @@ ggsave("Profit_dominance.png",
        dpi = 300)
 
 
+
+#Soil organic carbon gain/loss and sowndiv
+c_Corg <- conditional_effects(fitCorg)
+plot_Corg_data <- c_Corg[[1]]
+  
+p_Corg <- ggplot() +
+  geom_point(data = dom_bio_final, aes(x = sowndiv, y = Corg_diff), 
+             alpha = 0.4, color = "#28a87d") +
+   # Model-estimated effect
+  geom_line(data = plot_Corg_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
+
+  # Credible interval ribbon
+  geom_ribbon(data = plot_Corg_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
+              fill = "#287da8", alpha = 0.2) +
+  labs(x = "Sown plant diversity",  y = expression("SOC change (" * g ~ kg^{-1} ~ yr^{-1} * ")")) +
+  scale_x_continuous(breaks = c(1,2,3, 4,6,9))
+
+p_Corg
+
+# save plot
+ggsave("Corg_dominance.png",
+       plot = p_Corg,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
 ```
+
+## Create subset dataframe for supplement figure
+```{r}
+dom_bio_final <- dom_bio_final %>% 
+  select(plotcode, sowndiv, profit_mean)
+
+dom_soc <- dom_soc %>% 
+  select(plotcode, Corg_diff)
+
+dom_soc$Corg_diff <- dom_soc$Corg_diff / 16
+
+dom_bio_final <- dom_bio_final %>% 
+  left_join(dom_soc, by = join_by(plotcode)) %>% 
+  mutate(experiment = 'dom')
+
+MainExp17 <-  MainExp17 %>% 
+  select(plotcode, sowndiv, profit_mean, SOC_diff) %>% 
+  rename_at('SOC_diff', ~ 'Corg_diff') %>% 
+  mutate(experiment = 'main')
+
+MainDomDiff <- rbind(MainExp17, dom_bio_final)
+
+writexl::write_xlsx(MainDomDiff, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/MainDomDiff.xlsx")
+```
+
+```{r Plot difference in productivity: main - dominance}
+# create linear model for main experiment profit
+fitProfitMain <- brm(
+  profit_mean ~ log2(sowndiv),
+  MainExp17) 
+
+    # check model assumptions 
+    pp_check(fitProfitMain, type="scatter_avg")
+    pp_check(fitProfitMain, ndraws=50)
+    check_model(fitProfitMain, check="linearity")
+    check_model(fitProfitMain, check="homogeneity")
+    plot(fitProfit)
+    
+    # check output of model
+    summary(fitProfitMain)
+    
+# plot conditional effects together with dominance results
+c_ProfitMain <- conditional_effects(fitProfitMain)
+plot_Profit_Main_data <- c_ProfitMain[[1]]
+
+p_profit_dif <- ggplot() +
+  # raw data
+  geom_point(data = MainDomDiff,
+             aes(x = sowndiv, y = profit_mean, colour = experiment),
+             position = position_jitter(width = 0.15, height = 0),
+             alpha = 0.4
+             ) +
+  scale_colour_manual(values = c(
+  "main" = "#0072B2",
+  "dom" = "#D55E00"
+  )) +
+
+  # Model 1
+  geom_ribbon(data = plot_Profit_data,
+              aes(x = sowndiv, ymin = lower__, ymax = upper__),
+              fill = "#D55E00", alpha = 0.2) +
+  geom_line(data = plot_Profit_data,
+            aes(x = sowndiv, y = estimate__),
+            color = "#D55E00", size = .8) +
+
+  # Model 2 (different colour)
+  geom_ribbon(data = plot_Profit_Main_data,
+              aes(x = sowndiv, ymin = lower__, ymax = upper__),
+              fill = "#0072B2", alpha = 0.2) +
+  geom_line(data = plot_Profit_Main_data,
+            aes(x = sowndiv, y = estimate__),
+            color = "#0072B2", size = .8) +
+
+  labs(x = "Sown plant diversity", y = "Expected Profit (€/ha/year)") +
+  scale_x_continuous(breaks = c(1,2,3,4,6,8,9, 16))
+
+p_profit_dif
+
+ggsave("Profit_difference.png",
+       plot = p_profit_dif,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+```
+```{r Plot difference in SOC: main - dominance}
+#Soil organic carbon gain/loss and sowndiv - for main experiment until 2017
+fitCorgMain <- brm(
+  Corg_diff ~ log2(sowndiv),
+  MainExp17)
+
+# check model assumptions 
+    pp_check(fitCorgMain, type="scatter_avg")
+    pp_check(fitCorgMain, ndraws=50)
+    check_model(fitCorgMain, check="linearity")
+    check_model(fitCorgMain, check="homogeneity")
+    plot(fitCorgMain)
+    
+    # check output of model
+    summary(fitCorgMain)
+
+c_Corg_Main <- conditional_effects(fitCorgMain)
+plot_Corg_data_Main <- c_Corg_Main[[1]]
+
+# make a nice plot  
+p_Corg_diff <- ggplot() +
+  geom_point(data = MainDomDiff, aes(x = sowndiv, y = Corg_diff, colour = experiment), 
+             alpha = 0.4
+             ) +
+   scale_colour_manual(values = c(
+  "main" = "#0072B2",
+  "dom" = "#D55E00")) + 
+  
+   # Model-estimated effect, main experiment
+  geom_line(data = plot_Corg_data_Main,
+            aes(x = sowndiv, y = estimate__),
+            color = "#0072B2", size = .8, alpha = .6) +
+
+  # Credible interval ribbon, main experiment
+  geom_ribbon(data = plot_Corg_data_Main,
+              aes(x = sowndiv, ymin = lower__, ymax = upper__), 
+              fill = "#287da8", alpha = 0.2) +
+  
+  # Model-estimated effect, dominance experiment
+  geom_line(data = plot_Corg_data,
+            aes(x = sowndiv, y = estimate__),
+            color = "#D55E00", size = .8, alpha = .6) +
+
+  # Credible interval ribbon, dominance experiment
+  geom_ribbon(data = plot_Corg_data,
+              aes(x = sowndiv, ymin = lower__, ymax = upper__), 
+              fill = "#D55E00", alpha = 0.2) +
+  
+  labs(x = "Sown plant diversity", y = "SOC net loss/gain") +
+  scale_x_continuous(breaks = c(1,2,3,4,6,8,9, 16))
+
+p_Corg_diff
+
+ggsave("SOC_difference.png",
+       plot = p_Corg_diff,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+```
+
 

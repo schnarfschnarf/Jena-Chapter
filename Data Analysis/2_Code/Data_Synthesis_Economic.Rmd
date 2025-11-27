@@ -112,12 +112,12 @@ carbon02 <- carbon02 %>%
 carbon20 <- carbon20 %>%
   rename_at('plot', ~'plotcode')
 
-# create a new column with mean C across layers per plot for 2004 & 2006
+# create a new column with mean C across layers per plot for 2002
 carbon02_clean <- carbon02 %>% group_by(plotcode) %>% 
                     mutate(mean_org_02 = mean(Corg_Soil), mean_bulk = mean(BulkDensity_Soil)) %>%
                       distinct(plotcode, mean_org_02, mean_bulk)
 
-# create a new column with mean C across layers per plot for 2017 & 2020
+# create a new column with mean C across layers per plot for 2020
 carbon20_clean <- carbon20 %>% group_by(plotcode) %>% 
                     mutate(mean_org_20 = mean(Corg_Soil), mean_bulk = mean(BulkDensity_Soil)) %>%
                       distinct(plotcode, mean_org_20, mean_bulk)
@@ -193,3 +193,36 @@ writexl::write_xlsx(synthDat, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analy
 writexl::write_xlsx(carbon02_clean, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/carbon02_dom.xlsx")
 
 ```
+
+Create subset dataframe for comparing main and dominance experiment
+```{r}
+#load data on aboveground biomass production (ID = 624) 
+biomassDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/624_9_data.xlsx")  %>%  # remove sowndiv = 60 plots 
+  filter(!plotcode %in% c("B4A01", "B3A14", "B2A03", "B1A22")) %>% 
+  filter(year > 2002 & year < 2018)
+  biomassDat$plotcode <- as.factor(biomassDat$plotcode)
+
+  # load data on SGMs 
+SGMS <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/SGMs.xlsx") %>% 
+  filter(year < 2018)
+  SGMS$year <- as.factor(SGMS$year) # change year to a factor
+
+#load data on soil organic carbon (SOC) (2017: ID = 179 )
+carbon17 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/C&N_Soil/179_5_data.xlsx") %>%
+  rename_at('plot', ~'plotcode') %>% 
+  group_by(plotcode) %>% 
+  mutate(mean_org_17 = mean(as.numeric(Corg_Soil))) %>%
+  distinct(plotcode, mean_org_17)
+
+MainExp17 <- biomassMeans %>% # merge the biomass and the SOC data to compare to dominance data
+  left_join(SR, by = join_by(plotcode)) %>%
+  left_join(carbon02_clean, by = join_by(plotcode)) %>% 
+  left_join(carbon17, by = join_by(plotcode))
+
+# create a column with social costs of carbon (for different pricing scenarios)
+MainExp17$SOC_diff <- (MainExp17$mean_org_17 - MainExp17$mean_org_02) /16
+
+writexl::write_xlsx(MainExp17, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/MainExp17.xlsx")
+
+```
+
