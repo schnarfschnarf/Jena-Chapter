@@ -37,9 +37,8 @@ theme_set(theme_custom())
 
 ## Load datasets and filter for relevant observations/measurements
 ```{r Biomass Data}
-#  load biomass data from 2005 to 2017
+#  load biomass data from 2003 to 2017
 path <- "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/dom_plantBiomass_2002to2015"
-dom_bio_2002 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2002.tab"), skip = 38, show_col_types = FALSE) %>% filter(Repl == "mean")
 dom_bio_2003 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2003.tab"), skip = 38, show_col_types = FALSE) %>% filter(Repl == "mean")
 dom_bio_2004 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2004.tab"), skip = 40, show_col_types = FALSE) %>% filter(Repl == "mean")
 dom_bio_2005 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2005.tab"), skip = 38, show_col_types = FALSE) %>% filter(Repl == "mean")
@@ -58,9 +57,8 @@ dom_bio_2017 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/
   rename(`Experimental plot` = Plot, `Sown plant biom [g/m**2]` = bm)
 
 
-# merge Biomass files from 2005 to 2015
+# merge Biomass files from 2003 to 2017
 dom_bio <- bind_rows(
-  mutate(dom_bio_2002, year = 2002),
   mutate(dom_bio_2003, year = 2003),
   mutate(dom_bio_2004, year = 2004),
   mutate(dom_bio_2005, year = 2005),
@@ -80,7 +78,6 @@ dom_bio <- bind_rows(
 # load data on hay prices and costs
 SGMS <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/SGMs.xlsx") %>% 
   filter(year < 2018)
-  SGMS$year <- as.factor(SGMS$year) # change year to a factor
 
 # get the number of sown species
 design <- dom_bio_2005 %>%
@@ -105,10 +102,33 @@ dom_bio_a <- dom_bio_a %>%
 ```
 
 ```{r Carbon Data}
-# load data on soil organic carbon from 2017 (corg is in milligrams per gram)
-dom_soc <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/dom_SOC_2017/carbon17_dom.xlsx")  %>% 
+# load prepared dataframe for comparing 2002 and 2017 SOC stock (Soc content for 2017 is already in this table)
+dom_soc_diff <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/carbon+bulk_dominance_2002+2017.xlsx")  %>% 
   left_join(design, by = join_by(plotcode))
- 
+
+# loead SOC and bulk density measures for 2002
+dom_soc_02 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/carbon02_dom.xlsx")
+
+# loead bulk density measures for 2017
+dom_soc_17 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/dom_SOC_2017/bulk17_dom.xlsx")
+
+# join with dom_soc_diff table
+dom_soc_diff <- dom_soc_diff %>% 
+  left_join(dom_soc_02, by = "main_plot") %>% 
+  left_join(dom_soc_17, by = "main_plot")
+
+# create a column with annual SOC gain/loss
+dom_soc_diff$Corg_diff <- (as.numeric(dom_soc_diff$Corg17) - dom_soc_diff$Corg02) / 15 
+
+# create a column with mid SOC value for beginning and end
+dom_soc_diff$Corg02_val <- dom_soc_diff$Corg02 * dom_soc_diff$Bulk02 * 0.3 * 10000 / 1000 * 3.66 * 300
+dom_soc_diff$Corg17_val <- as.numeric(dom_soc_diff$Corg17) * dom_soc_diff$dom17_bulk * 0.3 * 10000 / 1000 * 3.66 * 300
+
+# create a column with annual SOC-value gain/loss
+dom_soc_diff$Corg_val_diff <- (as.numeric(dom_soc_diff$Corg17_val) - dom_soc_diff$Corg02_val) / 15
+
+
+writexl::write_xlsx(dom_soc_diff, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/carbon+bulk_dominance_2002+2017.xlsx") 
 ```
 
 
@@ -187,8 +207,8 @@ ggplot2::ggplot(dom_bio_final,
   scale_x_continuous(breaks = c(1,2,3, 4,6,9))
 
 # check the relationship between plot-aggregated-SOC and sowndiv
-ggplot2::ggplot(dom_soc,
-                aes(x = sowndiv, y = Corg_diff)
+ggplot2::ggplot(dom_soc_diff,
+                aes(x = sowndiv, y = Corg_val_diff)
                 ) +
   geom_point(
     fill = "#28a87d",
@@ -292,11 +312,6 @@ ggsave("Corg_dominance.png",
 ```{r}
 dom_bio_final <- dom_bio_final %>% 
   select(plotcode, sowndiv, profit_mean)
-
-dom_soc <- dom_soc %>% 
-  select(plotcode, Corg_diff)
-
-dom_soc$Corg_diff <- dom_soc$Corg_diff / 16
 
 dom_bio_final <- dom_bio_final %>% 
   left_join(dom_soc, by = join_by(plotcode)) %>% 
