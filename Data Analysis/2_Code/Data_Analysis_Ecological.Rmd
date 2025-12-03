@@ -127,33 +127,67 @@ c_sown_mf <- conditional_effects(fitMFsown)
 plot_sown_mf_data <- c_sown_mf[[1]]
 
 p_sown_mf <- ggplot() +
-  geom_point(data = ecologicalMF,
-             aes(x = sowndiv, y=multifunctionality),
-    color = "#28a87d",
-    alpha = .5,
-    shape = 20,
-    stroke = 1,
-    size = 4,
-    position = position_jitter(w = 0.03, h = 0)
+  # raw data
+  geom_point(
+    data   = ecologicalMF,
+    aes(x  = sowndiv, y = multifunctionality),
+    alpha  = 0.5,
+    size   = 2,
+    shape  = 21,
+    fill   = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4,
+    position = position_jitter(width = 0.12, height = 0)
   ) +
-  # Model-estimated effect
-  geom_line(data = plot_sown_mf_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
-  # Credible interval ribbon
-  geom_ribbon(data = plot_sown_mf_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(title = "",
-       x = "Sown plant diversity",
-       y = "Ecological multifunctionality w/o unit") +
-  scale_x_continuous(breaks = c(1,2,4,8,16))
+  
+  # model-estimated effect
+  geom_line(
+    data     = plot_sown_mf_data,
+    aes(x    = sowndiv, y = estimate__),
+    colour   = "#0072B2",
+    linewidth = 0.8
+  ) +
+
+  # credible interval ribbon
+  geom_ribbon(
+    data  = plot_sown_mf_data,
+    aes(x = sowndiv, ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+
+  # axis scaling
+  scale_x_continuous(
+    trans  = "log2",
+    breaks = c(1, 2, 4, 8, 16),
+    labels = c(1, 2, 4, 8, 16),
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+  
+  labs(
+    x = "Sown plant diversity (species)",
+    y = "Ecological multifunctionality"
+  ) +
+  
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(
+    aspect.ratio = 0.6
+  )
 
 p_sown_mf
 
-# save figure
-ggsave("EcologicalMF_sown.png",
-       plot = p_sown_mf,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
+# save graph
+ggsave(
+  filename = "EcologicalMF_sown.png",
+  plot     = p_sown_mf,
+  width    = 8,     # in inches; adjust to Nature’s figure width
+  height   = 5,
+  units    = "in",
+  device   = "png",
+  dpi      = 300,
+  path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/" 
+)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 # plot MF as a function of meanSR
@@ -199,33 +233,66 @@ joinedMF <- economicMF %>%
 # Correlation between economic and ecological multifunctionality
 cor.test(joinedMF$multifunctionality, joinedMF$costs_total_mid)
 
-cor.test(biomassMeans$mean_biomass, rootsMean$mean_root_biomass)
-
 # plot the correlation
 corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
+  # raw data
   geom_point(
-    color = "#28a87d",
-    alpha = .5,
-    shape = 20,
-    stroke = 1,
-    size = 4
+    alpha  = 0.5,
+    size   = 2.2,
+    shape  = 21,
+    fill   = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
   ) +
-  stat_cor(method = "pearson", label.x = 0.1, label.y = 1600, size = 5) +
-  geom_smooth(method = "lm", se = F, color = "#287da8") +
-  labs(title = "",
-       x = "Ecological multifunctionality",
-       y = "Economic multifunctionality (€/ha/year)") +
-  scale_x_continuous(breaks = c(0.1, 0.2, 0.3, 0.4, 0.4, 0.5, 0.6, 0.7)) +
-  scale_y_continuous(breaks = c(-1500, -750, 0, 750, 1500))
+  
+  # linear regression line
+  geom_smooth(
+    method = "lm",
+    se     = FALSE,
+    linewidth = 0.8,
+    colour = "#0072B2"
+  ) +
+  
+  # correlation annotation
+  stat_cor(
+    method  = "pearson",
+    label.x = 0.10,
+    label.y = max(joinedMF$costs_total_mid, na.rm = TRUE) * 0.95,
+    size    = 5
+  ) +
+  
+  scale_x_continuous(
+    breaks = seq(0.1, 0.7, by = 0.1),
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+  scale_y_continuous(
+    breaks = c(-1500, -750, 0, 750, 1500)
+  ) +
+  
+  labs(
+    x = "Ecological multifunctionality",
+    y = "Economic multifunctionality (€/ha/yr)"
+  ) +
+  
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(
+    aspect.ratio = 0.7
+  )
 
 corrPlot
 
 # save figure
-ggsave("Corr_EconomicMF_EcologicalMF.png",
-       plot = corrPlot,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
+ggsave(
+  filename = "Corr_EconomicMF_EcologicalMF.png",
+  plot     = corrPlot,
+  device   = "png",
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  dpi      = 300,
+  width    = 7,
+  height   = 5,
+  units    = "in"
+)
 
 ```
 # Supplements

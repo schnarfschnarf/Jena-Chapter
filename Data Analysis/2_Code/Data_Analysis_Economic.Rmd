@@ -59,127 +59,6 @@ noMono <- synthDat %>%
 
 ```
 
-
-## Plot the densities of the data
-```{r Exploratory Plotting}
-# check distribution
-p1 <- ggplot2::ggplot(synthDat,
-                aes(x = SOC_costs_mid)
-                ) +
-  geom_density(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-  labs(
-    x = "SOC 2020 - 2006+08",
-    y = "Density"
-  )
-
-p1
-
-p2 <- ggplot2::ggplot(synthDat,
-                aes(x = sowndiv, y = profit_mean)
-                ) +
-  geom_point(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-   geom_smooth(
-    method = "lm",
-    color = "blue"
-  ) +
-  labs(
-    x = "Sown Plant Diversity",
-    y = "Mean annual profit"
-  )
-p2
-
-p3 <- ggplot2::ggplot(synthDat,
-                aes(x = sowndiv, y = profit_mean)
-                ) +
-  geom_point(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-   geom_smooth(
-    method = "lm",
-    color = "blue"
-  ) +
-  labs(
-    x = "Plant Diversity",
-    y = "profit 2005 - 2020"
-  )
-p3
-
-p4 <- ggplot2::ggplot(synthDat,
-                aes(x = sowndiv, y = SOC_costs_mid)
-                ) +
-  geom_point(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-   geom_smooth(
-    method = "lm",
-    color = "blue"
-  ) +
-  labs(
-    x = "Plant Diversity",
-    y = "SOC costs 2017+20 minus 2004+06"
-  )
-
-p4
-
-p5 <- ggplot2::ggplot(synthDat,
-                aes(x = sowndiv, y = SOC_costs_mid)
-                ) +
-  geom_point(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-   geom_smooth(
-    method = "lm",
-    color = "blue"
-  ) +
-  labs(
-    x = "Plant Diversity",
-    y = "SOC costs 2020 minus 2010"
-  )
-
-p5
-
-p6 <- ggplot2::ggplot(synthDat,
-                aes(x = sowndiv, y = leach_costs_mid)
-                ) +
-  geom_point(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-   geom_smooth(
-    method = "lm",
-    color = "blue"
-  ) +
-  labs(
-    x = "Plant Diversity",
-    y = "leaching costs 2020 minus 2005"
-  )
-
-p6
-
-# show all in one grid
-p1 + p2 + p3 + p4
-  plot_layout(ncol = 2) +
-  plot_annotation(title = "comparison of 2 different SOC calculations") &
-  theme(plot.title = element_text(size=20,hjust=0.5))
-
-ggsave("InsuranceDeviation.png",
-       plot = p7,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
-```
-
-
 ## Statistical Models
 ### Linear models with monocultures
 #### &Sown diversity
@@ -363,108 +242,260 @@ fitTotalRealAll <- brm(
 
 ```
 
-
 ## Plotting
-### Plot sown diversity effect
-```{r}
+```{r Plot sown diversity  - profit}
 #Profit data with monocultures and sowndiv
 c_sown_Profit <- conditional_effects(fitProfit)
 plot_sown_Profit_data <- c_sown_Profit[[1]]
   
 p_sown_Profit <- ggplot() +
-  geom_point(data = synthDat, aes(x = sowndiv, y = profit_mean), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_sown_Profit_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
-
-  # Credible interval ribbon
-  geom_ribbon(data = plot_sown_Profit_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(x = "Sown plant diversity", y = "Operating profit (€/ha/year)") +
-  scale_x_continuous(breaks = c(1,2, 4, 8, 16))
+  # raw data
+  geom_point(
+    data = synthDat,
+    aes(x = sowndiv, y = profit_mean),
+    alpha = 0.5,
+    size  = 2,
+    shape = 21,
+    fill  = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  # model line
+  geom_line(
+    data = plot_sown_Profit_data,
+    aes(x = sowndiv, y = estimate__),
+    colour = "#0072B2",
+    linewidth = 0.8
+  ) +
+  # credible interval
+  geom_ribbon(
+    data = plot_sown_Profit_data,
+    aes(x = sowndiv, ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+  scale_x_continuous(
+    trans  = "log2",
+    breaks = c(1, 2, 4, 8, 16),
+    labels = c(1, 2, 4, 8, 16),
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+  labs(
+    x = "Sown plant diversity (species)",
+    y = "Profit (€/ha/yr)"
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(
+    aspect.ratio = 0.6   # width:height ~ 1 : 0.6 (tweak to taste)
+  )
 
 p_sown_Profit
 
-ggsave("Profit_sown.png",
-       plot = p_sown_Profit,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
+ggsave(
+  filename = "Fig_sown_profit.png",
+  plot     = p_sown_Profit,
+  width    = 8,     # in inches; adjust to Nature’s figure width
+  height   = 5,
+  units    = "in",
+  device   = "png",
+  dpi      = 300,
+  path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/" 
+)
+```
 
-
-#SOC costs without monocultures and mean sownized diversity
+```{r Plot sown diversity - SOC}
+# SOC costs with monocultures and mean sown diversity
 c_sown_soc <- conditional_effects(fitSOC)
 plot_sown_soc_data <- c_sown_soc[[1]]
-  
-p_sown_soc <- ggplot() +
-  geom_point(data = synthDat, aes(x = sowndiv, y = SOC_costs_mid), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_sown_soc_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
 
-  # Credible interval ribbon
-  geom_ribbon(data = plot_sown_soc_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(x = "Sown plant diversity", y = "Social costs of SOC sequestration (€/ha/year)") +
-  scale_x_continuous(breaks = c(1,2, 4, 8, 16)) +
-  scale_y_continuous(breaks = c(-1500,-1000, -500, 0, 500, 1000))
+p_sown_soc <- ggplot() +
+  # raw data
+  geom_point(
+    data = synthDat,
+    aes(x = sowndiv, y = SOC_costs_mid),
+    alpha = 0.5,
+    size  = 2,
+    shape = 21,
+    fill  = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  # model line
+  geom_line(
+    data   = plot_sown_soc_data,
+    aes(x  = sowndiv, y = estimate__),
+    colour = "#0072B2",
+    linewidth = 0.8
+  ) +
+  # credible interval ribbon
+  geom_ribbon(
+    data = plot_sown_soc_data,
+    aes(x = sowndiv, ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+  scale_x_continuous(
+    trans  = "log2",
+    breaks = c(1, 2, 4, 8, 16),
+    labels = c(1, 2, 4, 8, 16),
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+  scale_y_continuous(
+    breaks = c(-1500, -1000, -500, 0, 500, 1000)
+  ) +
+  labs(
+    x = "Sown plant diversity (species)",
+    y = "SOC cost (€/ha/yr)"
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(
+    aspect.ratio = 0.6   # width:height ~ 1 : 0.6, matching Fig_sown_profit
+  )
 
 p_sown_soc
 
-ggsave("SOC_sown.png",
-       plot = p_sown_soc,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
+ggsave(
+  filename = "SOC_sown.png",
+  plot     = p_sown_soc,
+  device   = "png",
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
 
+```
+
+```{r Plot sown diversity - Leaching}
 #Leaching costs and mean sown diversity
 c_sown_leach <- conditional_effects(fitLeach)
 plot_sown_leach_data <- c_sown_leach[[1]]
   
+# Leaching costs: sown diversity
 p_sown_leach <- ggplot() +
-  geom_point(data = synthDat, aes(x = sowndiv, y = leach_costs_mid), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_sown_leach_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
-
-  # Credible interval ribbon
-  geom_ribbon(data = plot_sown_leach_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(x = "Sown plant diversity", y = "Social costs of NO3-N leaching (€/ha/year)") +
-  scale_x_continuous(breaks = c(1,2, 4, 8, 16)) +
-  scale_y_continuous(breaks = c(-125, -100, -75, -50, -25))
+  # raw data
+  geom_point(
+    data = synthDat,
+    aes(x = sowndiv, y = leach_costs_mid),
+    alpha = 0.5,
+    size  = 2,
+    shape = 21,
+    fill  = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  # model line
+  geom_line(
+    data = plot_sown_leach_data,
+    aes(x = sowndiv, y = estimate__),
+    colour = "#0072B2",
+    linewidth = 0.8
+  ) +
+  # credible interval
+  geom_ribbon(
+    data = plot_sown_leach_data,
+    aes(x = sowndiv, ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+  scale_x_continuous(
+    trans  = "log2",
+    breaks = c(1, 2, 4, 8, 16),
+    labels = c(1, 2, 4, 8, 16),
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+  scale_y_continuous(
+    breaks = c(-125, -100, -75, -50, -25)
+  ) +
+  labs(
+    x = "Sown plant diversity (species)",
+    y = "Leaching cost (€/ha/yr)"
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(
+    aspect.ratio = 0.6
+  )
 
 p_sown_leach
 
-ggsave("Leach_sown.png",
-       plot = p_sown_leach,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
+ggsave(
+  filename = "Fig_Leach_sown.png",
+  plot     = p_sown_leach,
+  device   = "png",
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
 
+```
+
+```{r}
 #Insurance value and sown diversity
 c_sown_insurance <- conditional_effects(fitInsurance)
 plot_sown_insurance_data <- c_sown_insurance[[1]]
   
+# Insurance value ~ sown diversity
 p_sown_insurance <- ggplot() +
-  geom_point(data = synthDat, aes(x = sowndiv, y = insurance), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_sown_insurance_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
-
-  # Credible interval ribbon
-  geom_ribbon(data = plot_sown_insurance_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(x = "Sown plant diversity", y = "Insurance value (€/ha/a)") +
-  scale_x_continuous(breaks = c(1,2,4, 8, 16))
+  # raw data
+  geom_point(
+    data = synthDat,
+    aes(x = sowndiv, y = insurance),
+    alpha = 0.5,
+    size  = 2,
+    shape = 21,
+    fill  = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  # model-estimated effect
+  geom_line(
+    data = plot_sown_insurance_data,
+    aes(x = sowndiv, y = estimate__),
+    colour = "#0072B2",
+    linewidth = 0.8
+  ) +
+  # credible interval ribbon
+  geom_ribbon(
+    data = plot_sown_insurance_data,
+    aes(x = sowndiv, ymin = lower__, ymax = upper__),
+    fill = "#0072B2",
+    alpha = 0.15
+  ) +
+  scale_x_continuous(
+    trans  = "log2",
+    breaks = c(1, 2, 4, 8, 16),
+    labels = c(1, 2, 4, 8, 16),
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+  labs(
+    x = "Sown plant diversity (species)",
+    y = "Insurance"
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(
+    aspect.ratio = 0.6
+  )
 
 p_sown_insurance
 
-ggsave("Insurance_sown.png",
-       plot = p_sown_insurance,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
+ggsave(
+  filename = "fig_Insurance_sown.png",
+  plot     = p_sown_insurance,
+  device   = "png",
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
+
 
 #Risk premium and sown diversity
 c_sown_rp <- conditional_effects(fitRP)
@@ -472,13 +503,13 @@ plot_sown_rp_data <- c_sown_rp[[1]]
   
 p_sown_rp <- ggplot() +
   geom_point(data = synthDat, aes(x = sowndiv, y = RP), 
-             alpha = 0.4, color = "#28a87d") +
+             alpha = 0.4, color = "#0072B2") +
    # Model-estimated effect
-  geom_line(data = plot_sown_rp_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
+  geom_line(data = plot_sown_rp_data, aes(x = sowndiv, y = estimate__), color = "#0072B2", size = .8, alpha = .6) +
 
   # Credible interval ribbon
   geom_ribbon(data = plot_sown_rp_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
+              fill = "#0072B2", alpha = 0.2) +
   labs(x = "Sown plant diversity", y = "Risk premium (€/ha/a)") +
   scale_x_continuous(breaks = c(1,2,4, 8, 16))
 
@@ -489,191 +520,284 @@ ggsave("RP_sown.png",
        device = "png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
+```
 
+```{r}
 #economic MF and sown diversity
 c_sown_total <- conditional_effects(fitTotal)
 plot_sown_total_data <- c_sown_total[[1]]
   
+# Economic multifunctionality ~ sown diversity
 p_sown_total <- ggplot() +
-  geom_point(data = synthDat, aes(x = sowndiv, y = costs_total_mid), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_sown_total_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
-
-  # Credible interval ribbon
-  geom_ribbon(data = plot_sown_total_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(x = "Sown plant diversity", y = "Economic multifunctionality (€/ha/year)") +
-  scale_x_continuous(breaks = c(1,2, 4, 8, 16)) +
-  scale_y_continuous(breaks = c(-1500, -1000, -500, 0, 500, 1000))
+  # raw data
+  geom_point(
+    data = synthDat,
+    aes(x = sowndiv, y = costs_total_mid),
+    alpha = 0.5,
+    size  = 2,
+    shape = 21,
+    fill  = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  # model line
+  geom_line(
+    data = plot_sown_total_data,
+    aes(x = sowndiv, y = estimate__),
+    colour = "#0072B2",
+    linewidth = 0.8
+  ) +
+  # credible interval ribbon
+  geom_ribbon(
+    data = plot_sown_total_data,
+    aes(x = sowndiv, ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+  scale_x_continuous(
+    trans  = "log2",
+    breaks = c(1, 2, 4, 8, 16),
+    labels = c(1, 2, 4, 8, 16),
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+  scale_y_continuous(
+    breaks = c(-1500, -1000, -500, 0, 500, 1000)
+  ) +
+  labs(
+    x = "Sown plant diversity (species)",
+    y = "Economic multifunctionality (€/ha/year)"
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(
+    aspect.ratio = 0.6
+  )
 
 p_sown_total
 
-ggsave("total_sown.png",
-       plot = p_sown_total,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
+ggsave(
+  filename = "fig_total_sown.png",
+  plot     = p_sown_total,
+  device   = "png",
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
+
 
 ```
 
-### Plot realized species diversity effects
-```{r Plotting}
-#Profit data without monocultures and realdiv
-c_real_Profit <- conditional_effects(fitProfitReal)
-plot_real_Profit_data <- c_real_Profit[[1]]
-  
-p_real_Profit <- ggplot() +
-  geom_point(data = noMono, aes(x = meanSR, y = profit_mean), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_real_Profit_data, aes(x = meanSR, y = estimate__), color = "blue", size = .8, alpha = .6) +
+```{r Create multi-panel plot}
 
-  # Credible interval ribbon
-  geom_ribbon(data = plot_real_Profit_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(x = "Mean realized plant diversity", y = "Mean operating profit (€/ha/year)") +
-  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12)) +
-  scale_y_continuous(breaks = c(50, 100, 150, 200, 250))
-  
+fig_sown_all <- (
+  p_sown_Profit +
+  p_sown_soc
+) / (
+  p_sown_leach +
+  p_sown_insurance
+) +
+  plot_annotation(
+    tag_levels = "a"
+  ) &
+  theme(
+    plot.tag = element_text(
+      face = "bold",
+      size = 14,
+      hjust = -0.2,
+      vjust = 1.5
+    )
+  )
 
-p_real_Profit
+fig_sown_all
 
-ggsave("Profit_real_noMono.png",
-       plot = p_real_Profit,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
+ggsave(
+  filename = "Fig_sown_multifunctionality_insurance.png",
+  plot     = fig_sown_all,
+  width    = 8,
+  height   = 8,
+  units    = "in",
+  dpi      = 300,
+  device   = "png",
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/"
+)
+
+ggsave(
+  filename = "Fig_sown_multifunctionality_insurance.pdf",
+  plot     = fig_sown_all,
+  width    = 8,
+  height   = 8,
+  units    = "in",
+  device   = cairo_pdf,
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/"
+)
 
 
-#SOC costs without monocultures and mean realized diversity
-c_real_soc <- conditional_effects(fitSOCreal)
-plot_real_soc_data <- c_real_soc[[1]]
-  
-p_real_soc <- ggplot() +
-  geom_point(data = noMono, aes(x = meanSR, y = SOC_costs_mid), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_real_soc_data, aes(x = meanSR, y = estimate__), color = "blue", size = .8, alpha = .6) +
+```
 
-  # Credible interval ribbon
-  geom_ribbon(data = plot_real_soc_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(x = "Mean realized plant diversity", y = "Social benefits of SOC sequestration (€/ha/year)") +
-  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12)) +
-  scale_y_continuous(breaks = c(-500, -250, 0, 250, 500, 750))
 
-p_real_soc
+### Sensitivity Analysis with different price scenarios
+```{r Sensitivity Analysis}
+# Low Total Costs against species richness
+fitTotalLo <- brm(
+  costs_total_lo ~ log2(sowndiv) + (1|block),
+  synthDat)
 
-ggsave("SOC_real_noMono.png",
-       plot = p_real_soc,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
+    # check model assumptions
+    pp_check(fitTotalLo, type="scatter_avg") 
+    pp_check(fitTotalLo, ndraws=50)
+    check_model(fitTotalLo, check="linearity") 
+    check_model(fitTotalLo, check="homogeneity")
+    plot(fitTotalLo)
+    
+    # check output of model
+    summary(fitTotalLo)
 
-#Leaching costs without monocultures and mean realized diversity
-c_real_leach <- conditional_effects(fitLeachReal)
-plot_real_leach_data <- c_real_leach[[1]]
-  
-p_real_leach <- ggplot() +
-  geom_point(data = noMono, aes(x = meanSR, y = leach_costs_mid), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_real_leach_data, aes(x = meanSR, y = estimate__), color = "blue", size = .8, alpha = .6) +
+# High Total Costs against species richness
+fitTotalHi <- brm(
+  costs_total_hi ~ log2(sowndiv) + (1|block),
+  synthDat)
 
-  # Credible interval ribbon
-  geom_ribbon(data = plot_real_leach_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(x = "Mean realized plant diversity", y = "Social costs of nitrogen leaching (€/ha/year)") +
-  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12))
+    # check model assumptions
+    pp_check(fitTotalHi, type="scatter_avg") 
+    pp_check(fitTotalHi, ndraws=50)
+    check_model(fitTotalHi, check="linearity") 
+    check_model(fitTotalHi, check="homogeneity")
+    plot(fitTotal4)
+    
+    # check output of model
+    summary(fitTotalHi)
+    
+```
 
-p_real_leach
-
-ggsave("Leach_real_noMono.png",
-       plot = p_real_leach,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
-#Insurance value without monocultures and mean realized diversity
-c_real_insurance <- conditional_effects(fitInsuranceReal)
-plot_real_insurance_data <- c_real_insurance[[1]]
-  
-p_real_insurance <- ggplot() +
-  geom_point(data = noMono, aes(x = meanSR, y = insurance), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_real_insurance_data, aes(x = meanSR, y = estimate__), color = "blue", size = .8, alpha = .6) +
-
-  # Credible interval ribbon
-  geom_ribbon(data = plot_real_insurance_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(x = "Mean realized plant diversity", y = "Insurance value (€)") +
-  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12))
-
-p_real_insurance
-
-ggsave("Insurance_real_noMono.png",
-       plot = p_real_insurance,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
-# combine the plots for realized SR in one grid
-p_services_real <- p_real_Profit + p_real_soc + p_real_leach + p_real_insurance +
-  plot_annotation(title = "Profit, SOC benefit, Leaching Costs, and Insurance value plotted against realized plant diversity") &
-  theme(plot.title = element_text(size=13,hjust=0.5))
-
-ggsave("Single_Services_real.png",
-       plot = last_plot(),
-       bg = "white",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
+### Plot sensitivity analysis
+```{r}
 #economic MF without monocultures and mean realized diversity
-c_real_total <- conditional_effects(fitTotalReal)
-plot_real_total_data <- c_real_total[[1]]
+c_sown_total <- conditional_effects(fitTotal)
+plot_sown_total_data <- c_sown_total[[1]]
 
-c_real_total_lo <- conditional_effects(fitTotalLo)
-plot_real_total_data_lo <- c_real_total_lo[[1]]
+c_sown_total_lo <- conditional_effects(fitTotalLo)
+plot_sown_total_data_lo <- c_sown_total_lo[[1]]
 
-c_real_total_hi <- conditional_effects(fitTotalHi)
-plot_real_total_data_hi <- c_real_total_hi[[1]]
+c_sown_total_hi <- conditional_effects(fitTotalHi)
+plot_sown_total_data_hi <- c_sown_total_hi[[1]]
+
+
+# Combine the three conditional_effects data frames
+plot_sown_total_all <- bind_rows(
+  mutate(plot_sown_total_data,    scenario = "Mid price (default)"),
+  mutate(plot_sown_total_data_lo, scenario = "Low price"),
+  mutate(plot_sown_total_data_hi, scenario = "High price")
+)
+
+# prepare data for combined plot
+library(tidyr)
+
+raw_sown_total_all <- synthDat %>%
+  select(sowndiv, costs_total_mid, costs_total_lo, costs_total_hi) %>%
+  pivot_longer(
+    cols      = c(costs_total_mid, costs_total_lo, costs_total_hi),
+    names_to  = "scenario_raw",
+    values_to = "economic_mf"
+  ) %>%
+  mutate(
+    scenario = dplyr::recode(
+      scenario_raw,
+      "costs_total_mid" = "Mid price (default)",
+      "costs_total_lo"  = "Low price",
+      "costs_total_hi"  = "High price"
+    )
+  )
+
+# Plot without raw data points
+p_sown_total <- ggplot() +
   
-p_real_total <- ggplot() +
-  geom_point(data = noMono, aes(x = meanSR, y = costs_total_mid), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_real_total_data, aes(x = meanSR, y = estimate__), color = "blue", size = 1, alpha = .6) +
-  geom_line(data = plot_real_total_data_lo, aes(x = meanSR, y = estimate__), color = "green", linewidth = .8, alpha = .6) +
-  geom_line(data = plot_real_total_data_hi, aes(x = meanSR, y = estimate__), color = "yellow", linewidth = .8, alpha = .6) +
+  # horizontal reference line at y = 0
+  geom_hline(
+    yintercept = 0,
+    colour     = "grey80",
+    linewidth  = 0.6
+  ) +
   
-  # add line at y = 0
-  geom_hline(yintercept = 0, color = "grey90", linewidth = 0.8, linetype = 1, alpha = .5) +
+  # CI ribbon for mid/default scenario only
+  geom_ribbon(
+    data = filter(plot_sown_total_all, scenario == "Mid price (default)"),
+    aes(x = sowndiv, ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+  
+  # model lines for all three price scenarios
+  geom_line(
+    data = plot_sown_total_all,
+    aes(x = sowndiv, y = estimate__, colour = scenario, linetype = scenario),
+    linewidth = 0.9
+  ) +
+  
+  # colours and line types for scenarios
+  scale_colour_manual(
+    name   = "Price scenario",
+    values = c(
+      "Mid price (default)" = "#0072B2",  # blue
+      "Low price"           = "#009E73",  # green
+      "High price"          = "#E69F00"   # orange
+    )
+  ) +
+  scale_linetype_manual(
+    name   = "Price scenario",
+    values = c(
+      "Mid price (default)" = "solid",
+      "Low price"           = "dashed",
+      "High price"          = "dotted"
+    )
+  ) +
+  
+  # log2 x-axis
+  scale_x_continuous(
+    trans  = "log2",
+    breaks = c(1, 2, 4, 8, 16),
+    labels = c(1, 2, 4, 8, 16),
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+  
+  # y-axis
+  scale_y_continuous(
+    breaks = c(-1500, -1000, -500, 0, 500, 1000, 1500)
+  ) +
+  
+  # labels
+  labs(
+    x = "Sown plant diversity (species)",
+    y = "Economic multifunctionality (€/ha/yr)"
+  ) +
+  
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(
+    aspect.ratio     = 0.6,
+    legend.position  = "bottom",
+    legend.direction = "horizontal",
+    legend.box       = "horizontal",
+    legend.title     = element_text(size = 12),
+    legend.text      = element_text(size = 11),
+    legend.spacing.x = unit(4, "pt")
+  )
 
-  # Credible interval ribbon
+p_sown_total
 
-#    geom_ribbon(data = plot_real_total_data_lo, aes(x = meanSR, ymin = lower__, ymax = upper__), 
-#              fill = "green", alpha = 0.2) +
-#      geom_ribbon(data = plot_real_total_data_hi, aes(x = meanSR, ymin = lower__, ymax = upper__), 
-#              fill = "yellow", alpha = 0.2) +
-    geom_ribbon(data = plot_real_total_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.4) +
-  labs(x = "Mean realized plant diversity", y = "Economic multifunctionality (€/ha/a)") +
-  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12)) +
-  scale_y_continuous(breaks = c(-500, -250, 0, 250, 500, 750))
-
-p_real_total
-
-ggsave("total_real_noMono.png",
-       plot = p_real_total,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
+ggsave(
+  filename = "total_sown_different_pricing.png",
+  plot     = p_sown_total,
+  device   = "png",
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
 
 ```
-
-
 
 ## Supplementary Analysis
 ### sowndiv without Monocultures
@@ -970,32 +1094,148 @@ ggsave("Single_Services_real.png",
        path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
        dpi = 300)
 
+```
+
+
+### Plot realized species diversity effects - no Monocultures
+```{r Plotting}
+#Profit data without monocultures and realdiv
+c_real_Profit <- conditional_effects(fitProfitReal)
+plot_real_Profit_data <- c_real_Profit[[1]]
+  
+p_real_Profit <- ggplot() +
+  geom_point(data = noMono, aes(x = meanSR, y = profit_mean), 
+             alpha = 0.4, color = "#0072B2") +
+   # Model-estimated effect
+  geom_line(data = plot_real_Profit_data, aes(x = meanSR, y = estimate__), color = "#0072B2", size = .8, alpha = .6) +
+
+  # Credible interval ribbon
+  geom_ribbon(data = plot_real_Profit_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
+              fill = "#0072B2", alpha = 0.2) +
+  labs(x = "Mean realized plant diversity", y = "Mean operating profit (€/ha/year)") +
+  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12)) +
+  scale_y_continuous(breaks = c(50, 100, 150, 200, 250))
+  
+
+p_real_Profit
+
+ggsave("Profit_real_noMono.png",
+       plot = p_real_Profit,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+
+#SOC costs without monocultures and mean realized diversity
+c_real_soc <- conditional_effects(fitSOCreal)
+plot_real_soc_data <- c_real_soc[[1]]
+  
+p_real_soc <- ggplot() +
+  geom_point(data = noMono, aes(x = meanSR, y = SOC_costs_mid), 
+             alpha = 0.4, color = "#0072B2") +
+   # Model-estimated effect
+  geom_line(data = plot_real_soc_data, aes(x = meanSR, y = estimate__), color = "#0072B2", size = .8, alpha = .6) +
+
+  # Credible interval ribbon
+  geom_ribbon(data = plot_real_soc_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
+              fill = "#0072B2", alpha = 0.2) +
+  labs(x = "Mean realized plant diversity", y = "Social benefits of SOC sequestration (€/ha/year)") +
+  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12)) +
+  scale_y_continuous(breaks = c(-500, -250, 0, 250, 500, 750))
+
+p_real_soc
+
+ggsave("SOC_real_noMono.png",
+       plot = p_real_soc,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+#Leaching costs without monocultures and mean realized diversity
+c_real_leach <- conditional_effects(fitLeachReal)
+plot_real_leach_data <- c_real_leach[[1]]
+  
+p_real_leach <- ggplot() +
+  geom_point(data = noMono, aes(x = meanSR, y = leach_costs_mid), 
+             alpha = 0.4, color = "#0072B2") +
+   # Model-estimated effect
+  geom_line(data = plot_real_leach_data, aes(x = meanSR, y = estimate__), color = "#0072B2", size = .8, alpha = .6) +
+
+  # Credible interval ribbon
+  geom_ribbon(data = plot_real_leach_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
+              fill = "#0072B2", alpha = 0.2) +
+  labs(x = "Mean realized plant diversity", y = "Social costs of nitrogen leaching (€/ha/year)") +
+  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12))
+
+p_real_leach
+
+ggsave("Leach_real_noMono.png",
+       plot = p_real_leach,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+#Insurance value without monocultures and mean realized diversity
+c_real_insurance <- conditional_effects(fitInsuranceReal)
+plot_real_insurance_data <- c_real_insurance[[1]]
+  
+p_real_insurance <- ggplot() +
+  geom_point(data = noMono, aes(x = meanSR, y = insurance), 
+             alpha = 0.4, color = "#0072B2") +
+   # Model-estimated effect
+  geom_line(data = plot_real_insurance_data, aes(x = meanSR, y = estimate__), color = "#0072B2", size = .8, alpha = .6) +
+
+  # Credible interval ribbon
+  geom_ribbon(data = plot_real_insurance_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
+              fill = "#0072B2", alpha = 0.2) +
+  labs(x = "Mean realized plant diversity", y = "Insurance value (€)") +
+  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12))
+
+p_real_insurance
+
+ggsave("Insurance_real_noMono.png",
+       plot = p_real_insurance,
+       device = "png",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
+# combine the plots for realized SR in one grid
+p_services_real <- p_real_Profit + p_real_soc + p_real_leach + p_real_insurance +
+  plot_annotation(title = "Profit, SOC benefit, Leaching Costs, and Insurance value plotted against realized plant diversity") &
+  theme(plot.title = element_text(size=13,hjust=0.5))
+
+ggsave("Single_Services_real.png",
+       plot = last_plot(),
+       bg = "white",
+       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       dpi = 300)
+
 #economic MF without monocultures and mean realized diversity
 c_real_total <- conditional_effects(fitTotalReal)
 plot_real_total_data <- c_real_total[[1]]
 
 c_real_total_lo <- conditional_effects(fitTotalLo)
-plot_real_total_data_lo <- c_real_total_lo[[1]]
+plot_sown_total_data_lo <- c_real_total_lo[[1]]
 
 c_real_total_hi <- conditional_effects(fitTotalHi)
-plot_real_total_data_hi <- c_real_total_hi[[1]]
+plot_sown_total_data_hi <- c_real_total_hi[[1]]
   
 p_real_total <- ggplot() +
   geom_point(data = noMono, aes(x = meanSR, y = costs_total_mid), 
-             alpha = 0.4, color = "#28a87d") +
+             alpha = 0.4, color = "#0072B2") +
    # Model-estimated effect
   geom_line(data = plot_real_total_data, aes(x = meanSR, y = estimate__), color = "blue", size = 1, alpha = .6) +
-  geom_line(data = plot_real_total_data_lo, aes(x = meanSR, y = estimate__), color = "green", linewidth = .8, alpha = .6) +
-  geom_line(data = plot_real_total_data_hi, aes(x = meanSR, y = estimate__), color = "yellow", linewidth = .8, alpha = .6) +
+  geom_line(data = plot_sown_total_data_lo, aes(x = meanSR, y = estimate__), color = "green", linewidth = .8, alpha = .6) +
+  geom_line(data = plot_sown_total_data_hi, aes(x = meanSR, y = estimate__), color = "yellow", linewidth = .8, alpha = .6) +
   
   # add line at y = 0
   geom_hline(yintercept = 0, color = "grey90", linewidth = 0.8, linetype = 1, alpha = .5) +
 
   # Credible interval ribbon
 
-#    geom_ribbon(data = plot_real_total_data_lo, aes(x = meanSR, ymin = lower__, ymax = upper__), 
+#    geom_ribbon(data = plot_sown_total_data_lo, aes(x = meanSR, ymin = lower__, ymax = upper__), 
 #              fill = "green", alpha = 0.2) +
-#      geom_ribbon(data = plot_real_total_data_hi, aes(x = meanSR, ymin = lower__, ymax = upper__), 
+#      geom_ribbon(data = plot_sown_total_data_hi, aes(x = meanSR, ymin = lower__, ymax = upper__), 
 #              fill = "yellow", alpha = 0.2) +
     geom_ribbon(data = plot_real_total_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
               fill = "#287da8", alpha = 0.4) +
@@ -1012,45 +1252,3 @@ ggsave("total_real_noMono.png",
        dpi = 300)
 
 ```
-
-
-
-### Sensitivity Analysis with different price scenarios
-```{r Sensitivity Analysis}
-# Low Total Costs against species richness
-fitTotalLo <- brm(
-  costs_total_lo ~ log2(meanSR) + (1|block),
-  noMono)
-
-    # check model assumptions
-    pp_check(fitTotalLo, type="scatter_avg") 
-    pp_check(fitTotalLo, ndraws=50)
-    check_model(fitTotalLo, check="linearity") 
-    check_model(fitTotalLo, check="homogeneity")
-    plot(fitTotalLo)
-    
-    # check output of model
-    summary(fitTotalLo)
-
-# High Total Costs against species richness
-fitTotalHi <- brm(
-  costs_total_hi ~ log2(meanSR) + (1|block),
-  noMono)
-
-    # check model assumptions
-    pp_check(fitTotalHi, type="scatter_avg") 
-    pp_check(fitTotalHi, ndraws=50)
-    check_model(fitTotalHi, check="linearity") 
-    check_model(fitTotalHi, check="homogeneity")
-    plot(fitTotal4)
-    
-    # check output of model
-    summary(fitTotalHi)
-    
-```
-
-### Plot sensitivity analysis
-```{r}
-
-```
-

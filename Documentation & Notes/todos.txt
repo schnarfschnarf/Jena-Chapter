@@ -5,22 +5,19 @@
  Polycrisis paper -> Give more feedback on current draft
 
 
-!) Finalize the figures
-	- update figures according to comments, create legends, add descriptions
-	- draw transgressive overyielding line in the plot?
+IDEAS: 
+Should I change the way I calculate the nitrate leaching (by comparing to the plot with the largest costs, therefore all my values would turn positive again)?
 
-!) Finalize methods
-	- this is more or less finished
+!) Finalize the figures
+	- add descriptions
 
 !) Finalize analysis 
-	- include small analysis of dominance experiment (Box with 400 words max)
 	- update aggregate analysis with new dataset
-- finalize this f***ing insurance analysis
+	- finalize this f***ing insurance analysis
 
 !) WRITE!!!!
 	- include the missing references
-	- create equations
-	- work through remaining comments and red markups
+	- make clean equations
 	- mention the term "transgressive overyielding" (look at Günay et al. 2013, on Mic Biomass)
 	- update description of model parameters in the methods (also increased delta and iteration for main analysis = sown div))
 
@@ -29,6 +26,12 @@
 	 
 
 HALF-DONE) Include sensitivity analysis
+
+DONE) Finalize methods
+
+DONE) update the figures so they all appear linear
+
+DONE) include small analysis of dominance experiment (Box with 400 words max)
 
 DONE) update hay price source (Landesbetrieb Landwirtschaft Hessen, German Authority for agricultural education and advisory.
 

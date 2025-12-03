@@ -621,6 +621,58 @@ BANK HOLIDAY
 - finished dominance soc analysis
 - stopped working at 16.15
 
+02.12.25
+- started at 9:00
+- finalized the analysis of the dominance experiment: I checked the data again, and found errors in the bulk Density values for 2002
+	I corrected all dominance experiment tables and run the models with the final datasets and produced the final figures.
+- I more or less finished the box for the dominance analysis in the manuscript.
+- I participated in the active lunch break (30 min) by the TK.
+- I wrote a message to Nico and Marie to ask for short feedback on my drafted message to the co-authors.
+- I intend to send around this message tomorrow or on Thursday.
+- Stopped working at 15:45
+
+03.12.25
+- started working at 9:15
+- finished email to co-authors and included all the recipients
+- updated all the figures
+- converted all the raw model Outputs to nice tables
+- finished some of the comments in the manuscript
+- almost finished the manuscript so it is ready to circulate, I sent it around by the end of the day, also to Yuanyuan to forward to the JE team
+- stopped working at 16:00
+
+04.12.25
+
+05.12.25
+
+08.12.25
+
+09.12.25
+
+10.12.25
+
+11.12.25
+
+12.12.25
+
+
+
+15.12.25
+
+16.12.25
+
+17.12.25
+
+18.12.25
+
+19.12.25
+- Home office in Stuttgart
+
+22.12.25
+- Home office in Tübingen
+
+23.12.25
+- Home office in Tübingen
+
 24.12.25-04.01.26
 - Holidays :)
 
