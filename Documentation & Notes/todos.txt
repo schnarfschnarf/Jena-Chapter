@@ -9,23 +9,30 @@ IDEAS:
 Should I change the way I calculate the nitrate leaching (by comparing to the plot with the largest costs, therefore all my values would turn positive again)?
 
 !) Finalize the figures
-	- add descriptions
+	- wait until insurance evaluation is final and then update the figures accordingly
 
 !) Finalize analysis 
 	- update aggregate analysis with new dataset
 	- finalize this f***ing insurance analysis
+	- do the profit analysis again, I used median, now I will use mean --> more coherent approach
+	- redo the root analysis with excluding 30 - 40 cm layer and with including year 2024
+
 
 !) WRITE!!!!
 	- include the missing references
 	- make clean equations
 	- mention the term "transgressive overyielding" (look at Günay et al. 2013, on Mic Biomass)
-	- update description of model parameters in the methods (also increased delta and iteration for main analysis = sown div))
+	- update the Nitrate leaching methods (measures probably only from 2003 and 2004)
 
 
-!!!!! SEND AROUND EMAIL TO ALL CO-AUTHORS (INCL. YUANYUAN) ON BEGINNING OF DECEMBER AND SET DEADLINE TO COMMENT AND REVIEW TO 14 DAYS !!!!!
-	 
 
-HALF-DONE) Include sensitivity analysis
+DONE) SEND AROUND EMAIL TO ALL CO-AUTHORS (INCL. YUANYUAN) ON BEGINNING OF DECEMBER AND SET DEADLINE TO COMMENT AND REVIEW TO 14 DAYS
+
+DONE) Include sensitivity analysis
+
+DONE) update description of model parameters in the methods (also increased delta and iteration for main analysis = sown div))
+
+DONE) add figure descriptions
 
 DONE) Finalize methods
 

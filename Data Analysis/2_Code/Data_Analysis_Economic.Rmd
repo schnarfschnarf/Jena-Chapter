@@ -30,32 +30,38 @@ library(performance)
 library(ggpmisc)
 ```
 
-## Set up a theme
+## Theme Custom
 ```{r Theme}
 theme_set(theme_custom())
 ```
 
-## Load datasets and filter for relevant observations/measurements
+## Load datasets - Filter for relevant observations/measurements
 ```{r Read Data}
 #load synthesis dataset
 synthDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF_final.xlsx") %>% 
   filter(sowndiv < 60) %>%  #remove 60 species plots
   mutate(block = as.factor(block))
+
+synthDat$insurance_RP <- 49.4 - synthDat$RP
+
 ```
 
-## Data wrangling
+## Data Wrangling
 Change data types and filter for relevant observations.
 ```{r Synthesis data}
 synthDat$plotcode <- as.factor(synthDat$plotcode) #change the plotcode to a factor
 
+# add insurance to mid costs
+synthDat$costs_total_mid <- synthDat$costs_total_mid + synthDat$insurance_RP
+
 # add up all the low costs for lower total value
-synthDat$costs_total_lo <- synthDat$SOC_costs_lo + synthDat$leach_costs_lo + synthDat$profit_mean
+synthDat$costs_total_lo <- synthDat$SOC_costs_lo + synthDat$leach_costs_lo + synthDat$profit_mean + synthDat$insurance_RP
 
 # add up all the high costs for higher total value
-synthDat$costs_total_hi <- synthDat$SOC_costs_hi + synthDat$leach_costs_hi + synthDat$profit_mean
+synthDat$costs_total_hi <- synthDat$SOC_costs_hi + synthDat$leach_costs_hi + synthDat$profit_mean + synthDat$insurance_RP
 
-noMono <- synthDat %>% 
-  filter(sowndiv > 1) #filter out monocultures
+#noMono <- synthDat %>% 
+ # filter(sowndiv > 1) #filter out monocultures
 
 ```
 
@@ -116,7 +122,7 @@ fitLeach <- brm(
 
 # Insurance value against sown plant diversity
 fitInsurance <- brm(
-  insurance ~log2(sowndiv) + (1|block),
+  insurance_RP ~log2(sowndiv) + (1|block),
   control = list(adapt_delta = 0.95),
   iter = 3000,
   synthDat
@@ -153,91 +159,91 @@ fitTotal <- brm(
 ```
 
 #### &Realized diversity
-```{r Realized Diversity With Monocultures, include=FALSE}
+```{r Realized Diversity WITH Monocultures, include=FALSE}
 # Profit against species richness - including monocultures
-fitProfitRealAll <- brm(
+fitProfitReal <- brm(
   profit_mean ~ log2(meanSR) + (1|block),
   control = list(adapt_delta = 0.95),
   iter = 3000,
   synthDat) 
 
     # check model assumptions 
-    pp_check(fitProfitRealAll, type="scatter_avg")
-    pp_check(fitProfitRealAll, ndraws=50)
-    check_model(fitProfitRealAll, check="linearity")
-    check_model(fitProfitRealAll, check="homogeneity")
-    plot(fitProfitRealAll)
+    pp_check(fitProfitReal, type="scatter_avg")
+    pp_check(fitProfitReal, ndraws=50)
+    check_model(fitProfitReal, check="linearity")
+    check_model(fitProfitReal, check="homogeneity")
+    plot(fitProfitReal)
     
     # check output of model
-    summary(fitProfitRealAll)
+    summary(fitProfitReal)
 
 # SOC against species richness - including monocultures
-fitSOCrealAll <- brm(
+fitSOCreal <- brm(
   SOC_costs_mid ~ log2(meanSR) + (1|block),
   control = list(adapt_delta = 0.95),
   iter = 3000,
   synthDat)
 
     # check model assumptions
-    pp_check(fitSOCrealAll, type="scatter_avg") 
-    pp_check(fitSOCrealAll, ndraws=50)
-    check_model(fitSOCrealAll, check="linearity") 
-    check_model(fitSOCrealAll, check="homogeneity")
-    plot(fitSOCrealAll)
+    pp_check(fitSOCreal, type="scatter_avg") 
+    pp_check(fitSOCreal, ndraws=50)
+    check_model(fitSOCreal, check="linearity") 
+    check_model(fitSOCreal, check="homogeneity")
+    plot(fitSOCreal)
     
     # check output of model
-    summary(fitSOCrealAll)
+    summary(fitSOCreal)
 
 # Leaching costs against species richness - including monocultures
-fitLeachRealAll <- brm(
+fitLeachReal <- brm(
   leach_costs_mid ~ log2(meanSR) + (1|block),
   control = list(adapt_delta = 0.95),
   iter = 3000,
   synthDat)
 
     # check model assumptions
-    pp_check(fitLeachRealAll, type="scatter_avg") 
-    pp_check(fitLeachRealAll, ndraws=50)
-    check_model(fitLeachRealAll, check="linearity") 
-    check_model(fitLeachRealAll, check="homogeneity")
-    plot(fitLeachRealAll)
+    pp_check(fitLeachReal, type="scatter_avg") 
+    pp_check(fitLeachReal, ndraws=50)
+    check_model(fitLeachReal, check="linearity") 
+    check_model(fitLeachReal, check="homogeneity")
+    plot(fitLeachReal)
     
     # check output of model
-    summary(fitLeachRealAll)
+    summary(fitLeachReal)
 
 # Insurance against species richness - including monocultures
-fitInsuranceRealAll <- brm(
-  insurance ~ log2(meanSR) + (1|block),
+fitInsuranceReal <- brm(
+  insurance_RP ~ log2(meanSR) + (1|block),
   control = list(adapt_delta = 0.95),
   iter = 3000,
   synthDat)
 
     # check model assumptions
-    pp_check(fitInsuranceRealAll, type="scatter_avg") 
-    pp_check(fitInsuranceRealAll, ndraws=50)
-    check_model(fitInsuranceRealAll, check="linearity") 
-    check_model(fitInsuranceRealAll, check="homogeneity")
-    plot(fitInsuranceRealAll)
+    pp_check(fitInsuranceReal, type="scatter_avg") 
+    pp_check(fitInsuranceReal, ndraws=50)
+    check_model(fitInsuranceReal, check="linearity") 
+    check_model(fitInsuranceReal, check="homogeneity")
+    plot(fitInsuranceReal)
     
     # check output of model
-    summary(fitInsuranceRealAll)        
+    summary(fitInsuranceReal)        
 
 # Total Costs against mean realized species richness - including monocultures
-fitTotalRealAll <- brm(
+fitTotalReal <- brm(
   costs_total_mid ~ log2(meanSR) + (1|block),
   control = list(adapt_delta = 0.95),
   iter = 3000,
   synthDat)
 
     # check model assumptions
-    pp_check(fitTotalRealAll, type="scatter_avg") 
-    pp_check(fitTotalRealAll, ndraws=50)
-    check_model(fitTotalRealAll, check="linearity") 
-    check_model(fitTotalRealAll, check="homogeneity")
-    plot(fitTotalRealAll)
+    pp_check(fitTotalReal, type="scatter_avg") 
+    pp_check(fitTotalReal, ndraws=50)
+    check_model(fitTotalReal, check="linearity") 
+    check_model(fitTotalReal, check="homogeneity")
+    plot(fitTotalReal)
     
     # check output of model
-    summary(fitTotalRealAll)
+    summary(fitTotalReal)
 
 
 ```
@@ -435,7 +441,7 @@ ggsave(
 
 ```
 
-```{r}
+```{r Plot sown diversity - Insurance}
 #Insurance value and sown diversity
 c_sown_insurance <- conditional_effects(fitInsurance)
 plot_sown_insurance_data <- c_sown_insurance[[1]]
@@ -445,7 +451,7 @@ p_sown_insurance <- ggplot() +
   # raw data
   geom_point(
     data = synthDat,
-    aes(x = sowndiv, y = insurance),
+    aes(x = sowndiv, y = insurance_RP),
     alpha = 0.5,
     size  = 2,
     shape = 21,
@@ -522,7 +528,7 @@ ggsave("RP_sown.png",
        dpi = 300)
 ```
 
-```{r}
+```{r Plot sown diversity - Economic MF}
 #economic MF and sown diversity
 c_sown_total <- conditional_effects(fitTotal)
 plot_sown_total_data <- c_sown_total[[1]]
@@ -613,23 +619,13 @@ fig_sown_all <- (
 fig_sown_all
 
 ggsave(
-  filename = "Fig_sown_multifunctionality_insurance.png",
+  filename = "Fig_sown_multifunctionality.png",
   plot     = fig_sown_all,
   width    = 8,
   height   = 8,
   units    = "in",
   dpi      = 300,
   device   = "png",
-  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/"
-)
-
-ggsave(
-  filename = "Fig_sown_multifunctionality_insurance.pdf",
-  plot     = fig_sown_all,
-  width    = 8,
-  height   = 8,
-  units    = "in",
-  device   = cairo_pdf,
   path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/"
 )
 
@@ -642,6 +638,8 @@ ggsave(
 # Low Total Costs against species richness
 fitTotalLo <- brm(
   costs_total_lo ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 3000,
   synthDat)
 
     # check model assumptions
@@ -657,6 +655,8 @@ fitTotalLo <- brm(
 # High Total Costs against species richness
 fitTotalHi <- brm(
   costs_total_hi ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 3000,
   synthDat)
 
     # check model assumptions
@@ -672,8 +672,7 @@ fitTotalHi <- brm(
 ```
 
 ### Plot sensitivity analysis
-```{r}
-#economic MF without monocultures and mean realized diversity
+```{r Plot Sown Diversity - Economic MF - Alternative Pricing}
 c_sown_total <- conditional_effects(fitTotal)
 plot_sown_total_data <- c_sown_total[[1]]
 
@@ -800,6 +799,336 @@ ggsave(
 ```
 
 ## Supplementary Analysis
+#### Plot realized species diversity effects including monocultures
+```{r Plot Realized SR - Profit}
+# Profit data with monocultures and realized diversity
+c_real_profit_all <- conditional_effects(fitProfitReal)
+plot_real_profit_all_data <- c_real_profit_all[[1]]
+
+p_real_profit_all <- ggplot() +
+  # raw data
+  geom_point(
+    data   = synthDat,
+    aes(x  = meanSR, y = profit_mean),
+    alpha  = 0.5,
+    size   = 2,
+    shape  = 21,
+    fill   = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  # model-estimated effect
+  geom_line(
+    data     = plot_real_profit_all_data,
+    aes(x    = meanSR, y = estimate__),
+    colour   = "#0072B2",
+    linewidth = 0.8
+  ) +
+  # credible interval ribbon
+  geom_ribbon(
+    data  = plot_real_profit_all_data,
+    aes(x = meanSR, ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+  
+  # --- LOG2 AXIS ---
+  scale_x_continuous(
+  trans  = "log2",
+  expand = expansion(mult = c(0.02, 0.02))
+  ) + 
+
+  # labels
+  labs(
+    x = "Mean realized plant species (n)",
+    y = "Profit (€/ha/yr)"
+  ) +
+  
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(
+    aspect.ratio = 0.6
+  )
+
+p_real_profit_all
+
+ggsave(
+  filename = "Profit_real_all.png",
+  plot     = p_real_profit_all,
+  device   = "png",
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
+
+```
+
+
+```{r Plot Realized SR - SOC}
+# SOC benefits without monocultures and realised diversity
+c_real_soc_all <- conditional_effects(fitSOCreal)
+plot_real_soc_all_data <- c_real_soc_all[[1]]
+
+p_real_soc_all <- ggplot() +
+  geom_point(
+    data   = synthDat,
+    aes(x  = meanSR, y = SOC_costs_mid),
+    alpha  = 0.5,
+    size   = 2,
+    shape  = 21,
+    fill   = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  geom_line(
+    data     = plot_real_soc_all_data,
+    aes(x    = meanSR, y = estimate__),
+    colour   = "#0072B2",
+    linewidth = 0.8
+  ) +
+  geom_ribbon(
+    data  = plot_real_soc_all_data,
+    aes(x = meanSR, ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+  scale_x_continuous(
+    trans  = "log2",
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+  scale_y_continuous(
+    breaks = c(-1500,-1000, -500, 0, 500, 1000)
+  ) +
+  labs(
+    x = "Mean realized plant species (n)",
+    y = "SOC benefit (€/ha/yr)"
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(aspect.ratio = 0.6)
+
+
+p_real_soc_all
+
+ggsave(
+  filename = "SOC_real_all.png",
+  plot     = p_real_soc_all,
+  device   = "png",
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
+```
+
+
+```{r Plot Realized SR - Leaching}
+# Leaching costs without monocultures and realised diversity
+c_real_leach_all <- conditional_effects(fitLeachReal)
+plot_real_leach_all_data <- c_real_leach_all[[1]]
+
+p_real_leach_all <- ggplot() +
+  geom_point(
+    data   = synthDat,
+    aes(x  = meanSR, y = leach_costs_mid),
+    alpha  = 0.5,
+    size   = 2,
+    shape  = 21,
+    fill   = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  geom_line(
+    data     = plot_real_leach_all_data,
+    aes(x    = meanSR, y = estimate__),
+    colour   = "#0072B2",
+    linewidth = 0.8
+  ) +
+  geom_ribbon(
+    data  = plot_real_leach_all_data,
+    aes(x = meanSR, ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+  scale_x_continuous(
+    trans  = "log2",
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+   scale_y_continuous(
+    breaks = c(-125,-100,-75,-50,-25, 0)
+  ) +  
+  labs(
+    x = "Mean realized plant species (n)",
+    y = "Leaching cost (€/ha/yr)"
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(aspect.ratio = 0.6)
+
+
+p_real_leach_all
+
+ggsave(
+  filename = "Leach_real_all.png",
+  plot     = p_real_leach_all,
+  device   = "png",
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
+```
+
+
+```{r Plot Realized SR - Insurance}
+# Insurance value without monocultures and realised diversity
+c_real_insurance_all <- conditional_effects(fitInsuranceReal)
+plot_real_insurance_all_data <- c_real_insurance_all[[1]]
+
+p_real_insurance_all <- ggplot() +
+  geom_point(
+    data   = synthDat,
+    aes(x  = meanSR, y = insurance_RP),
+    alpha  = 0.5,
+    size   = 2,
+    shape  = 21,
+    fill   = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  # model-estimated effect
+  geom_line(
+    data = plot_real_insurance_all_data,
+    aes(x = meanSR, y = estimate__),
+    colour = "#0072B2",
+    linewidth = 0.8
+  ) +
+  # credible interval ribbon
+  geom_ribbon(
+    data = plot_real_insurance_all_data,
+    aes(x = meanSR, ymin = lower__, ymax = upper__),
+    fill = "#0072B2",
+    alpha = 0.15
+  ) +
+  scale_x_continuous(
+    trans  = "log2",
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+  labs(
+    x = "Mean realized plant species (n)",
+    y = "Insurance (€/ha/yr)"
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(aspect.ratio = 0.6)
+
+
+p_real_insurance_all
+
+ggsave(
+  filename = "Insurance_real_all.png",
+  plot     = p_real_insurance_all,
+  device   = "png",
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
+
+```
+
+```{r Plot Realized SR - Multi-panel-PLot}
+p_services_real <- (
+  p_real_profit_all + p_real_soc_all
+) /
+(
+  p_real_leach_all + p_real_insurance_all
+) +
+  plot_annotation(tag_levels = "a")
+
+ggsave(
+  filename = "Single_Services_real.png",
+  plot     = p_services_real,
+  bg       = "white",
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  dpi      = 300,
+  width    = 8,
+  height   = 8,
+  units    = "in"
+)
+
+```
+
+```{r Plot Realized SR - Economic MF}
+# Economic MF and realised diversity
+c_real_total <- conditional_effects(fitTotalReal)
+plot_real_total_data <- c_real_total[[1]]
+
+# Economic MF (total costs) vs mean realised diversity
+
+p_real_total <- ggplot() +
+  # raw data
+  geom_point(
+    data   = synthDat,
+    aes(x  = meanSR, y = costs_total_mid),
+    alpha  = 0.5,
+    size   = 2,
+    shape  = 21,
+    fill   = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  # model-estimated effect
+  geom_line(
+    data     = plot_real_total_data,
+    aes(x    = meanSR, y = estimate__),
+    colour   = "#0072B2",
+    linewidth = 0.8
+  ) +
+  # credible interval ribbon
+  geom_ribbon(
+    data  = plot_real_total_data,
+    aes(x = meanSR, ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+  # log2 x-axis, no manual breaks/limits
+  scale_x_continuous(
+    trans  = "log2",
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+  labs(
+    x = "Mean realised plant species (n)",
+    y = "Economic multifunctionality (€/ha/yr)"
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(
+    aspect.ratio = 0.6
+  )
+
+p_real_total
+
+ggsave(
+  filename = "total_real_all.png",
+  plot     = p_real_total,
+  device   = "png",
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
+
+
+```
+
+
 ### sowndiv without Monocultures
 ```{r Sown Diversity WITHOUT Monocultures}
 # Profit against species richness
@@ -980,121 +1309,6 @@ fitTotalReal <- brm(
 
 
 
-
-#### Plot realized species diversity effects including monocultures
-```{r Plotting}
-#Profit data without monocultures and realdiv
-c_real_profit_all <- conditional_effects(fitProfitRealAll)
-plot_real_profit_all_data <- c_real_profit_all[[1]]
-  
-p_real_profit_all <- ggplot() +
-  geom_point(data = synthDat, aes(x = meanSR, y = profit_mean), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_real_profit_all_data, aes(x = meanSR, y = estimate__), color = "blue", size = .8, alpha = .6) +
-
-  # Credible interval ribbon
-  geom_ribbon(data = plot_real_profit_all_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(x = "Mean realized plant diversity", y = "Mean operating profit (€/ha/year)") +
-  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12)) +
-  scale_y_continuous(breaks = c(50, 100, 150, 200, 250))
-  
-
-p_real_profit_all
-
-ggsave("Profit_real_all.png",
-       plot = p_real_profit_all,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
-
-#SOC costs without monocultures and mean realized diversity
-c_real_soc_all <- conditional_effects(fitSOCrealAll)
-plot_real_soc_all_data <- c_real_soc_all[[1]]
-  
-p_real_soc_all <- ggplot() +
-  geom_point(data = synthDat, aes(x = meanSR, y = SOC_costs_mid), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_real_soc_all_data, aes(x = meanSR, y = estimate__), color = "blue", size = .8, alpha = .6) +
-
-  # Credible interval ribbon
-  geom_ribbon(data = plot_real_soc_all_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(x = "Mean realized plant diversity", y = "Social benefits of SOC sequestration (€/ha/year)") +
-  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12)) +
-  scale_y_continuous(breaks = c(-500, -250, 0, 250, 500, 750))
-
-p_real_soc_all
-
-ggsave("SOC_real_all.png",
-       plot = p_real_soc_all,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
-#Leaching costs without monocultures and mean realized diversity
-c_real_leach_all <- conditional_effects(fitLeachRealAll)
-plot_real_leach_all_data <- c_real_leach_all[[1]]
-  
-p_real_leach_all <- ggplot() +
-  geom_point(data = synthDat, aes(x = meanSR, y = leach_costs_mid), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_real_leach_all_data, aes(x = meanSR, y = estimate__), color = "blue", size = .8, alpha = .6) +
-
-  # Credible interval ribbon
-  geom_ribbon(data = plot_real_leach_all_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(x = "Mean realized plant diversity", y = "Social costs of nitrogen leaching (€/ha/year)") +
-  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12))
-
-p_real_leach_all
-
-ggsave("Leach_real_all.png",
-       plot = p_real_leach_all,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
-#Insurance value without monocultures and mean realized diversity
-c_real_insurance_all <- conditional_effects(fitInsuranceRealAll)
-plot_real_insurance_all_data <- c_real_insurance_all[[1]]
-  
-p_real_insurance_all <- ggplot() +
-  geom_point(data = synthDat, aes(x = meanSR, y = insurance), 
-             alpha = 0.4, color = "#28a87d") +
-   # Model-estimated effect
-  geom_line(data = plot_real_insurance_all_data, aes(x = meanSR, y = estimate__), color = "blue", size = .8, alpha = .6) +
-
-  # Credible interval ribbon
-  geom_ribbon(data = plot_real_insurance_all_data, aes(x = meanSR, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(x = "Mean realized plant diversity", y = "Insurance value (€)") +
-  scale_x_continuous(breaks = c(2, 4, 6, 8, 10, 12))
-
-p_real_insurance_all
-
-ggsave("Insurance_real_all.png",
-       plot = p_real_insurance_all,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
-# combine the plots for realized SR in one grid
-p_services_real <- p_real_profit_all + p_real_soc_all + p_real_leach_all + p_real_insurance_all +
-  plot_annotation(title = "Profit, SOC benefit, Leaching Costs, and Insurance value plotted against realized plant diversity") &
-  theme(plot.title = element_text(size=13,hjust=0.5))
-
-ggsave("Single_Services_real.png",
-       plot = last_plot(),
-       bg = "white",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
-```
 
 
 ### Plot realized species diversity effects - no Monocultures

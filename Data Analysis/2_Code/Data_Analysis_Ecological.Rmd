@@ -298,71 +298,47 @@ ggsave(
 # Supplements
 ## Single Function Models
 ```{r Model Single Functions}
-fitLeachReal <- brm(
-  av_leaching ~ log2(sowndiv) + (1|block),
- ecologicalMF)
-
-summary(fitLeachReal)
-
-fitBiomassReal <- brm(
-  mean_biomass ~ log2(sowndiv) + (1|block),
- ecologicalMF)
-
-summary(fitBiomassReal)
-
-fitMicbioReal <- brm(
+fitMicbio <- brm(
   mean_micbiomass ~ log2(sowndiv) + (1|block),
  ecologicalMF)
 
-summary(fitMicbioReal)
+summary(fitMicbio)
 
-fitMicresReal <- brm(
+fitMicres <- brm(
   mean_micrespiration ~ log2(sowndiv) + (1|block),
  ecologicalMF)
 
-summary(fitMicresReal)
+summary(fitMicres)
 
-fitRootReal <- brm(
+fitRoot <- brm(
   mean_root_biomass ~ log2(sowndiv) + (1|block),
  ecologicalMF)
 
-summary(fitRootReal)
+summary(fitRoot)
 
-fitSOCReal <- brm(
-  SOC_overall_mean ~ log2(sowndiv) + (1|block),
- ecologicalMF)
-
-summary(fitSOCReal)
-
-fitPolReal <- brm(
+fitPol <- brm(
   mean_diversity ~ log2(sowndiv) + (1|block),
  ecologicalMF)
 
-summary(fitPolReal)
+summary(fitPol)
 
-fitAboveReaL <- brm(
+fitAbove <- brm(
   mean_above_control ~ log2(sowndiv) + (1|block),
  ecologicalMF)
 
-summary(fitAboveReaL)
+summary(fitAbove)
 
-fitBelowReal <- brm(
+fitBelow <- brm(
   mean_below_control ~ log2(sowndiv) + (1|block),
  ecologicalMF)
 
-summary(fitBelowReal)
+summary(fitBelow)
 
-fitStabiReal <- brm(
-  biomass_stability ~ log2(sowndiv) + (1|block),
- ecologicalMF)
-
-summary(fitStabiReal)
-
-fitAggReal <- brm(
+fitAgg <- brm(
   mean_agg ~ log2(sowndiv) + (1|block),
  ecologicalMF)
 
-summary(fitAggReal)
+summary(fitAgg)
 
 ```
 

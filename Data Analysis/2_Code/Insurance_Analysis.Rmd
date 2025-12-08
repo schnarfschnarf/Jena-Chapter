@@ -1,0 +1,76 @@
+---
+title: "Insurance_Value_Analysis"
+author: "Marius Munschek"
+date: "2025-12-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+```
+
+```{r}
+by_SR <- synthDat %>%
+  group_by(sowndiv) %>%
+  summarise(
+    mu_SR = mean(profit_mean, na.rm = TRUE),  # mean profit €/ha
+    CV_SR = mean(CV,           na.rm = TRUE), # mean CV of profit
+    RP_SR = mean(RP,           na.rm = TRUE), # mean risk premium €/ha
+    CE_SR = mean(CE,           na.rm = TRUE), # mean certainty equivalent €/ha
+    .groups = "drop"
+  )
+```
+
+```{r}
+SR0 <- min(by_SR$sowndiv)   # or choose any other baseline
+
+RP0 <- by_SR$RP_SR[by_SR$sowndiv == SR0]
+CE0 <- by_SR$CE_SR[by_SR$sowndiv == SR0]
+
+by_SR <- by_SR %>%
+  mutate(
+    insurance_RP = RP0 - RP_SR,   # €/ha reduction in risk premium vs baseline
+    insurance_CE = CE_SR - CE0    # €/ha gain in certainty equivalent vs baseline
+  )
+
+```
+
+```{r}
+# quadratic fit of CV vs richness, using plot-level data:
+quad <- lm(CV ~ sowndiv + I(sowndiv^2), data = synthDat)
+
+dCVdSR <- function(SR) {
+  c <- coef(quad)
+  c[2] + 2 * c[3] * SR
+}
+
+by_SR <- by_SR %>%
+  mutate(
+    dCVdSR          = dCVdSR(sowndiv),
+    insurance_index = - sowndiv * dCVdSR   # dimensionless stability index
+  )
+
+```
+
+```{r}
+by_SR_pub <- by_SR %>%
+  select(
+    sowndiv,
+    mu_SR,
+    CV_SR,
+    RP_SR,
+    CE_SR,
+    insurance_RP,
+    insurance_CE
+  )
+
+
+write.csv(by_SR_pub, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/by_SR_publication.csv", row.names = FALSE)
+```
+

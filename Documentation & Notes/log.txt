@@ -641,10 +641,30 @@ BANK HOLIDAY
 - stopped working at 16:00
 
 04.12.25
+- started working at 9:30
+- working on the manuscript, added all figure captions, updated the model results in the main text, fine tuned the text
+- attended the time management workshop
+- stopped working at 16:00
 
 05.12.25
+- started working at 10:00
+- lab meeting (talk by Ke, I will approach her for collab)
+- generated model Outputs for sensitivity analysis with realized species diversity
+- generated figures for realized species richness
+- included outputs and figures in the manuscript
+- tried to solve this insurance calculation
+- stopped working at 15:30
 
 08.12.25
+- started working at 10:45
+- checking emails, responded to Leo that he can still be co-author if he wants to although he only provided root 23 biomass data
+- worked on the comments in the manuscript
+- Christiane Roscher left a comment that I reported wrong results of the regioDiv project -> I corrected this
+- I run the models for Profit again and used mean instead of median
+- I run the insurance models with the ChatGPT revised code and calculation of monetary value of insurance by comparing to monoculture baseline values
+- I  have to correct the root biomass calculation (added the year 2024) and exclude 30cm -40 cm values for years 2011 and onwards to stay coherent with previous measures
+- stopped working at 16:00
+- ECO-N Christmas part from 16:00
 
 09.12.25
 

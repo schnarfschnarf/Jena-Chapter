@@ -85,14 +85,14 @@ biomassAnnual$profit_annual <- biomassAnnual$biomass_mean * (biomassAnnual$price
 # calculate the biomass stability as the coefficient of variance of the biomass across years (CV = SD/mean)
 biomassAnnual <- biomassAnnual %>% 
   group_by(plotcode) %>% 
-  mutate(CV = (sd(biomass_mean)/mean(biomass_mean))) 
+  mutate(CV = (sd(profit_annual)/mean(profit_annual))) 
 
 # sum up biomass for each plot and calculate the mean biomass and mean profit across years. (calculating "mean of CV" doesn't change it's value on plot level, because the CV was already the same for every year per plot)
 biomassMeans <- biomassAnnual %>% 
   group_by(plotcode) %>% 
   summarise(
     biomass_mean = mean(biomass_mean, na.rm = TRUE),
-    profit_mean = median(profit_annual, na.rm = TRUE),
+    profit_mean = mean(profit_annual, na.rm = TRUE),
     CV = mean(CV, na.rm = TRUE),
     .groups = "drop"
   )
@@ -147,8 +147,8 @@ leachingMean <- leaching %>%
 
 # calculate the costs in €/ha/a for each plot
 leachingMean$leach_costs_lo <- leachingMean$leaching_mean * 5 *(-1)
-leachingMean$leach_costs_mid <- leachingMean$leaching_mean * 11.23 *(-1)
-leachingMean$leach_costs_hi <- leachingMean$leaching_mean * 20 *(-1)
+leachingMean$leach_costs_mid <- leachingMean$leaching_mean * 14.50 *(-1)
+leachingMean$leach_costs_hi <- leachingMean$leaching_mean * 24 *(-1)
 ```
 
 ## Synthesize in one Dataset
@@ -165,25 +165,11 @@ synthDat <- biomassMeans %>% # merge the biomass and the realized SR data
 synthDat$block <- as.factor(synthDat$block) # change block to a factor
 synthDat$plotcode <- as.factor(synthDat$plotcode)  # change plotcode to a factor
 
-
-  # define quadratic relationship between biodiversity and insurance value
-  quad <- lm(CV ~ sowndiv + I(sowndiv^2), synthDat)
-
-  # calculate dCV/dSR
-  dCVdSR <- function(SR) {
-  c <- coef(quad)
-  c[2] + 2 * c[3] * SR
-}
-  
-  # insurance value like in Martin's code
-  synthDat <- synthDat %>% 
-    mutate(dCVdSR = dCVdSR(sowndiv),
-         insurance = sowndiv * dCVdSR * (-1))
  
 # create a column with social costs of carbon (for different pricing scenarios)
-synthDat$SOC_costs_mid <- (synthDat$SOC_costs_mid_20 - synthDat$SOC_costs_mid_02) /17
-synthDat$SOC_costs_lo <- (synthDat$SOC_costs_mid_20 - synthDat$SOC_costs_mid_02) / 17 / 4 # price is only 75€ per ton which is 25% of 300
-synthDat$SOC_costs_hi <- (synthDat$SOC_costs_mid_20 - synthDat$SOC_costs_mid_02) / 17 / 0.375 # price is 800€ per ton 
+synthDat$SOC_costs_mid <- (synthDat$SOC_costs_mid_20 - synthDat$SOC_costs_mid_02) /18
+synthDat$SOC_costs_lo <- (synthDat$SOC_costs_mid_20 - synthDat$SOC_costs_mid_02) / 18 / 4 # price is only 75€ per ton which is 25% of 300
+synthDat$SOC_costs_hi <- (synthDat$SOC_costs_mid_20 - synthDat$SOC_costs_mid_02) / 18 / 0.375 # price is 800€ per ton 
 
 # add up all the costs for total value
 synthDat$costs_total_mid <- synthDat$SOC_costs_mid + synthDat$leach_costs_mid + synthDat$profit_mean # + synthDat$insurance
