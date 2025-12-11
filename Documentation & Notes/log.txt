@@ -667,34 +667,59 @@ BANK HOLIDAY
 - ECO-N Christmas part from 16:00
 
 09.12.25
+- started working at 10:00
+- started to work on the comments in the manuscript
+- caught up with science TBD
+- stopped working at 12:30
 
 10.12.25
+- started working at 9:30
+- manuscript work
+- ECO-N lecture series
+- iDiv Paper Club
+- stopped working at 16:15
 
 11.12.25
+- started working at 9:30
+- lab meeting
+- ECO-N lecture series
+- checked the exhibition on jewish forced labor in Greece during lunch break
+- worked on the manuscript and incorporated comments and feedback#
+- stopped working at 16:00
+
 
 12.12.25
-
-
+- started working at
+- work in train?
 
 15.12.25
+-
 
 16.12.25
+-
 
 17.12.25
+-
 
 18.12.25
+-
 
 19.12.25
 - Home office in Stuttgart
+-
 
 22.12.25
 - Home office in Tübingen
+-
 
 23.12.25
 - Home office in Tübingen
+-
 
 24.12.25-04.01.26
 - Holidays :)
 
+
+After the holidays I will end this document here and start a journal in VSCode and with .pylab or rmd files
 
 

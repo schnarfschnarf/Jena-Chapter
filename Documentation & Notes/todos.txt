@@ -23,6 +23,8 @@ Should I change the way I calculate the nitrate leaching (by comparing to the pl
 	- make clean equations
 	- mention the term "transgressive overyielding" (look at Günay et al. 2013, on Mic Biomass)
 	- update the Nitrate leaching methods (measures probably only from 2003 and 2004)
+	- better explain insurance value calculation and meaning and RP and CE and their meaning
+	
 
 
 
