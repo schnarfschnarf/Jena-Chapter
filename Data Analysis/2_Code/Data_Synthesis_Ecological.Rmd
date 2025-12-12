@@ -6,7 +6,7 @@ output: html_document
 ---
 
 # Preface
-This R Script is to be used to load, explore, and synthesize the data for assessing the (soil) ecological multifunctionality in the Jena experiment and it's response to different levels of plant diversity. The following ecological functions were are incuded: Aboveground biomass production, C&N content in the soil, Realized Species Richness, nitrogen leaching (into the groundwater), pollination, above- and belowground herbivory (for belowground measured as energy fluxes in the food web), soil organic carbon (SOC), leaf dry matter content (LDMC), soil diversity, microbial biomass + respiration. 
+This R Script is to be used to load, explore, and synthesize the data for assessing the (soil) ecological multifunctionality in the Jena experiment and it's response to different levels of plant diversity. The following ecological functions were are incuded: root biomass, pollinator diversity, above- and belowground herbivory (measured as energy fluxes in the food web), microbial biomass + respiration, and water-stable-aggregates
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warn = TRUE, 
                       message = FALSE, 
@@ -91,7 +91,8 @@ aggregates <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_
 Before the individual datasets can be merged, they have to be harmonized. Additionally for some datasets, aggregated values have to be calculated. 
 ```{r Biomass data}
 # calculate mean biomass for root dataset
-rootsMean <- roots %>% 
+rootsMean <- roots %>%
+  filter(depth.max < 0.4) %>% 
   group_by(plotcode) %>% 
   mutate(mean_root_biomass = mean(root.bm, na.rm = TRUE)) %>% 
   distinct(plotcode, mean_root_biomass) %>%

@@ -253,14 +253,6 @@ corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
     colour = "#0072B2"
   ) +
   
-  # correlation annotation
-  stat_cor(
-    method  = "pearson",
-    label.x = 0.10,
-    label.y = max(joinedMF$costs_total_mid, na.rm = TRUE) * 0.95,
-    size    = 5
-  ) +
-  
   scale_x_continuous(
     breaks = seq(0.1, 0.7, by = 0.1),
     expand = expansion(mult = c(0.02, 0.02))
