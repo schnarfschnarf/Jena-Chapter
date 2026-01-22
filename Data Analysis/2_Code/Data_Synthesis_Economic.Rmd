@@ -98,8 +98,14 @@ biomassMeans <- biomassAnnual %>%
   )
 
 # calculate certainty equivalent (CE) and risk premium (RP) with profit, CV and risk aversion coefficient (taken from Rommel & Sagebiel et al., 2023)
-biomassMeans$CE <- biomassMeans$profit_mean * (1+(biomassMeans$CV)^2)^(-0.6)
-biomassMeans$RP <- biomassMeans$profit_mean - biomassMeans$CE
+r_RS <- 0.214
+gamma <- 1 - r_RS
+
+biomassMeans <- biomassMeans %>%
+  mutate(
+    CE = profit_mean * (1 + CV^2)^(-gamma/2),
+    RP = profit_mean - CE
+  )
 
 ```
 
@@ -173,6 +179,7 @@ synthDat$SOC_costs_hi <- (synthDat$SOC_costs_mid_20 - synthDat$SOC_costs_mid_02)
 
 # add up all the costs for total value
 synthDat$costs_total_mid <- synthDat$SOC_costs_mid + synthDat$leach_costs_mid + synthDat$profit_mean # + synthDat$insurance
+
 
 # save the synthesized dataset
 writexl::write_xlsx(synthDat, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF_final.xlsx")

@@ -42,7 +42,7 @@ synthDat <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Da
   filter(sowndiv < 60) %>%  #remove 60 species plots
   mutate(block = as.factor(block))
 
-synthDat$insurance_RP <- 49.4 - synthDat$RP
+
 
 ```
 

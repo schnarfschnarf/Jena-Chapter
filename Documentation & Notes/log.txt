@@ -696,33 +696,33 @@ BANK HOLIDAY
 - work in train from 14:30 to 17:30
 
 15.12.25
--
+- worked only for 1-2 ours, felt super weak and could not concentrate
 
 16.12.25
--
+- called in SICK
 
 17.12.25
--
+- SICK
 
 18.12.25
--
+- SICK
 
 19.12.25
-- Home office in Stuttgart
+- SICK
 -
 
 22.12.25
 - Home office in Tübingen
--
+- worked for 3 hours, reading emails and scanning the comments and feedback in the manuscript
 
 23.12.25
 - Home office in Tübingen
--
+- 
 
 24.12.25-04.01.26
 - Holidays :)
 
 
-After the holidays I will end this document here and start a journal in VSCode and with .pylab or rmd files
+After the holidays I will end this document here and start a journal in VSCode with .pylab or rmd files
 
 

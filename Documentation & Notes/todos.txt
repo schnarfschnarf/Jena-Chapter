@@ -14,6 +14,7 @@ Emphasize improved management to counteract grassland degradation.
 
 !) Finalize the figures
 	- wait until insurance evaluation is final and then update the figures accordingly
+	- probably replace the figures with non transformed x-axis --> More meaningful
 
 !) Finalize analysis 
 	- finalize this f***ing insurance analysis
@@ -24,7 +25,8 @@ Emphasize improved management to counteract grassland degradation.
 	- make clean equation for insurance calculation and explain insurance value, RP and CE (and their meaning)
 	- mention the term "transgressive overyielding" (look at Günay et al. 2013, on Mic Biomass)
 	- update the Nitrate leaching methods (measures probably only from 2003 and 2004)
-	- probably need to change soc unit to 1 Mg C·ha−1·yr−1
+	- check for consistent use of tense
+	- 
 
 DONE) redo the root analysis with excluding 30 - 40 cm layer
 

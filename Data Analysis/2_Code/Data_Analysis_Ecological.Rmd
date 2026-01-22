@@ -28,6 +28,7 @@ library(brms)
 library(performance)
 library(ggpmisc)
 library(ggpubr)
+library(BayesFactor)
 ```
 ## Set up a theme
 ```{r Theme}
@@ -231,7 +232,13 @@ joinedMF <- economicMF %>%
   left_join(ecologicalMF, by = "plotcode") 
 
 # Correlation between economic and ecological multifunctionality
-cor.test(joinedMF$multifunctionality, joinedMF$costs_total_mid)
+bf <- correlationBF(joinedMF$multifunctionality, joinedMF$costs_total_mid)
+
+post <- posterior(bf, iterations = 20000)
+rho_draws <- post[, "rho"]
+
+quantile(rho_draws, c(.025, .5, .975))
+mean(rho_draws)
 
 # plot the correlation
 corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
