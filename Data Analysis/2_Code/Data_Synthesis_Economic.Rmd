@@ -178,7 +178,7 @@ synthDat$SOC_costs_lo <- (synthDat$SOC_costs_mid_20 - synthDat$SOC_costs_mid_02)
 synthDat$SOC_costs_hi <- (synthDat$SOC_costs_mid_20 - synthDat$SOC_costs_mid_02) / 18 / 0.375 # price is 800€ per ton 
 
 # add up all the costs for total value
-synthDat$costs_total_mid <- synthDat$SOC_costs_mid + synthDat$leach_costs_mid + synthDat$profit_mean # + synthDat$insurance
+synthDat$costs_total_mid <- synthDat$SOC_costs_mid + synthDat$leach_costs_mid + synthDat$profit_mean
 
 
 # save the synthesized dataset

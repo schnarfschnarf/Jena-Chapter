@@ -88,6 +88,7 @@ Also single functions or just multifunctionality?
 fitMFsown <- brm(
   multifunctionality ~ log2(sowndiv) + (1|block),
   control = list(adapt_delta = 0.95),
+  iter = 3000,
  ecologicalMF)
 
 #check model assumptions
@@ -159,7 +160,6 @@ p_sown_mf <- ggplot() +
 
   # axis scaling
   scale_x_continuous(
-    trans  = "log2",
     breaks = c(1, 2, 4, 8, 16),
     labels = c(1, 2, 4, 8, 16),
     expand = expansion(mult = c(0.02, 0.02))
@@ -265,12 +265,12 @@ corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
     expand = expansion(mult = c(0.02, 0.02))
   ) +
   scale_y_continuous(
-    breaks = c(-1500, -750, 0, 750, 1500)
+    breaks = c(-1000, -500, 0, 500, 1000)
   ) +
   
   labs(
     x = "Ecological multifunctionality",
-    y = "Economic multifunctionality (€/ha/yr)"
+    y = expression("Economic multifunctionality; € ha"^{-1}*" yr"^{-1}*"")
   ) +
   
   coord_cartesian(clip = "off") +

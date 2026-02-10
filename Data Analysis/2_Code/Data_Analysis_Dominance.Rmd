@@ -53,7 +53,7 @@ dom_bio_2013 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2013.tab"), skip = 
 dom_bio_2014 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2014.tab"), skip = 33, show_col_types = FALSE)
 dom_bio_2015 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2015.tab"), skip = 33, show_col_types = FALSE)
 dom_bio_2017 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/dom_plantBiomass_2017/376_12_data.xlsx") %>% 
-  select(c(Plot, bm)) %>% 
+  dplyr::select(c(Plot, bm)) %>% 
   rename(`Experimental plot` = Plot, `Sown plant biom [g/m**2]` = bm)
 
 
@@ -82,9 +82,9 @@ SGMS <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/B
 # get the number of sown species
 design <- dom_bio_2005 %>%
   mutate(
-    sowndiv = apply(select(., 9:17), 1, function(x) sum(!is.na(x)))
+    sowndiv = apply(dplyr::select(., 9:17), 1, function(x) sum(!is.na(x)))
   ) %>%
-  select(`Experimental plot`, sowndiv) %>%
+  dplyr::select(`Experimental plot`, sowndiv) %>%
   distinct() %>% 
   rename_at('Experimental plot', ~'plotcode')
 
@@ -153,26 +153,168 @@ dom_bio_final <- dom_bio_a %>%
   )
 
 # calculate certainty equivalent (CE) and risk premium (RP) with profit, CV and risk aversion coefficient (taken from Rommel & Sagebiel et al., 2023)
-dom_bio_final$CE <- dom_bio_final$profit_mean * (1+(dom_bio_final$CV)^2)^(-0.6)
+r_RS <- 0.214
+gamma <- 1 - r_RS
+
+dom_bio_final$CE <- dom_bio_final$profit_mean * (1+(dom_bio_final$CV)^2)^(-gamma/2)
 dom_bio_final$RP <- dom_bio_final$profit_mean - dom_bio_final$CE
 
 # merge biomass data with design data
 dom_bio_final <- dom_bio_final %>% # merge the biomass and the realized SR data
   left_join(design, by = join_by(plotcode))
 
-# define quadratic relationship between biodiversity and insurance value
-  quad <- lm(CV ~ sowndiv + I(sowndiv^2), dom_bio_final)
+```
 
-  # calculate dCV/dSR
-  dCVdSR <- function(SR) {
-  c <- coef(quad)
-  c[2] + 2 * c[3] * SR
-}
+
+```{r}
+# calculating richness level means
+by_SR_dom <- dom_bio_final %>%
+  group_by(sowndiv) %>%
+  summarise(
+    mu_SR = mean(profit_mean, na.rm = TRUE),  # mean profit €/ha
+    CV_SR = mean(CV,           na.rm = TRUE), # mean CV of profit
+    RP_SR = mean(RP,           na.rm = TRUE), # mean risk premium €/ha
+    CE_SR = mean(CE,           na.rm = TRUE), # mean certainty equivalent €/ha
+    .groups = "drop"
+  )
+```
+
+```{r}
+# compare with baseline value
+SR0 <- min(by_SR_dom$sowndiv)   # or choose any other baseline
+
+RP0 <- by_SR_dom$RP_SR[by_SR_dom$sowndiv == SR0]
+CE0 <- by_SR_dom$CE_SR[by_SR_dom$sowndiv == SR0]
+
+by_SR_dom <- by_SR_dom %>%
+  mutate(
+    insurance_RP = RP0 - RP_SR,   # €/ha reduction in risk premium vs baseline
+    insurance_CE = CE_SR - CE0    # €/ha gain in certainty equivalent vs baseline
+  )
+
+```
+
+```{r}
+by_SR_dom_pub <- by_SR %>%
+  dplyr::select(
+    sowndiv,
+    mu_SR,
+    CV_SR,
+    RP_SR,
+    CE_SR,
+    insurance_RP,
+    insurance_CE
+  ) %>% 
+  left_join(insurance_post, by = join_by(sowndiv))
+
+
+write.csv(by_SR_pub, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/by_SR_publication.csv", row.names = FALSE)
+```
+
+
+```{r}
+# calculate uncertainties for plotting
+ins <- dom_bio_final %>%
+  dplyr::select(plotcode, sowndiv, RP)
+
+d0 <- min(ins$sowndiv)
+
+bb_insurance <- function(data, d0, n_draws = 4000) {
   
-  # insurance value like in Martin's code
-  dom_bio_final <- dom_bio_final %>% 
-    mutate(dCVdSR = dCVdSR(sowndiv),
-         insurance = sowndiv * dCVdSR * (-1))
+  richness_levels <- sort(unique(data$sowndiv))
+  
+  draws <- lapply(1:n_draws, function(i) {
+    
+    # weighted means per richness
+    rp_means <- sapply(richness_levels, function(d) {
+      rp_d <- data$RP[data$sowndiv == d]
+      w <- as.numeric(rdirichlet(1, rep(1, length(rp_d))))
+      sum(w * rp_d)
+    })
+    
+    names(rp_means) <- richness_levels
+    
+    tibble(
+      sowndiv = richness_levels,
+      insurance_RP = rp_means[as.character(d0)] - rp_means
+    )
+  })
+  
+  bind_rows(draws, .id = "draw")
+}
+
+# run model
+bb_draws <- bb_insurance(ins, d0)
+
+
+insurance_post <- bb_draws %>%
+  group_by(sowndiv) %>%
+  summarise(
+    mean = mean(insurance_RP),
+    lwr  = quantile(insurance_RP, 0.025),
+    upr  = quantile(insurance_RP, 0.975),
+    .groups = "drop"
+  )
+
+
+p_sown_insurance <- ggplot(
+  insurance_post,
+  aes(x = factor(sowndiv), y = mean)
+) +
+  
+  # points (matched aesthetics)
+  geom_point(
+    size   = 2.5,
+    shape  = 21,
+    fill   = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  
+  # credible intervals
+  geom_errorbar(
+    aes(ymin = lwr, ymax = upr),
+    width  = 0.15,
+    colour = "#004C70",
+    linewidth = 0.5
+  ) +
+  
+  # zero reference line
+  geom_hline(
+    yintercept = 0,
+    linetype   = "dashed",
+    colour     = "grey50",
+    linewidth  = 0.6
+  ) +
+  
+  scale_x_discrete(
+    limits = c("1", "2", "3", "4", "6", "9")
+  ) +
+  
+  labs(
+    x = "Sown plant species richness",
+    y = expression("Insurance value; € ha"^{-1}*" yr"^{-1}*"")
+  ) +
+  
+  coord_cartesian(clip = "off") +
+  
+  theme_custom() +
+  theme(
+    aspect.ratio = 0.6
+  )
+
+p_sown_insurance
+
+
+ggsave(
+  filename = "Fig_sown_insurance_dom.png",
+  plot     = p_sown_insurance,
+  width    = 8,     # in inches; adjust to Nature’s figure width
+  height   = 5,
+  units    = "in",
+  device   = "png",
+  dpi      = 300,
+  path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/")
 
 ```
 
@@ -286,7 +428,6 @@ p_Profit <- ggplot() +
   ) +
   # x-axis: log2 scale to match your modelling strategy
   scale_x_continuous(
-    trans  = "log2",
     breaks = c(1, 2, 3, 4, 6, 9),
     labels = c(1, 2, 3, 4, 6, 9),
     expand = expansion(mult = c(0.02, 0.02))
@@ -295,8 +436,8 @@ p_Profit <- ggplot() +
     breaks = c(100, 300, 500, 700)
   ) +
   labs(
-    x = "Sown plant diversity (species)",
-    y = "Profit (€/ha/yr)"
+    x = "Sown plant species richness",
+    y = expression("Profit; € ha"^{-1}*" yr"^{-1}*"")
   ) +
   coord_cartesian(clip = "off") +
   theme_custom() +
@@ -353,14 +494,13 @@ p_Corg <- ggplot() +
     alpha = 0.15
   ) +
   scale_x_continuous(
-    trans  = "log2",
     breaks = c(1, 2, 6, 9),
     labels = c(1, 2, 6, 9),
     expand = expansion(mult = c(0.02, 0.02))
   ) +
   labs(
-    x = "Sown plant diversity (species)",
-    y = "SOC benefit (€/ha/yr)"
+    x = "Sown plant species richness",
+    y = expression("Social value of SOC; € ha"^{-1}*" yr"^{-1}*"")
   ) +
   coord_cartesian(clip = "off") +
   theme_custom() +
@@ -387,7 +527,7 @@ ggsave(
 ### Create a 2-panel figure
 ```{r}
 # 2-panel dominance figure: (a) Profit, (b) SOC benefit
-fig_dominance <- p_Profit / p_Corg +
+fig_dominance <- p_Profit + p_Corg +
   plot_annotation(
     tag_levels = "a"   # -> a, b
   ) &
@@ -423,16 +563,16 @@ MainExp17 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_D
 MainExp17$Corg_val_diff <- MainExp17$SOC_diff * MainExp17$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 300
 
 dom_bio_final <- dom_bio_final %>% 
-  select(plotcode, sowndiv, profit_mean)
+  dplyr::select(plotcode, sowndiv, profit_mean)
 
-dom_soc_diff <- dom_soc_diff %>% select(plotcode, Corg_val_diff)
+dom_soc_diff <- dom_soc_diff %>% dplyr::select(plotcode, Corg_val_diff)
 
 dom_bio_final <- dom_bio_final %>% 
   left_join(dom_soc_diff, by = join_by(plotcode)) %>% 
   mutate(experiment = 'dom')
 
 MainExp17 <-  MainExp17 %>% 
-  select(plotcode, sowndiv, profit_mean, Corg_val_diff) %>% 
+  dplyr::select(plotcode, sowndiv, profit_mean, Corg_val_diff) %>% 
   mutate(experiment = 'main')
 
 MainDomDiff <- rbind(MainExp17, dom_bio_final)
@@ -511,14 +651,13 @@ p_profit_dif <- ggplot() +
 
   # Axes
   scale_x_continuous(
-    trans  = "log2",
     breaks = c(1, 2, 3, 4, 6, 8, 9, 16),
     labels = c(1, 2, 3, 4, 6, 8, 9, 16),
     expand = expansion(mult = c(0.02, 0.02))
   ) +
   labs(
-    x = "Sown plant diversity (species)",
-    y = "Expected profit (€/ha/yr)"
+    x = "Sown plant species richness",
+    y = expression("Profit; € ha"^{-1}*" yr"^{-1}*"")
   ) +
   coord_cartesian(clip = "off") +
   theme_custom() +
@@ -621,14 +760,13 @@ p_Corg_diff <- ggplot() +
 
   # axes
   scale_x_continuous(
-    trans  = "log2",
     breaks = c(1, 2, 3, 4, 6, 8, 9, 16),
     labels = c(1, 2, 3, 4, 6, 8, 9, 16),
     expand = expansion(mult = c(0.02, 0.02))
   ) +
   labs(
-    x = "Sown plant diversity (species)",
-    y = "SOC benefit (€/ha/yr)"
+    x = "Sown plant species richness",
+    y = expression("Social value of SOC; € ha"^{-1}*" yr"^{-1}*"")
   ) +
   coord_cartesian(clip = "off") +
   theme_custom() +
