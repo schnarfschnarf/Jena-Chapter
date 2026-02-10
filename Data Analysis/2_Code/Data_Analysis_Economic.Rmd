@@ -142,22 +142,22 @@ fitTotal <- brm(
     summary(fitTotal)
 
     
-# Total Costs (medium) against sown plant diversity
-fitTotalAdj <- brm(
-  costs_total_mid_adj ~ log2(sowndiv) + (1|block),
+# CE against sown plant diversity
+fitProfitAdj <- brm(
+  CE ~ log2(sowndiv) + (1|block),
   control = list(adapt_delta = 0.95),
   iter = 3000,
   synthDat)
 
     # check model assumptions
-    pp_check(fitTotalAdj, type="scatter_avg") 
-    pp_check(fitTotalAdj, ndraws=50)
-    check_model(fitTotalAdj, check="linearity") 
-    check_model(fitTotalAdj, check="homogeneity")
-    plot(fitTotal)
+    pp_check(fitProfitAdj, type="scatter_avg") 
+    pp_check(fitProfitAdj, ndraws=50)
+    check_model(fitProfitAdj, check="linearity") 
+    check_model(fitProfitAdj, check="homogeneity")
+    plot(fitProfitAdj)
     
     # check output of model
-    summary(fitTotalAdj)        
+    summary(fitProfitAdj)        
 ```
 
 #### &Realized diversity
