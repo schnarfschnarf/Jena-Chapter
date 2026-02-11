@@ -106,29 +106,25 @@ dom_bio_a <- dom_bio_a %>%
 dom_soc_diff <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/dom_SOC_2017/SOC17_dom.xlsx")  %>% 
   left_join(design, by = join_by(plotcode))
 
-# loead SOC and bulk density measures for 2002
+# load SOC and bulk density measures for 2002
 dom_soc_02 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/carbon02_dom.xlsx")
-
-# loead bulk density measures for 2017
-dom_bulk_17 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/dom_SOC_2017/bulk17_dom.xlsx")
 
 # join with dom_soc_diff table
 dom_soc_diff <- dom_soc_diff %>% 
-  left_join(dom_soc_02, by = "main_plot") %>% 
-  left_join(dom_bulk_17, by = "main_plot")
+  left_join(dom_soc_02, by = "main_plot") 
 
 # create a column with annual SOC gain/loss
 dom_soc_diff$Corg_diff <- (as.numeric(dom_soc_diff$Corg17) - dom_soc_diff$Corg02) / 15 
 
 # create a column with mid SOC value for beginning and end
 dom_soc_diff$Corg02_val <- dom_soc_diff$Corg02 * dom_soc_diff$Bulk02 * 0.3 * 10000 / 1000 * 3.66 * 300
-dom_soc_diff$Corg17_val <- as.numeric(dom_soc_diff$Corg17) * dom_soc_diff$dom17_bulk * 0.3 * 10000 / 1000 * 3.66 * 300
+dom_soc_diff$Corg17_val <- as.numeric(dom_soc_diff$Corg17) * dom_soc_diff$Bulk02 * 0.3 * 10000 / 1000 * 3.66 * 300
 
 # create a column with annual SOC-value gain/loss
 dom_soc_diff$Corg_val_diff <- (as.numeric(dom_soc_diff$Corg17_val) - dom_soc_diff$Corg02_val) / 15
 
 
-writexl::write_xlsx(dom_soc_diff, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/carbon+bulk_dominance_2002+2017.xlsx") 
+writexl::write_xlsx(dom_soc_diff, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/soc_dominance_2002+2017.xlsx") 
 ```
 
 
@@ -163,203 +159,7 @@ dom_bio_final$RP <- dom_bio_final$profit_mean - dom_bio_final$CE
 dom_bio_final <- dom_bio_final %>% # merge the biomass and the realized SR data
   left_join(design, by = join_by(plotcode))
 
-```
-
-
-```{r}
-# calculating richness level means
-by_SR_dom <- dom_bio_final %>%
-  group_by(sowndiv) %>%
-  summarise(
-    mu_SR = mean(profit_mean, na.rm = TRUE),  # mean profit €/ha
-    CV_SR = mean(CV,           na.rm = TRUE), # mean CV of profit
-    RP_SR = mean(RP,           na.rm = TRUE), # mean risk premium €/ha
-    CE_SR = mean(CE,           na.rm = TRUE), # mean certainty equivalent €/ha
-    .groups = "drop"
-  )
-```
-
-```{r}
-# compare with baseline value
-SR0 <- min(by_SR_dom$sowndiv)   # or choose any other baseline
-
-RP0 <- by_SR_dom$RP_SR[by_SR_dom$sowndiv == SR0]
-CE0 <- by_SR_dom$CE_SR[by_SR_dom$sowndiv == SR0]
-
-by_SR_dom <- by_SR_dom %>%
-  mutate(
-    insurance_RP = RP0 - RP_SR,   # €/ha reduction in risk premium vs baseline
-    insurance_CE = CE_SR - CE0    # €/ha gain in certainty equivalent vs baseline
-  )
-
-```
-
-```{r}
-by_SR_dom_pub <- by_SR %>%
-  dplyr::select(
-    sowndiv,
-    mu_SR,
-    CV_SR,
-    RP_SR,
-    CE_SR,
-    insurance_RP,
-    insurance_CE
-  ) %>% 
-  left_join(insurance_post, by = join_by(sowndiv))
-
-
-write.csv(by_SR_pub, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/by_SR_publication.csv", row.names = FALSE)
-```
-
-
-```{r}
-# calculate uncertainties for plotting
-ins <- dom_bio_final %>%
-  dplyr::select(plotcode, sowndiv, RP)
-
-d0 <- min(ins$sowndiv)
-
-bb_insurance <- function(data, d0, n_draws = 4000) {
-  
-  richness_levels <- sort(unique(data$sowndiv))
-  
-  draws <- lapply(1:n_draws, function(i) {
-    
-    # weighted means per richness
-    rp_means <- sapply(richness_levels, function(d) {
-      rp_d <- data$RP[data$sowndiv == d]
-      w <- as.numeric(rdirichlet(1, rep(1, length(rp_d))))
-      sum(w * rp_d)
-    })
-    
-    names(rp_means) <- richness_levels
-    
-    tibble(
-      sowndiv = richness_levels,
-      insurance_RP = rp_means[as.character(d0)] - rp_means
-    )
-  })
-  
-  bind_rows(draws, .id = "draw")
-}
-
-# run model
-bb_draws <- bb_insurance(ins, d0)
-
-
-insurance_post <- bb_draws %>%
-  group_by(sowndiv) %>%
-  summarise(
-    mean = mean(insurance_RP),
-    lwr  = quantile(insurance_RP, 0.025),
-    upr  = quantile(insurance_RP, 0.975),
-    .groups = "drop"
-  )
-
-
-p_sown_insurance <- ggplot(
-  insurance_post,
-  aes(x = factor(sowndiv), y = mean)
-) +
-  
-  # points (matched aesthetics)
-  geom_point(
-    size   = 2.5,
-    shape  = 21,
-    fill   = "#0072B2",
-    colour = "#004C70",
-    stroke = 0.4
-  ) +
-  
-  # credible intervals
-  geom_errorbar(
-    aes(ymin = lwr, ymax = upr),
-    width  = 0.15,
-    colour = "#004C70",
-    linewidth = 0.5
-  ) +
-  
-  # zero reference line
-  geom_hline(
-    yintercept = 0,
-    linetype   = "dashed",
-    colour     = "grey50",
-    linewidth  = 0.6
-  ) +
-  
-  scale_x_discrete(
-    limits = c("1", "2", "3", "4", "6", "9")
-  ) +
-  
-  labs(
-    x = "Sown plant species richness",
-    y = expression("Insurance value; € ha"^{-1}*" yr"^{-1}*"")
-  ) +
-  
-  coord_cartesian(clip = "off") +
-  
-  theme_custom() +
-  theme(
-    aspect.ratio = 0.6
-  )
-
-p_sown_insurance
-
-
-ggsave(
-  filename = "Fig_sown_insurance_dom.png",
-  plot     = p_sown_insurance,
-  width    = 8,     # in inches; adjust to Nature’s figure width
-  height   = 5,
-  units    = "in",
-  device   = "png",
-  dpi      = 300,
-  path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/")
-
-```
-
-
-## Descriptive plots
-```{r Descriptive plots}
-# check the relationship between diversity and productivity
-ggplot2::ggplot(dom_bio_final,
-                aes(x = sowndiv, y = profit_mean)
-                ) +
-  geom_point(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-  labs(
-    x = "Sown Plant Diversity",
-    y = "Expected Profit (€/ha/year)") +
-  scale_x_continuous(breaks = c(1,2,3, 4,6,9))
-
-
-# check the relationship between CV and productivity
-ggplot2::ggplot(dom_bio_final,
-                aes(x = sowndiv, y = insurance)
-                ) +
-  geom_point(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-  labs(
-    x = "Species Diversity",
-    y = "Stability") +
-  scale_x_continuous(breaks = c(1,2,3, 4,6,9))
-
-# check the relationship between plot-aggregated-SOC and sowndiv
-ggplot2::ggplot(dom_soc_diff,
-                aes(x = sowndiv, y = Corg_val_diff)
-                ) +
-  geom_point(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-  labs(
-    x = "Species Diversity",
-    y = "Difference in SOC plotwise")  +
-  scale_x_continuous(breaks = c(1,2,3, 4,6,9))
+writexl::write_xlsx(dom_bio_final, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/dominance_mean_biomass_profit_2002_to_2017.xlsx") 
 
 ```
 
@@ -437,13 +237,10 @@ p_Profit <- ggplot() +
   ) +
   labs(
     x = "Sown plant species richness",
-    y = expression("Profit; € ha"^{-1}*" yr"^{-1}*"")
+    y = expression(
+  "Profit (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")")
   ) +
-  coord_cartesian(clip = "off") +
-  theme_custom() +
-  theme(
-    aspect.ratio = 0.6
-  )
+  theme_custom()
 
 p_Profit
 
@@ -454,7 +251,7 @@ ggsave(
   device   = "png",
   path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
   dpi      = 300,
-  width    = 8,
+  width    = 7,
   height   = 5,
   units    = "in"
 )
@@ -500,13 +297,13 @@ p_Corg <- ggplot() +
   ) +
   labs(
     x = "Sown plant species richness",
-    y = expression("Social value of SOC; € ha"^{-1}*" yr"^{-1}*"")
+y = expression(
+  atop(
+    "Social value of",
+    "SOC (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")")
+    )
   ) +
-  coord_cartesian(clip = "off") +
-  theme_custom() +
-  theme(
-    aspect.ratio = 0.6
-  )
+  theme_custom()
 
 p_Corg
 
@@ -517,7 +314,7 @@ ggsave(
   device   = "png",
   path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
   dpi      = 300,
-  width    = 8,
+  width    = 7,
   height   = 5,
   units    = "in"
 )
@@ -526,18 +323,22 @@ ggsave(
 
 ### Create a 2-panel figure
 ```{r}
-# 2-panel dominance figure: (a) Profit, (b) SOC benefit
-fig_dominance <- p_Profit + p_Corg +
-  plot_annotation(
-    tag_levels = "a"   # -> a, b
-  ) &
+
+fig_dominance <- (p_Profit + p_Corg) +
+  plot_annotation(tag_levels = "a") &
   theme(
+    # tags inside top-left, slightly nudged right
+    plot.tag.position = c(0.06, 0.98),
     plot.tag = element_text(
       face = "bold",
-      size = 14,
-      hjust = -0.2,
-      vjust = 1.5
-    )
+      size = 12,   # match your other figure
+      hjust = 0,
+      vjust = 1
+    ),
+
+    # keep spacing compact and consistent
+    axis.title.y = element_text(margin = margin(r = 2)),
+    plot.margin = margin(2, 2, 2, 2)
   )
 
 fig_dominance
@@ -546,8 +347,8 @@ fig_dominance
 ggsave(
   filename = "Fig_dominance_profit_SOC.png",
   plot     = fig_dominance,
-  width    = 10,   # a bit wider since it’s 2 panels side-by-side
-  height   = 5,
+  width    = 6.5, 
+  height   = 3.8,
   units    = "in",
   dpi      = 300,
   device   = "png",
@@ -613,13 +414,14 @@ p_profit_dif <- ggplot() +
     stroke = 0.3
   ) +
   scale_fill_manual(
-    values = c(
-      "main" = "#0072B2",  # blue
-      "dom"  = "#D55E00"   # orange
-    ),
-    name = "Experiment",
-    labels = c("Main experiment", "Dominance experiment")
-  ) +
+  values = c(
+    "main" = "#0072B2",
+    "dom"  = "#D55E00"
+  ),
+  breaks = c("main", "dom"),  # <- controls legend order
+  name = "Experiment",
+  labels = c("Main experiment", "Dominance experiment")
+) +
 
   # Dominance model (orange)
   geom_ribbon(
@@ -657,12 +459,10 @@ p_profit_dif <- ggplot() +
   ) +
   labs(
     x = "Sown plant species richness",
-    y = expression("Profit; € ha"^{-1}*" yr"^{-1}*"")
+    y = expression(Profit ~ "(" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")")
   ) +
-  coord_cartesian(clip = "off") +
   theme_custom() +
   theme(
-    aspect.ratio     = 0.6,
     legend.position  = "bottom",
     legend.title     = element_text(size = 12),
     legend.text      = element_text(size = 11),
@@ -679,8 +479,8 @@ ggsave(
   device   = "png",
   path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
   dpi      = 300,
-  width    = 8,
-  height   = 5,
+  width    = 5.9,
+  height   = 4.5,
   units    = "in"
 )
 
@@ -721,14 +521,15 @@ p_Corg_diff <- ggplot() +
     colour = "black",
     stroke = 0.3
   ) +
-  scale_fill_manual(
-    values = c(
-      "main" = "#0072B2",  # blue
-      "dom"  = "#D55E00"   # orange
-    ),
-    name   = "Experiment",
-    labels = c("Main experiment", "Dominance experiment")
-  ) +
+ scale_fill_manual(
+  values = c(
+    "main" = "#0072B2",
+    "dom"  = "#D55E00"
+  ),
+  breaks = c("main", "dom"),  # <- controls legend order
+  name = "Experiment",
+  labels = c("Main experiment", "Dominance experiment")
+) +
 
   # Main experiment model (blue)
   geom_ribbon(
@@ -766,12 +567,12 @@ p_Corg_diff <- ggplot() +
   ) +
   labs(
     x = "Sown plant species richness",
-    y = expression("Social value of SOC; € ha"^{-1}*" yr"^{-1}*"")
+    y = expression(
+    "Social value of SOC (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+  )
   ) +
-  coord_cartesian(clip = "off") +
   theme_custom() +
   theme(
-    aspect.ratio     = 0.6,
     legend.position  = "bottom",
     legend.title     = element_text(size = 12),
     legend.text      = element_text(size = 11),
@@ -788,8 +589,8 @@ ggsave(
   device   = "png",
   path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
   dpi      = 300,
-  width    = 8,
-  height   = 5,
+  width    = 5.9,
+  height   = 4.5,
   units    = "in"
 )
 

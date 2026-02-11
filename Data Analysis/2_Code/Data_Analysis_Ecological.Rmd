@@ -51,37 +51,6 @@ economicMF$plotcode <- as.factor(economicMF$plotcode)
 
 ```
 
-## Plot the densities of the data
-```{r Densities}
-# check distribution of multifunctionality
-ggplot2::ggplot(ecologicalMF,
-                aes(x = multifunctionality)
-                ) +
-  geom_density(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-  labs(
-    x = "Ecological Multifunctionality",
-    y = "Density"
-  ) +
-  expand_limits(x = 0, y = 0)
-
-# check the distribution of realized SR
-ggplot2::ggplot(ecologicalMF,
-                aes(x = meanSR)
-                ) +
-  geom_density(
-    fill = "#28a87d",
-    alpha = .5
-  ) +
-  labs(
-    x = "Mean Realized Plant Diversity",
-    y = "Density"
-  ) 
-
-```
-
 ## Statistical Models 
 Also single functions or just multifunctionality?
 ```{r MF ~ sowndiv}
@@ -166,15 +135,10 @@ p_sown_mf <- ggplot() +
   ) +
   
   labs(
-    x = "Sown plant diversity (species)",
+    x = "Sown plant species diversity",
     y = "Ecological multifunctionality"
   ) +
-  
-  coord_cartesian(clip = "off") +
-  theme_custom() +
-  theme(
-    aspect.ratio = 0.6
-  )
+  theme_custom() 
 
 p_sown_mf
 
@@ -182,8 +146,8 @@ p_sown_mf
 ggsave(
   filename = "EcologicalMF_sown.png",
   plot     = p_sown_mf,
-  width    = 8,     # in inches; adjust to Nature’s figure width
-  height   = 5,
+  width    = 5.9,
+  height   = 4.5,
   units    = "in",
   device   = "png",
   dpi      = 300,
@@ -270,14 +234,10 @@ corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
   
   labs(
     x = "Ecological multifunctionality",
-    y = expression("Economic multifunctionality; € ha"^{-1}*" yr"^{-1}*"")
+    y = expression(
+  "EMF (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")")
   ) +
-  
-  coord_cartesian(clip = "off") +
-  theme_custom() +
-  theme(
-    aspect.ratio = 0.7
-  )
+  theme_custom()
 
 corrPlot
 
@@ -288,9 +248,38 @@ ggsave(
   device   = "png",
   path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
   dpi      = 300,
-  width    = 7,
+  width    = 6.27,
   height   = 5,
   units    = "in"
+)
+
+
+# create two panel plot with economic MF
+fig_MF_and_corr <- (
+  p_sown_total /
+  plot_spacer() /
+  corrPlot
+) +
+  plot_layout(heights = c(1, 0.09, 1)) +
+  plot_annotation(tag_levels = "a") &
+  theme(
+    plot.tag.position = c(0.08, 0.98),
+    plot.tag = element_text(face = "bold", hjust = 0, vjust = 1),
+    axis.title.y = element_text(margin = margin(r = 2)),
+    plot.margin = margin(10, 15, 10, 15)
+  )
+
+fig_MF_and_corr
+
+ggsave(
+  filename = "Fig_MF_and_corr.png",
+  plot     = fig_MF_and_corr,
+  width    = 5.9,
+  height   = 6.6,
+  units    = "in",
+  dpi      = 300,
+  device   = ragg::agg_png,
+  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/"
 )
 
 ```

@@ -28,6 +28,7 @@ library(patchwork)
 library(brms)
 library(performance)
 library(ggpmisc)
+library(stringr)
 ```
 
 ## Theme Custom
@@ -105,24 +106,6 @@ fitLeach <- brm(
     # check output of model
     summary(fitLeach)
 
-# Insurance value against sown plant diversity
-fitInsurance <- brm(
-  CE ~log2(sowndiv) + (1|block),
-  control = list(adapt_delta = 0.95),
-  iter = 3000,
-  synthDat
-)    
-    
-    # check model assumptions
-    pp_check(fitInsurance, type="scatter_avg") 
-    pp_check(fitInsurance, ndraws=50)
-    check_model(fitInsurance, check="linearity") 
-    check_model(fitInsurance, check="homogeneity")
-    plot(fitInsurance)
-    
-    #check model output
-    summary(fitInsurance)
-    
     
 # Total Costs (medium) against sown plant diversity
 fitTotal <- brm(
@@ -141,23 +124,53 @@ fitTotal <- brm(
     # check output of model
     summary(fitTotal)
 
-    
-# CE against sown plant diversity
-fitProfitAdj <- brm(
-  CE ~ log2(sowndiv) + (1|block),
-  control = list(adapt_delta = 0.95),
-  iter = 3000,
-  synthDat)
+
+# define model for RP ~ sowndiv
+fitRP <- brm(RP ~ log2(sowndiv) + (1|block),
+             control = list(adapt_delta = 0.95),
+             iter = 3000,
+             data = synthDat)
 
     # check model assumptions
-    pp_check(fitProfitAdj, type="scatter_avg") 
-    pp_check(fitProfitAdj, ndraws=50)
-    check_model(fitProfitAdj, check="linearity") 
-    check_model(fitProfitAdj, check="homogeneity")
-    plot(fitProfitAdj)
+    pp_check(fitRP, type="scatter_avg") 
+    pp_check(fitRP, ndraws=50)
+    check_model(fitRP, check="linearity") 
+    check_model(fitRP, check="homogeneity")
+    plot(fitRP)
     
     # check output of model
-    summary(fitProfitAdj)        
+    summary(fitRP)
+
+# calculate effect size of insurance
+post <- as_draws_df(fitRP)
+
+insurance_draws <- -post$b_log2sowndiv
+
+insurance_summary <- tibble(
+  mean = mean(insurance_draws),
+  lwr  = quantile(insurance_draws, 0.025),
+  upr  = quantile(insurance_draws, 0.975)
+)
+
+insurance_summary
+    
+    
+# CE against sown plant diversity
+#fitProfitAdj <- brm(
+#  CE ~ log2(sowndiv) + (1|block),
+#  control = list(adapt_delta = 0.95),
+#  iter = 3000,
+#  synthDat)
+
+    # check model assumptions
+#    pp_check(fitProfitAdj, type="scatter_avg") 
+#    pp_check(fitProfitAdj, ndraws=50)
+#    check_model(fitProfitAdj, check="linearity") 
+#    check_model(fitProfitAdj, check="homogeneity")
+#    plot(fitProfitAdj)
+    
+    # check output of model
+#    summary(fitProfitAdj)        
 ```
 
 #### &Realized diversity
@@ -213,24 +226,36 @@ fitLeachReal <- brm(
     # check output of model
     summary(fitLeachReal)
 
-# Insurance against species richness - including monocultures
-fitInsuranceReal <- brm(
-  CE ~ log2(meanSR) + (1|block),
-  control = list(adapt_delta = 0.95),
-  iter = 3000,
-  synthDat)
+# Risk premium against realized diversity
+fitRPreal <- brm(RP ~ log2(sowndiv) + (1|block),
+             control = list(adapt_delta = 0.95),
+             iter = 3000,
+             data = synthDat)
 
     # check model assumptions
-    pp_check(fitInsuranceReal, type="scatter_avg") 
-    pp_check(fitInsuranceReal, ndraws=50)
-    check_model(fitInsuranceReal, check="linearity") 
-    check_model(fitInsuranceReal, check="homogeneity")
-    plot(fitInsuranceReal)
+    pp_check(fitRPreal, type="scatter_avg") 
+    pp_check(fitRPreal, ndraws=50)
+    check_model(fitRPreal, check="linearity") 
+    check_model(fitRPreal, check="homogeneity")
+    plot(fitRPreal)
     
     # check output of model
-    summary(fitInsuranceReal)        
+    summary(fitRPreal)
 
-# Total Costs against mean realized species richness - including monocultures
+# calculate effect size of insurance
+post_real <- as_draws_df(fitRPreal)
+
+insurance_draws_real <- -post_real$b_log2sowndiv
+
+insurance_summary_real <- tibble(
+  mean = mean(insurance_draws_real),
+  lwr  = quantile(insurance_draws_real, 0.025),
+  upr  = quantile(insurance_draws_real, 0.975)
+)
+
+insurance_summary       
+
+# Total Costs against mean realized species richness
 fitTotalReal <- brm(
   costs_total_mid ~ log2(meanSR) + (1|block),
   control = list(adapt_delta = 0.95),
@@ -247,23 +272,6 @@ fitTotalReal <- brm(
     # check output of model
     summary(fitTotalReal)
 
-# Total risk-adjusted costs against mean realized species richness - including monocultures
-fitTotalRealAdj <- brm(
-  costs_total_mid_adj ~ log2(meanSR) + (1|block),
-  control = list(adapt_delta = 0.95),
-  iter = 3000,
-  synthDat)
-
-    # check model assumptions
-    pp_check(fitTotalRealAdj, type="scatter_avg") 
-    pp_check(fitTotalRealAdj, ndraws=50)
-    check_model(fitTotalRealAdj, check="linearity") 
-    check_model(fitTotalRealAdj, check="homogeneity")
-    plot(fitTotalRealAdj)
-    
-    # check output of model
-    summary(fitTotalRealAdj)    
-    
 
 ```
 
@@ -306,9 +314,10 @@ p_sown_Profit <- ggplot() +
   ) +
   labs(
     x = "Sown plant species richness",
-    y = expression("Profit; € ha"^{-1}*" yr"^{-1}*"")
+    y = expression(
+  "Profit (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+)
   ) +
-  coord_cartesian(clip = "off") +
   theme_custom() +
   theme(
     aspect.ratio = 0.6   # width:height ~ 1 : 0.6 (tweak to taste)
@@ -369,13 +378,14 @@ p_sown_soc <- ggplot() +
   ) +
   labs(
     x = "Sown plant species richness",
-    y = expression("Social value of SOC; € ha"^{-1}*" yr"^{-1}*"")
-  ) +
-  coord_cartesian(clip = "off") +
-  theme_custom() +
-  theme(
-    aspect.ratio = 0.6   # width:height ~ 1 : 0.6, matching Fig_sown_profit
+y = expression(
+  atop(
+    "Social value of",
+    "SOC (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
   )
+)
+  ) +
+  theme_custom()
 
 p_sown_soc
 
@@ -385,7 +395,7 @@ ggsave(
   device   = "png",
   path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
   dpi      = 300,
-  width    = 8,
+  width    = 6.27,
   height   = 5,
   units    = "in"
 )
@@ -434,9 +444,13 @@ p_sown_leach <- ggplot() +
   ) +
   labs(
     x = "Sown plant species richness",
-    y = expression("Social costs of nitrate leaching; € ha"^{-1}*" yr"^{-1}*"")
+y = expression(
+  atop(
+    "Social costs of",
+    NO[3] * "\u2013N leaching (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+  )
+)
   ) +
-  coord_cartesian(clip = "off") +
   theme_custom() +
   theme(
     aspect.ratio = 0.6
@@ -457,36 +471,33 @@ ggsave(
 
 ```
 
-```{r Plot sown diversity - CE}
+```{r Plot sown diversity - RP}
 #Insurance value and sown diversity
-c_sown_insurance <- conditional_effects(fitInsurance)
-plot_sown_insurance_data <- c_sown_insurance[[1]]
-  
-# Insurance value ~ sown diversity
-p_sown_insurance <- ggplot() +
-  # raw data
+c_sown_rp <- conditional_effects(fitRP)
+plot_sown_rp_data <- c_sown_rp[[1]]
+
+p_sown_rp <- ggplot() +
   geom_point(
-    data = synthDat,
-    aes(x = sowndiv, y = CE),
-    alpha = 0.5,
-    size  = 2,
-    shape = 21,
-    fill  = "#0072B2",
+    data   = synthDat,
+    aes(x  = sowndiv, y = RP),
+    alpha  = 0.5,
+    size   = 2,
+    shape  = 21,
+    fill   = "#0072B2",
     colour = "#004C70",
-    stroke = 0.4
+    stroke = 0.4,
+    position = position_jitter(width = 0.12, height = 0)
   ) +
-  # model-estimated effect
   geom_line(
-    data = plot_sown_insurance_data,
-    aes(x = sowndiv, y = estimate__),
-    colour = "#0072B2",
+    data     = plot_sown_rp_data,
+    aes(x    = 2^log2(sowndiv), y = estimate__),
+    colour   = "#0072B2",
     linewidth = 0.8
   ) +
-  # credible interval ribbon
   geom_ribbon(
-    data = plot_sown_insurance_data,
-    aes(x = sowndiv, ymin = lower__, ymax = upper__),
-    fill = "#0072B2",
+    data  = plot_sown_rp_data,
+    aes(x = 2^log2(sowndiv), ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
     alpha = 0.15
   ) +
   scale_x_continuous(
@@ -496,25 +507,25 @@ p_sown_insurance <- ggplot() +
   ) +
   labs(
     x = "Sown plant species richness",
-    y = expression("Risk-adjusted profit; € ha"^{-1}*" yr"^{-1}*"")
-  ) +
-  coord_cartesian(clip = "off") +
-  theme_custom() +
-  theme(
-    aspect.ratio = 0.6
-  )
+    y = expression(
+  "Risk premium (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+)
 
-p_sown_insurance
+  ) +
+  theme_custom() +
+  theme(aspect.ratio = 0.6)
+
+p_sown_rp
 
 ggsave(
-  filename = "fig_CE_sown.png",
-  plot     = p_sown_insurance,
-  device   = "png",
-  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-  dpi      = 300,
-  width    = 8,
+  filename = "Fig_sown_RP.png",
+  plot     = p_sown_rp,
+  width    = 8,     # in inches; adjust to Nature’s figure width
   height   = 5,
-  units    = "in"
+  units    = "in",
+  device   = "png",
+  dpi      = 300,
+  path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/" 
 )
 
 ```
@@ -562,13 +573,11 @@ p_sown_total <- ggplot() +
   ) +
   labs(
     x = "Sown plant species richness",
-    y = expression("Economic multifunctionality; € ha"^{-1}*" yr"^{-1}*"")
+y = expression(
+  "EMF (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+)
   ) +
-  coord_cartesian(clip = "off") +
-  theme_custom() +
-  theme(
-    aspect.ratio = 0.6
-  )
+  theme_custom()
 
 p_sown_total
 
@@ -578,7 +587,7 @@ ggsave(
   device   = "png",
   path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
   dpi      = 300,
-  width    = 8,
+  width    = 6.27,
   height   = 5,
   units    = "in"
 )
@@ -588,66 +597,66 @@ ggsave(
 
 ```{r Plot sown diversity - Risk-adjusted Economic MF}
 #economic MF and sown diversity
-c_sown_total_adj <- conditional_effects(fitTotalAdj)
-plot_sown_total_adj_data <- c_sown_total_adj[[1]]
+#c_sown_total_adj <- conditional_effects(fitTotalAdj)
+#plot_sown_total_adj_data <- c_sown_total_adj[[1]]
   
 # Economic multifunctionality ~ sown diversity
-p_sown_total_adj <- ggplot() +
+#p_sown_total_adj <- ggplot() +
   # raw data
-  geom_point(
-    data = synthDat,
-    aes(x = sowndiv, y = costs_total_mid_adj),
-    alpha = 0.5,
-    size  = 2,
-    shape = 21,
-    fill  = "#0072B2",
-    colour = "#004C70",
-    stroke = 0.4
-  ) +
+#  geom_point(
+#    data = synthDat,
+#    aes(x = sowndiv, y = costs_total_mid_adj),
+#    alpha = 0.5,
+#    size  = 2,
+#    shape = 21,
+#    fill  = "#0072B2",
+#    colour = "#004C70",
+#    stroke = 0.4
+#  ) +
   # model line
-  geom_line(
-    data = plot_sown_total_adj_data,
-    aes(x = sowndiv, y = estimate__),
-    colour = "#0072B2",
-    linewidth = 0.8
-  ) +
-  # credible interval ribbon
-  geom_ribbon(
-    data = plot_sown_total_adj_data,
-    aes(x = sowndiv, ymin = lower__, ymax = upper__),
-    fill  = "#0072B2",
-    alpha = 0.15
-  ) +
-  scale_x_continuous(
-    breaks = c(1, 2, 4, 8, 16),
-    labels = c(1, 2, 4, 8, 16),
-    expand = expansion(mult = c(0.02, 0.02))
-  ) +
-  scale_y_continuous(
-    breaks = c(-1500, -1000, -500, 0, 500, 1000)
-  ) +
-  labs(
-    x = "Sown plant species richness",
-    y = expression("Risk-adjusted economic multifunctionality; € ha"^{-1}*" yr"^{-1}*"")
-  ) +
-  coord_cartesian(clip = "off") +
-  theme_custom() +
-  theme(
-    aspect.ratio = 0.6
-  )
+#  geom_line(
+#    data = plot_sown_total_adj_data,
+#    aes(x = sowndiv, y = estimate__),
+#    colour = "#0072B2",
+#    linewidth = 0.8
+#  ) +
+#  # credible interval ribbon
+#  geom_ribbon(
+#    data = plot_sown_total_adj_data,
+#    aes(x = sowndiv, ymin = lower__, ymax = upper__),
+#    fill  = "#0072B2",
+#    alpha = 0.15
+#  ) +
+#  scale_x_continuous(
+#    breaks = c(1, 2, 4, 8, 16),
+#    labels = c(1, 2, 4, 8, 16),
+#    expand = expansion(mult = c(0.02, 0.02))
+#  ) +
+#  scale_y_continuous(
+#    breaks = c(-1500, -1000, -500, 0, 500, 1000)
+#  ) +
+#  labs(
+#    x = "Sown plant species richness",
+#    y = expression("Risk-adjusted economic multifunctionality; € ha"^{-1}*" yr"^{-1}*"")
+#  ) +
+#coord_cartesian(clip = "off") +
+#  theme_custom() +
+#  theme(
+#    aspect.ratio = 0.6
+#  )
 
-p_sown_total_adj
+#p_sown_total_adj
 
-ggsave(
-  filename = "fig_total_sown_adj.png",
-  plot     = p_sown_total_adj,
-  device   = "png",
-  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-  dpi      = 300,
-  width    = 8,
-  height   = 5,
-  units    = "in"
-)
+#ggsave(
+#  filename = "fig_total_sown_adj.png",
+#  plot     = p_sown_total_adj,
+#  device   = "png",
+#  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+#  dpi      = 300,
+#  width    = 8,
+#  height   = 5,
+#  units    = "in"
+#)
 
 
 ```
@@ -660,7 +669,7 @@ fig_sown_all <- (
   p_sown_soc
 ) / (
   p_sown_leach +
-  p_sown_insurance
+  p_sown_rp
 ) +
   plot_annotation(
     tag_levels = "a"
@@ -668,7 +677,7 @@ fig_sown_all <- (
   theme(
     plot.tag = element_text(
       face = "bold",
-      size = 14,
+      size = 12,
       hjust = -0.2,
       vjust = 1.5
     )
@@ -680,7 +689,7 @@ ggsave(
   filename = "Fig_sown_multifunctionality.png",
   plot     = fig_sown_all,
   width    = 8,
-  height   = 8,
+  height   = 5,
   units    = "in",
   dpi      = 300,
   device   = "png",
@@ -768,7 +777,7 @@ raw_sown_total_all <- synthDat %>%
   )
 
 # Plot without raw data points
-p_sown_total <- ggplot() +
+p_sown_total_sens <- ggplot() +
   
   # horizontal reference line at y = 0
   geom_hline(
@@ -825,13 +834,14 @@ p_sown_total <- ggplot() +
   # labels
   labs(
     x = "Sown plant species richness",
-    y = expression("Economic multifunctionality; ha"^{-1}*" yr"^{-1}*"")
+    y = expression(
+  "Economic multifunctionality (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+)
+
   ) +
   
-  coord_cartesian(clip = "off") +
   theme_custom() +
   theme(
-    aspect.ratio     = 0.6,
     legend.position  = "bottom",
     legend.direction = "horizontal",
     legend.box       = "horizontal",
@@ -840,16 +850,16 @@ p_sown_total <- ggplot() +
     legend.spacing.x = unit(4, "pt")
   )
 
-p_sown_total
+p_sown_total_sens
 
 ggsave(
   filename = "total_sown_different_pricing.png",
-  plot     = p_sown_total,
+  plot     = p_sown_total_sens,
   device   = "png",
   path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
   dpi      = 300,
-  width    = 8,
-  height   = 5,
+  width    = 5.9,
+  height   = 4.5,
   units    = "in"
 )
 
@@ -897,7 +907,10 @@ p_real_profit_all <- ggplot() +
   # labels
   labs(
     x = "Realized plant species richness",
-    y = expression("Profit; € ha"^{-1}*" yr"^{-1}*"")
+    y = expression(atop(
+        "Profit (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+)
+)
   ) +
   
   coord_cartesian(clip = "off") +
@@ -958,7 +971,12 @@ p_real_soc_all <- ggplot() +
   ) +
   labs(
     x = "Realized plant species richness",
-    y = expression("Social value of SOC; € ha"^{-1}*" yr"^{-1}*"")
+y = expression(
+  atop(
+    "Social value of",
+    "SOC (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+  )
+)
   ) +
   coord_cartesian(clip = "off") +
   theme_custom() +
@@ -1016,7 +1034,12 @@ p_real_leach_all <- ggplot() +
   ) +  
   labs(
     x = "Realized plant species richness",
-    y = expression("Social costs of nitrate leaching; € ha"^{-1}*" yr"^{-1}*"")
+y = expression(
+  atop(
+    "Social costs of",
+    NO[3] * "\u2013N leaching (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+  )
+)
   ) +
   coord_cartesian(clip = "off") +
   theme_custom() +
@@ -1038,71 +1061,86 @@ ggsave(
 ```
 
 
-```{r Plot Realized SR - Insurance}
-# Insurance value without monocultures and realised diversity
-c_real_insurance_all <- conditional_effects(fitInsuranceReal)
-plot_real_insurance_all_data <- c_real_insurance_all[[1]]
+```{r Plot realized diversity - RP}
+#Insurance value and sown diversity
+c_real_rp <- conditional_effects(fitRPreal)
+plot_real_rp_data <- c_real_rp[[1]]
 
-p_real_insurance_all <- ggplot() +
+
+p_real_rp <- ggplot() +
   geom_point(
     data   = synthDat,
-    aes(x  = meanSR, y = CE),
+    aes(x  = sowndiv, y = RP),
     alpha  = 0.5,
     size   = 2,
     shape  = 21,
     fill   = "#0072B2",
     colour = "#004C70",
-    stroke = 0.4
+    stroke = 0.4,
+    position = position_jitter(width = 0.12, height = 0)
   ) +
-  # model-estimated effect
   geom_line(
-    data = plot_real_insurance_all_data,
-    aes(x = meanSR, y = estimate__),
-    colour = "#0072B2",
+    data     = plot_sown_rp_data,
+    aes(x    = 2^log2(sowndiv), y = estimate__),
+    colour   = "#0072B2",
     linewidth = 0.8
   ) +
-  # credible interval ribbon
   geom_ribbon(
-    data = plot_real_insurance_all_data,
-    aes(x = meanSR, ymin = lower__, ymax = upper__),
-    fill = "#0072B2",
+    data  = plot_sown_rp_data,
+    aes(x = 2^log2(sowndiv), ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
     alpha = 0.15
   ) +
   scale_x_continuous(
+    breaks = c(1, 2, 4, 8, 16),
+    labels = c(1, 2, 4, 8, 16),
     expand = expansion(mult = c(0.02, 0.02))
   ) +
   labs(
-    x = "Realized plant species richness",
-    y = expression("Risk-adjusted profit; € ha"^{-1}*" yr"^{-1}*"")
+    x = "Sown plant species richness",
+y = expression(atop(
+  "Risk premium (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+)
+)
   ) +
   coord_cartesian(clip = "off") +
   theme_custom() +
   theme(aspect.ratio = 0.6)
 
-
-p_real_insurance_all
+p_real_rp
 
 ggsave(
-  filename = "Fig_CE_real.png",
-  plot     = p_real_insurance_all,
-  device   = "png",
-  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-  dpi      = 300,
-  width    = 8,
+  filename = "Fig_real_RP.png",
+  plot     = p_real_rp,
+  width    = 8,     # in inches; adjust to Nature’s figure width
   height   = 5,
-  units    = "in"
+  units    = "in",
+  device   = "png",
+  dpi      = 300,
+  path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/" 
 )
 
 ```
+
 
 ```{r Plot Realized SR - Multi-panel-PLot}
 p_services_real <- (
   p_real_profit_all + p_real_soc_all
 ) /
 (
-  p_real_leach_all + p_real_insurance_all
+  p_real_leach_all + p_real_rp
 ) +
-  plot_annotation(tag_levels = "a")
+  plot_annotation(tag_levels = "a") &
+  theme(
+    plot.tag = element_text(
+      face = "bold",
+      size = 12,
+      hjust = -0.2,
+      vjust = 1.5
+    )
+  )
+
+p_services_real
 
 ggsave(
   filename = "Single_Services_real.png",
@@ -1111,7 +1149,7 @@ ggsave(
   path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
   dpi      = 300,
   width    = 8,
-  height   = 8,
+  height   = 5,
   units    = "in"
 )
 
@@ -1156,7 +1194,10 @@ p_real_total <- ggplot() +
   ) +
   labs(
     x = "Realized plant species richness",
-    y = expression("Economic multifunctionality; € ha"^{-1}*" yr"^{-1}*"")
+y = expression(
+  "Economic multifunctionality (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+)
+
   ) +
   coord_cartesian(clip = "off") +
   theme_custom() +
@@ -1179,136 +1220,6 @@ ggsave(
 
 
 ```
-
-
-```{r Plot Realized SR - Economic MF}
-# Economic MF and realised diversity
-c_real_total <- conditional_effects(fitTotalReal)
-plot_real_total_data <- c_real_total[[1]]
-
-# Economic MF (total costs) vs mean realised diversity
-
-p_real_total <- ggplot() +
-  # raw data
-  geom_point(
-    data   = synthDat,
-    aes(x  = meanSR, y = costs_total_mid),
-    alpha  = 0.5,
-    size   = 2,
-    shape  = 21,
-    fill   = "#0072B2",
-    colour = "#004C70",
-    stroke = 0.4
-  ) +
-  # model-estimated effect
-  geom_line(
-    data     = plot_real_total_data,
-    aes(x    = meanSR, y = estimate__),
-    colour   = "#0072B2",
-    linewidth = 0.8
-  ) +
-  # credible interval ribbon
-  geom_ribbon(
-    data  = plot_real_total_data,
-    aes(x = meanSR, ymin = lower__, ymax = upper__),
-    fill  = "#0072B2",
-    alpha = 0.15
-  ) +
-  # log2 x-axis, no manual breaks/limits
-  scale_x_continuous(
-    expand = expansion(mult = c(0.02, 0.02))
-  ) +
-  labs(
-    x = "Realized plant species richness",
-    y = expression("Economic multifunctionality; € ha"^{-1}*" yr"^{-1}*"")
-  ) +
-  coord_cartesian(clip = "off") +
-  theme_custom() +
-  theme(
-    aspect.ratio = 0.6
-  )
-
-p_real_total
-
-ggsave(
-  filename = "total_real_all.png",
-  plot     = p_real_total,
-  device   = "png",
-  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-  dpi      = 300,
-  width    = 8,
-  height   = 5,
-  units    = "in"
-)
-
-
-```
-
-
-```{r Plot Realized SR - Risk-adjusted Economic MF}
-# Economic MF and realised diversity
-c_real_total_adj <- conditional_effects(fitTotalRealAdj)
-plot_real_total_adj_data <- c_real_total_adj[[1]]
-
-# Economic MF (total costs) vs mean realised diversity
-
-p_real_total <- ggplot() +
-  # raw data
-  geom_point(
-    data   = synthDat,
-    aes(x  = meanSR, y = costs_total_mid_adj),
-    alpha  = 0.5,
-    size   = 2,
-    shape  = 21,
-    fill   = "#0072B2",
-    colour = "#004C70",
-    stroke = 0.4
-  ) +
-  # model-estimated effect
-  geom_line(
-    data     = plot_real_total_adj_data,
-    aes(x    = meanSR, y = estimate__),
-    colour   = "#0072B2",
-    linewidth = 0.8
-  ) +
-  # credible interval ribbon
-  geom_ribbon(
-    data  = plot_real_total_adj_data,
-    aes(x = meanSR, ymin = lower__, ymax = upper__),
-    fill  = "#0072B2",
-    alpha = 0.15
-  ) +
-  # log2 x-axis, no manual breaks/limits
-  scale_x_continuous(
-    expand = expansion(mult = c(0.02, 0.02))
-  ) +
-  labs(
-    x = "Realized plant species richness",
-    y = expression("Risk-adjusted economic multifunctionality; € ha"^{-1}*" yr"^{-1}*"")
-  ) +
-  coord_cartesian(clip = "off") +
-  theme_custom() +
-  theme(
-    aspect.ratio = 0.6
-  )
-
-p_real_total
-
-ggsave(
-  filename = "total_real_all_adj.png",
-  plot     = p_real_total_adj,
-  device   = "png",
-  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-  dpi      = 300,
-  width    = 8,
-  height   = 5,
-  units    = "in"
-)
-
-
-```
-
-
 
 
 ### sowndiv without Monocultures
@@ -1488,9 +1399,6 @@ fitTotalReal <- brm(
 
     
 ```
-
-
-
 
 
 ### Plot realized species diversity effects - no Monocultures
