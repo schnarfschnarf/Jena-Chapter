@@ -4,17 +4,6 @@ This repository contains the full analysis pipeline for the manuscript examining
 
 All analyses are implemented in R and fully reproducible via a project-specific package environment managed with renv.
 
-_______________________________________________________________________________________________________________________________
-## Repository structure:
-.
-├── 1_Data/                # Input data
-├── 2_Code/                # R Markdown analysis scripts
-├── 3_Graphs/              # Output figures (generated)
-├── functions/             # Custom plotting/theme functions
-├── run_all.R              # Entry point to run full pipeline
-├── renv.lock              # Reproducible package environment
-└── Data Analysis.Rproj
-_______________________________________________________________________________________________________________________________
 ## Reproducibility
 
 ### Step 1 – Clone the repository
@@ -61,8 +50,8 @@ If any datasets are subject to usage restrictions, they are either:
 
 The exact version of the code used for submission has been archived as:
 
-Version: v1.0.0
-DOI: (to be added after Zenodo archiving)
+Version: v1.0.1
+DOI: https://doi.org/10.5281/zenodo.18723715
 
 ## Contact
 
