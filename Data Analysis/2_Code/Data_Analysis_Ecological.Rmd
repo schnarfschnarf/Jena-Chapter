@@ -10,10 +10,28 @@ This R Script is intended to be used to calculate the ecological multifunctional
 
 ```{r setup, include=FALSE}
 library(ragg)
+library(here)
 
-knitr::opts_chunk$set(warning=FALSE, message=FALSE, echo=TRUE, cache=TRUE, cache.lazy=FALSE, cache.path="cache/", out.width="100%", out.height="100%", dev = "ragg_png")
+knitr::opts_chunk$set(
+  warning = FALSE, message = FALSE, echo = TRUE,
+  cache = TRUE, cache.lazy = FALSE,
+  cache.path = "cache/",
+  out.width = "100%", out.height = "100%",
+  dev = "ragg_png"
+)
 
-source("C:/Users/mm68tulo/Documents/R/functions/myfunctions.R")
+# Make sure cache/figures/output exist (prevents silent failures on new machines)
+dir.create(here("cache"), showWarnings = FALSE, recursive = TRUE)
+dir.create(here("figures"), showWarnings = FALSE, recursive = TRUE)
+
+# Source project functions from the repo (portable)
+source(here("functions", "myfunctions.R"))
+source(here("functions", "fit_or_load.R"))
+stopifnot(exists("theme_custom"))
+
+# Define a portable output directory for ggsave()
+out_dir <- here("3_Graphs")
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 ```
 
 # Preparation
@@ -27,25 +45,25 @@ library(patchwork)
 library(brms)
 library(performance)
 library(ggpmisc)
-library(ggpubr)
-library(BayesFactor)
-```
-## Set up a theme
-```{r Theme}
-theme_set(theme_custom())
+library(stringr)
+library(tidyr)
+library(grid)
 ```
 
 ## Load datasets and filter for relevant observations/measurements
 ```{r Read Data}
 # load synthesis dataset
-ecologicalMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/ecological_multifunctionality_reduced.xlsx") %>% 
-  filter(!is.na(sowndiv) & sowndiv < 60) # remove rows with NA in sowndiv and sowndiv greater than 16
-economicMF <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/economic_MF_final.xlsx") %>% 
-  filter(sowndiv < 60) # remove rows with sowndiv greater than 16
+ecologicalMF <- read_xlsx(
+  here("1_Data", "ecological_multifunctionality_reduced.xlsx")
+) %>%
+  filter(!is.na(sowndiv) & sowndiv < 60)
+
+economicMF <- read_xlsx(
+  here("1_Data", "economic_MF_final.xlsx")
+) %>%
+  filter(sowndiv < 60)
 
 ecologicalMF$plotcode <- as.factor(ecologicalMF$plotcode)
-ecologicalMF$plotcode <- as.factor(ecologicalMF$plotcode)
-ecologicalMF$block <- as.factor(ecologicalMF$block)
 ecologicalMF$block <- as.factor(ecologicalMF$block)
 economicMF$plotcode <- as.factor(economicMF$plotcode)
 
@@ -54,11 +72,13 @@ economicMF$plotcode <- as.factor(economicMF$plotcode)
 ## Statistical Models 
 Also single functions or just multifunctionality?
 ```{r MF ~ sowndiv}
-fitMFsown <- brm(
+fitMFsown <- fit_or_load("fitMFsown", function() {
+  brm(
   multifunctionality ~ log2(sowndiv) + (1|block),
   control = list(adapt_delta = 0.95),
   iter = 3000,
  ecologicalMF)
+})
 
 #check model assumptions
     pp_check(fitMFsown, type="scatter_avg") 
@@ -73,11 +93,12 @@ summary(fitMFsown)
 ```
 
 ```{r MF ~ realized SR}
-fitMFreal <- brm(
+fitMFreal <- fit_or_load("fitMFreal", function() {
+  brm(
   multifunctionality ~ log2(meanSR) + (1|block),
   control = list(adapt_delta = 0.95),
   ecologicalMF)
-
+})
 # check model assumptions
     pp_check(fitMFreal, type="scatter_avg") 
     pp_check(fitMFreal, ndraws=50)
@@ -151,7 +172,7 @@ ggsave(
   units    = "in",
   device   = "png",
   dpi      = 300,
-  path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/" 
+  path = out_dir
 )
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
@@ -184,7 +205,7 @@ p_real_mf
 ggsave("EcologicalMF_realizedSR_noMono.png",
        plot = p_real_mf,
        device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+       path = out_dir,
        dpi = 300)
 
 ```
@@ -196,9 +217,9 @@ joinedMF <- economicMF %>%
   left_join(ecologicalMF, by = "plotcode") 
 
 # Correlation between economic and ecological multifunctionality
-bf <- correlationBF(joinedMF$multifunctionality, joinedMF$costs_total_mid)
+bf <- BayesFactor::correlationBF(joinedMF$multifunctionality, joinedMF$costs_total_mid)
 
-post <- posterior(bf, iterations = 20000)
+post <- BayesFactor::posterior(bf, iterations = 20000)
 rho_draws <- post[, "rho"]
 
 quantile(rho_draws, c(.025, .5, .975))
@@ -246,7 +267,7 @@ ggsave(
   filename = "Corr_EconomicMF_EcologicalMF.png",
   plot     = corrPlot,
   device   = "png",
-  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  path = out_dir,
   dpi      = 300,
   width    = 6.27,
   height   = 5,
@@ -279,92 +300,7 @@ ggsave(
   units    = "in",
   dpi      = 300,
   device   = ragg::agg_png,
-  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/"
+  path = out_dir
 )
 
 ```
-# Supplements
-## Single Function Models
-```{r Model Single Functions}
-fitMicbio <- brm(
-  mean_micbiomass ~ log2(sowndiv) + (1|block),
- ecologicalMF)
-
-summary(fitMicbio)
-
-fitMicres <- brm(
-  mean_micrespiration ~ log2(sowndiv) + (1|block),
- ecologicalMF)
-
-summary(fitMicres)
-
-fitRoot <- brm(
-  mean_root_biomass ~ log2(sowndiv) + (1|block),
- ecologicalMF)
-
-summary(fitRoot)
-
-fitPol <- brm(
-  mean_diversity ~ log2(sowndiv) + (1|block),
- ecologicalMF)
-
-summary(fitPol)
-
-fitAbove <- brm(
-  mean_above_control ~ log2(sowndiv) + (1|block),
- ecologicalMF)
-
-summary(fitAbove)
-
-fitBelow <- brm(
-  mean_below_control ~ log2(sowndiv) + (1|block),
- ecologicalMF)
-
-summary(fitBelow)
-
-fitAgg <- brm(
-  mean_agg ~ log2(sowndiv) + (1|block),
- ecologicalMF)
-
-summary(fitAgg)
-
-```
-
-
-## Plot the single functions
-```{r Plot Single functions}
-#plot biomass as a response to sowndiv
-c_sown_biomass <- conditional_effects(fitMFsown)
-plot_sown_mf_data <- c_sown_mf[[1]]
-
-p_sown_mf <- ggplot() +
-  geom_point(data = ecologicalMF,
-             aes(x = sowndiv, y=multifunctionality),
-    color = "#28a87d",
-    alpha = .5,
-    shape = 20,
-    stroke = 1,
-    size = 4,
-    position = position_jitter(w = 0.03, h = 0)
-  ) +
-  # Model-estimated effect
-  geom_line(data = plot_sown_mf_data, aes(x = sowndiv, y = estimate__), color = "blue", size = .8, alpha = .6) +
-  # Credible interval ribbon
-  geom_ribbon(data = plot_sown_mf_data, aes(x = sowndiv, ymin = lower__, ymax = upper__), 
-              fill = "#287da8", alpha = 0.2) +
-  labs(title = "",
-       x = "Sown plant diversity",
-       y = "Ecological multifunctionality") +
-  scale_x_continuous(breaks = c(1,2,4,8,16))
-
-p_sown_mf
-
-# save figure
-ggsave("EcologicalMF_sown_noMono.png",
-       plot = p_sown_mf,
-       device = "png",
-       path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
-       dpi = 300)
-
-```
-

@@ -8,20 +8,49 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning=FALSE, message=FALSE, echo=TRUE, fig.width=10, fig.height=6, dpi=300, cache=TRUE, cache.lazy=FALSE, cache.path="cache/", fig.path="figures/", out.width="100%", out.height="100%")
 
-source("C:/Users/mm68tulo/Documents/R/functions/myfunctions.R")
+library(here)
 
+dir.create(here("cache"), showWarnings = FALSE, recursive = TRUE)
+dir.create(here("figures"), showWarnings = FALSE, recursive = TRUE)
+
+source(here("functions", "myfunctions.R"))
+source(here("functions", "fit_or_load.R"))
+stopifnot(exists("theme_custom"))
 theme_set(theme_custom())
+
+out_dir <- here("3_Graphs")
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 ```
 
 ```{r}
 library(dplyr)
 library(ggplot2)
-library(MCMCpack)
+library(brms)
+library(posterior)  # for as_draws_df()
+library(tibble) 
 ```
+## Load datasets - Filter for relevant observations/measurements
+```{r Read Data}
+#load synthesis dataset
+synthDat <- read_xlsx(
+  here("1_Data", "economic_MF_final.xlsx")
+) %>%
+  filter(sowndiv < 60) %>%
+  mutate(block = as.factor(block))
+
+synthDat$plotcode <- as.factor(synthDat$plotcode) #change the plotcode to a factor
+
+```
+
 
 ```{r}
 # define model for RP ~ sowndiv
-fit_rp <- brm(RP ~ log2(sowndiv) + (1|block), data = synthDat, )
+fit_rp <- fit_or_load("fit_rp", function() {
+  brm(
+  RP ~ log2(sowndiv) + (1|block),
+  data = synthDat
+)
+})
 
 # plot regression
 c_sown_rp <- conditional_effects(fit_rp)
@@ -74,7 +103,7 @@ ggsave(
   units    = "in",
   device   = "png",
   dpi      = 300,
-  path = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/" 
+  path = out_dir 
 )
 
 

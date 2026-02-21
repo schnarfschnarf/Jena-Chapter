@@ -10,10 +10,28 @@ This R Script is intended to be used to calculate the economic multifunctionalit
 
 ```{r setup, include=FALSE}
 library(ragg)
+library(here)
 
-knitr::opts_chunk$set(warning=FALSE, message=FALSE, echo=TRUE, cache=TRUE, cache.lazy=FALSE, cache.path="cache/", out.width="100%", out.height="100%", dev = "ragg_png")
+knitr::opts_chunk$set(
+  warning = FALSE, message = FALSE, echo = TRUE,
+  cache = TRUE, cache.lazy = FALSE,
+  cache.path = "cache/",
+  out.width = "100%", out.height = "100%",
+  dev = "ragg_png"
+)
 
-source("C:/Users/mm68tulo/Documents/R/functions/myfunctions.R")
+# Make sure cache/figures/output exist (prevents silent failures on new machines)
+dir.create(here("cache"), showWarnings = FALSE, recursive = TRUE)
+dir.create(here("figures"), showWarnings = FALSE, recursive = TRUE)
+
+# Source project functions from the repo (portable)
+source(here("functions", "myfunctions.R"))
+source(here("functions", "fit_or_load.R"))
+stopifnot(exists("theme_custom"))
+
+# Define a portable output directory for ggsave()
+out_dir <- here("3_Graphs")
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 ```
 
 # Preparation
@@ -28,17 +46,14 @@ library(brms)
 library(performance)
 library(ggpmisc)
 library(ggpubr)
-```
-
-## Set up a theme
-```{r Theme}
-theme_set(theme_custom())
+library(grid)
 ```
 
 ## Load datasets and filter for relevant observations/measurements
 ```{r Biomass Data}
 #  load biomass data from 2003 to 2017
-path <- "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/dom_plantBiomass_2002to2015"
+path <- here("1_Data", "Dominance_Experiment", "dom_plantBiomass_2002to2015")
+stopifnot(dir.exists(path))
 dom_bio_2003 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2003.tab"), skip = 38, show_col_types = FALSE) %>% filter(Repl == "mean")
 dom_bio_2004 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2004.tab"), skip = 40, show_col_types = FALSE) %>% filter(Repl == "mean")
 dom_bio_2005 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2005.tab"), skip = 38, show_col_types = FALSE) %>% filter(Repl == "mean")
@@ -52,7 +67,9 @@ dom_bio_2012 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2012.tab"), skip = 
 dom_bio_2013 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2013.tab"), skip = 33, show_col_types = FALSE)
 dom_bio_2014 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2014.tab"), skip = 33, show_col_types = FALSE)
 dom_bio_2015 <- read_tsv(file.path(path, "JenExp_biomass_DOM_2015.tab"), skip = 33, show_col_types = FALSE)
-dom_bio_2017 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/dom_plantBiomass_2017/376_12_data.xlsx") %>% 
+dom_bio_2017 <- read_xlsx(
+  here("1_Data", "Dominance_Experiment", "dom_plantBiomass_2017", "376_12_data.xlsx")
+) %>% 
   dplyr::select(c(Plot, bm)) %>% 
   rename(`Experimental plot` = Plot, `Sown plant biom [g/m**2]` = bm)
 
@@ -76,7 +93,9 @@ dom_bio <- bind_rows(
 )
   
 # load data on hay prices and costs
-SGMS <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Biomass_Above/SGMs.xlsx") %>% 
+SGMS <- read_xlsx(
+  here("1_Data", "SGMs.xlsx")
+) %>% 
   filter(year < 2018)
 
 # get the number of sown species
@@ -103,11 +122,15 @@ dom_bio_a <- dom_bio_a %>%
 
 ```{r Carbon Data}
 # load prepared dataframe for comparing 2002 and 2017 SOC stock (Soc content for 2017 is already in this table)
-dom_soc_diff <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/dom_SOC_2017/SOC17_dom.xlsx")  %>% 
+dom_soc_diff <- read_xlsx(
+  here("1_Data", "Dominance_Experiment", "dom_SOC_2017", "SOC17_dom.xlsx")
+) %>% 
   left_join(design, by = join_by(plotcode))
 
 # load SOC and bulk density measures for 2002
-dom_soc_02 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/Dominance_Experiment/carbon02_dom.xlsx")
+dom_soc_02 <- read_xlsx(
+  here("1_Data", "Dominance_Experiment", "carbon02_dom.xlsx")
+)
 
 # join with dom_soc_diff table
 dom_soc_diff <- dom_soc_diff %>% 
@@ -124,7 +147,10 @@ dom_soc_diff$Corg17_val <- as.numeric(dom_soc_diff$Corg17) * dom_soc_diff$Bulk02
 dom_soc_diff$Corg_val_diff <- (as.numeric(dom_soc_diff$Corg17_val) - dom_soc_diff$Corg02_val) / 15
 
 
-writexl::write_xlsx(dom_soc_diff, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/soc_dominance_2002+2017.xlsx") 
+writexl::write_xlsx(
+  dom_soc_diff,
+  here("1_Data", "soc_dominance_2002_2017.xlsx")
+) 
 ```
 
 
@@ -159,15 +185,20 @@ dom_bio_final$RP <- dom_bio_final$profit_mean - dom_bio_final$CE
 dom_bio_final <- dom_bio_final %>% # merge the biomass and the realized SR data
   left_join(design, by = join_by(plotcode))
 
-writexl::write_xlsx(dom_bio_final, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/dominance_mean_biomass_profit_2002_to_2017.xlsx") 
+writexl::write_xlsx(
+  dom_bio_final,
+  here("1_Data", "dominance_mean_biomass_profit_2002_to_2017.xlsx")
+) 
 
 ```
 
 ## Statistical models
 ```{r Linear models}
-fitProfit <- brm(
+fitProfit <- fit_or_load("fitProfit", function() {
+  brm(
   profit_mean ~ log2(sowndiv),
   dom_bio_final) 
+})
 
     # check model assumptions 
     pp_check(fitProfit, type="scatter_avg")
@@ -179,9 +210,11 @@ fitProfit <- brm(
     # check output of model
     summary(fitProfit)
     
-fitCorg <- brm(
+fitCorg <- fit_or_load("fitCorg", function() {
+  brm(
   Corg_val_diff ~ log2(sowndiv),
   dom_soc_diff)
+})
 
 # check model assumptions 
     pp_check(fitCorg, type="scatter_avg")
@@ -249,7 +282,7 @@ ggsave(
   filename = "fig_Profit_dominance.png",
   plot     = p_Profit,
   device   = "png",
-  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  path     = out_dir,
   dpi      = 300,
   width    = 7,
   height   = 5,
@@ -312,7 +345,7 @@ ggsave(
   filename = "fig_Corg_dominance.png",
   plot     = p_Corg,
   device   = "png",
-  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  path     = out_dir,
   dpi      = 300,
   width    = 7,
   height   = 5,
@@ -352,14 +385,16 @@ ggsave(
   units    = "in",
   dpi      = 300,
   device   = "png",
-  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/"
+  path     = out_dir
 )
 ```
 
 
 ## Create subset dataframe for supplement figure
 ```{r}
-MainExp17 <- read_xlsx("C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/MainExp17.xlsx")
+MainExp17 <- read_xlsx(
+  here("1_Data", "MainExp17.xlsx")
+)
 
 MainExp17$Corg_val_diff <- MainExp17$SOC_diff * MainExp17$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 300
 
@@ -378,21 +413,26 @@ MainExp17 <-  MainExp17 %>%
 
 MainDomDiff <- rbind(MainExp17, dom_bio_final)
 
-writexl::write_xlsx(MainDomDiff, "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/1_Data/MainDomDiff.xlsx")
+writexl::write_xlsx(
+  MainDomDiff,
+  here("1_Data", "MainDomDiff.xlsx")
+)
 ```
 
 ```{r Plot difference in productivity: main - dominance}
 # create linear model for main experiment profit
-fitProfitMain <- brm(
+fitProfitMain <- fit_or_load("fitProfitMain", function() {
+  brm(
   profit_mean ~ log2(sowndiv),
-  MainExp17) 
+  MainExp17)
+})
 
     # check model assumptions 
     pp_check(fitProfitMain, type="scatter_avg")
     pp_check(fitProfitMain, ndraws=50)
     check_model(fitProfitMain, check="linearity")
     check_model(fitProfitMain, check="homogeneity")
-    plot(fitProfit)
+    plot(fitProfitMain)
     
     # check output of model
     summary(fitProfitMain)
@@ -477,7 +517,7 @@ ggsave(
   filename = "Profit_difference.png",
   plot     = p_profit_dif,
   device   = "png",
-  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  path     = out_dir,
   dpi      = 300,
   width    = 5.9,
   height   = 4.5,
@@ -489,9 +529,11 @@ ggsave(
 
 ```{r Plot difference in SOC: main - dominance}
 #Soil organic carbon gain/loss and sowndiv - for main experiment until 2017
-fitCorgMain <- brm(
+fitCorgMain <- fit_or_load("fitCorgMain", function() {
+  brm(
   Corg_val_diff ~ log2(sowndiv),
   MainExp17)
+})
 
 # check model assumptions 
     pp_check(fitCorgMain, type="scatter_avg")
@@ -587,7 +629,7 @@ ggsave(
   filename = "SOC_difference.png",
   plot     = p_Corg_diff,
   device   = "png",
-  path     = "C:/Users/mm68tulo/Desktop/Jena Chapter/Data Analysis/3_Graphs/",
+  path     = out_dir,
   dpi      = 300,
   width    = 5.9,
   height   = 4.5,

@@ -8,3 +8,14 @@ brms
 performance
 ggpp
 ggpmisc
+here
+rmarkdown
+ragg
+stringr
+tidyr
+posterior
+tibble
+ggpubr
+coda
+Matrix
+BayesFactor
