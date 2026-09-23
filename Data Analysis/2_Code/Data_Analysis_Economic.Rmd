@@ -64,6 +64,9 @@ synthDat <- read_xlsx(
 
 synthDat$plotcode <- as.factor(synthDat$plotcode) #change the plotcode to a factor
 
+noMono <- synthDat %>% 
+  filter(sowndiv > 1)
+
 ```
 
 ## Statistical Models
@@ -293,6 +296,125 @@ fitTotalReal <- fit_or_load("fitTotalReal", function() {
 
 
 ```
+
+## Statistical Models
+### Linear models WITHOUT monocultures
+#### &Sown diversity
+```{r Sown Diversity WITHOUT Monocultures, include=FALSE}
+# Profit against sown plant diversity
+fitProfitMono <- fit_or_load("fitProfitMono", function() {
+  brm(
+  profit_mean ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 3000,
+  noMono) 
+})
+
+    # check model assumptions 
+    pp_check(fitProfitMono, type="scatter_avg")
+    pp_check(fitProfitMono, ndraws=50)
+    check_model(fitProfitMono, check="linearity")
+    check_model(fitProfitMono, check="homogeneity")
+    plot(fitProfitMono)
+    
+    # check output of model
+    summary(fitProfitMono)
+
+# SOC against sown plant diversity
+fitSOCmono <- fit_or_load("fitSOCmono", function() {
+  brm(
+  SOC_costs_mid ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 3000,
+  noMono)
+})
+
+    # check model assumptions
+    pp_check(fitSOCmono, type="scatter_avg") 
+    pp_check(fitSOCmono, ndraws=50)
+    check_model(fitSOCmono, check="linearity") 
+    check_model(fitSOCmono, check="homogeneity")
+    plot(fitSOCmono)
+    
+    # check output of model
+    summary(fitSOCmono)
+
+# Leaching costs against sown plant diversity
+fitLeachMono <- fit_or_load("fitLeachMono", function() {
+  brm(
+  leach_costs_mid ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 3000,
+  noMono)
+})
+
+    # check model assumptions
+    pp_check(fitLeachMono, type="scatter_avg") 
+    pp_check(fitLeachMono, ndraws=50)
+    check_model(fitLeachMono, check="linearity") 
+    check_model(fitLeachMono, check="homogeneity")
+    plot(fitLeachMono)
+    
+    # check output of model
+    summary(fitLeachMono)
+
+    
+# Total Costs (medium) against sown plant diversity
+fitTotalMono <- fit_or_load("fitTotalMono", function() {
+  brm(
+  costs_total_mid ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 3000,
+  noMono)
+})
+
+    # check model assumptions
+    pp_check(fitTotalMono, type="scatter_avg") 
+    pp_check(fitTotalMono, ndraws=50)
+    check_model(fitTotalMono, check="linearity") 
+    check_model(fitTotalMono, check="homogeneity")
+    plot(fitTotalMono)
+    
+    # check output of model
+    summary(fitTotalMono)
+
+
+# define model for RP ~ sowndiv
+fitRPmono <- fit_or_load("fitRP", function() {
+  brm(
+    RP ~ log2(sowndiv) + (1|block),
+             control = list(adapt_delta = 0.95),
+             iter = 3000,
+             data = noMono)
+})
+
+    # check model assumptions
+    pp_check(fitRPmono, type="scatter_avg") 
+    pp_check(fitRPmono, ndraws=50)
+    check_model(fitRPmono, check="linearity") 
+    check_model(fitRPmono, check="homogeneity")
+    plot(fitRPmono)
+    
+    # check output of model
+    summary(fitRPmono)
+
+# calculate effect size of insurance
+post <- as_draws_df(fitRPmono)
+
+insurance_draws <- -post$b_log2sowndiv
+
+insurance_summary <- tibble(
+  mean = mean(insurance_draws),
+  lwr  = quantile(insurance_draws, 0.025),
+  upr  = quantile(insurance_draws, 0.975)
+)
+
+insurance_summary
+    
+    
+```
+
+
 
 ## Plotting
 ```{r Plot sown diversity  - profit}
