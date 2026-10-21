@@ -246,7 +246,7 @@ fitLeachReal <- fit_or_load("fitLeachReal", function() {
 
 # Risk premium against realized diversity
 fitRPreal <- fit_or_load("fitRPreal", function() {
-  brm(RP ~ log2(sowndiv) + (1|block),
+  brm(RP ~ log2(meanSR) + (1|block),
              control = list(adapt_delta = 0.95),
              iter = 3000,
              data = synthDat)
@@ -265,7 +265,7 @@ fitRPreal <- fit_or_load("fitRPreal", function() {
 # calculate effect size of insurance
 post_real <- as_draws_df(fitRPreal)
 
-insurance_draws_real <- -post_real$b_log2sowndiv
+insurance_draws_real <- -post_real$b_log2meanSR
 
 insurance_summary_real <- tibble(
   mean = mean(insurance_draws_real),
@@ -273,7 +273,7 @@ insurance_summary_real <- tibble(
   upr  = quantile(insurance_draws_real, 0.975)
 )
 
-insurance_summary       
+insurance_summary_real     
 
 # Total Costs against mean realized species richness
 fitTotalReal <- fit_or_load("fitTotalReal", function() {
@@ -588,7 +588,7 @@ p_sown_leach <- ggplot() +
 y = expression(
   atop(
     "Social costs of",
-    NO[3] * "\u2013N leaching (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+    "nitrogen leaching (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
   )
 )
   ) +
@@ -633,7 +633,8 @@ p_sown_rp <- ggplot() +
     data     = plot_sown_rp_data,
     aes(x    = 2^log2(sowndiv), y = estimate__),
     colour   = "#0072B2",
-    linewidth = 0.8
+    linewidth = 0.8,
+    linetype = "dashed"
   ) +
   geom_ribbon(
     data  = plot_sown_rp_data,
@@ -715,7 +716,7 @@ p_sown_total <- ggplot() +
   labs(
     x = "Sown plant species richness",
 y = expression(
-  "EMF (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+  "Economic multifunctionality (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
 )
   ) +
   theme_custom()
@@ -977,10 +978,11 @@ p_real_profit_all <- ggplot() +
     alpha = 0.15
   ) +
   
-  # --- LOG2 AXIS ---
+  # --- LINEAR AXIS ---
   scale_x_continuous(
-  expand = expansion(mult = c(0.02, 0.02))
-  ) + 
+    breaks = c(1, 2, 4, 8, 12),
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
 
   # labels
   labs(
@@ -1042,6 +1044,7 @@ p_real_soc_all <- ggplot() +
     alpha = 0.15
   ) +
   scale_x_continuous(
+    breaks = c(1, 2, 4, 8, 12),
     expand = expansion(mult = c(0.02, 0.02))
   ) +
   scale_y_continuous(
@@ -1105,17 +1108,18 @@ p_real_leach_all <- ggplot() +
     alpha = 0.15
   ) +
   scale_x_continuous(
+    breaks = c(1, 2, 4, 8, 12),
     expand = expansion(mult = c(0.02, 0.02))
   ) +
    scale_y_continuous(
     breaks = c(-125,-100,-75,-50,-25, 0)
   ) +  
   labs(
-    x = "Realized plant species richness",
+    x = "Sown plant species richness",
 y = expression(
   atop(
     "Social costs of",
-    NO[3] * "\u2013N leaching (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+    "nitrogen leaching (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
   )
 )
   ) +
@@ -1148,7 +1152,7 @@ plot_real_rp_data <- c_real_rp[[1]]
 p_real_rp <- ggplot() +
   geom_point(
     data   = synthDat,
-    aes(x  = sowndiv, y = RP),
+    aes(x  = meanSR, y = RP),
     alpha  = 0.5,
     size   = 2,
     shape  = 21,
@@ -1158,24 +1162,24 @@ p_real_rp <- ggplot() +
     position = position_jitter(width = 0.12, height = 0)
   ) +
   geom_line(
-    data     = plot_sown_rp_data,
-    aes(x    = 2^log2(sowndiv), y = estimate__),
+    data     = plot_real_rp_data,
+    aes(x    = 2^log2(meanSR), y = estimate__),
     colour   = "#0072B2",
-    linewidth = 0.8
+    linewidth = 0.8,
+    linetype = "dashed"
   ) +
   geom_ribbon(
-    data  = plot_sown_rp_data,
-    aes(x = 2^log2(sowndiv), ymin = lower__, ymax = upper__),
+    data  = plot_real_rp_data,
+    aes(x = 2^log2(meanSR), ymin = lower__, ymax = upper__),
     fill  = "#0072B2",
     alpha = 0.15
   ) +
   scale_x_continuous(
-    breaks = c(1, 2, 4, 8, 16),
-    labels = c(1, 2, 4, 8, 16),
+    breaks = c(1, 2, 4, 8, 12),
     expand = expansion(mult = c(0.02, 0.02))
   ) +
   labs(
-    x = "Sown plant species richness",
+    x = "Realized plant species richness",
 y = expression(atop(
   "Risk premium (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
 )
@@ -1268,6 +1272,7 @@ p_real_total <- ggplot() +
   ) +
   # log2 x-axis, no manual breaks/limits
   scale_x_continuous(
+    breaks = c(1, 2, 4, 8, 12),
     expand = expansion(mult = c(0.02, 0.02))
   ) +
   labs(
@@ -1298,3 +1303,437 @@ ggsave(
 
 
 ```
+
+#### Plot sown species diversity effects WITHOUT monocultures
+```{r Plot sown SR - Profit}
+# Profit data without monocultures and sown diversity
+c_mono_profit <- conditional_effects(fitProfitMono)
+plot_mono_profit_data <- c_mono_profit[[1]]
+
+p_mono_profit <- ggplot() +
+  # raw data
+  geom_point(
+    data   = noMono,
+    aes(x  = sowndiv, y = profit_mean),
+    alpha  = 0.5,
+    size   = 2,
+    shape  = 21,
+    fill   = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  # model-estimated effect
+  geom_line(
+    data     = plot_mono_profit_data,
+    aes(x    = sowndiv, y = estimate__),
+    colour   = "#0072B2",
+    linewidth = 0.8
+  ) +
+  # credible interval ribbon
+  geom_ribbon(
+    data  = plot_mono_profit_data,
+    aes(x = sowndiv, ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+  
+  # --- LINEAR AXIS ---
+  scale_x_continuous(
+    breaks = c(1, 2, 4, 8, 16),
+    labels = c(1, 2, 4, 8, 16),
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+
+  # labels
+  labs(
+    x = "Sown plant species richness",
+    y = expression(atop(
+        "Profit (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+)
+)
+  ) +
+  
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(
+    aspect.ratio = 0.6
+  )
+
+p_mono_profit
+
+ggsave(
+  filename = "Profit_mono.png",
+  plot     = p_mono_profit,
+  device   = "png",
+  path     = out_dir,
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
+
+```
+
+
+```{r Plot sown SR - SOC}
+# SOC benefits without monocultures and sown diversity
+c_mono_soc <- conditional_effects(fitSOCmono)
+plot_mono_soc_data <- c_mono_soc[[1]]
+
+p_mono_soc <- ggplot() +
+  geom_point(
+    data   = noMono,
+    aes(x  = sowndiv, y = SOC_costs_mid),
+    alpha  = 0.5,
+    size   = 2,
+    shape  = 21,
+    fill   = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  geom_line(
+    data     = plot_mono_soc_data,
+    aes(x    = sowndiv, y = estimate__),
+    colour   = "#0072B2",
+    linewidth = 0.8
+  ) +
+  geom_ribbon(
+    data  = plot_mono_soc_data,
+    aes(x = sowndiv, ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+  scale_x_continuous(
+    breaks = c(1, 2, 4, 8, 16),
+    labels = c(1, 2, 4, 8, 16),
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+  scale_y_continuous(
+    breaks = c(-1500,-1000, -500, 0, 500, 1000)
+  ) +
+  labs(
+    x = "Sown plant species richness",
+y = expression(
+  atop(
+    "Social value of",
+    "SOC (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+  )
+)
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(aspect.ratio = 0.6)
+
+
+p_mono_soc
+
+ggsave(
+  filename = "SOC_mono.png",
+  plot     = p_mono_soc,
+  device   = "png",
+  path     = out_dir,
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
+```
+
+
+```{r Plot sown SR - Leaching}
+# Leaching costs without monocultures and sown diversity
+c_mono_leach <- conditional_effects(fitLeachMono)
+plot_mono_leach_data <- c_mono_leach[[1]]
+
+p_mono_leach <- ggplot() +
+  geom_point(
+    data   = noMono,
+    aes(x  = sowndiv, y = leach_costs_mid),
+    alpha  = 0.5,
+    size   = 2,
+    shape  = 21,
+    fill   = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  geom_line(
+    data     = plot_mono_leach_data,
+    aes(x    = sowndiv, y = estimate__),
+    colour   = "#0072B2",
+    linewidth = 0.8,
+    linetype = "dashed"
+  ) +
+  geom_ribbon(
+    data  = plot_mono_leach_data,
+    aes(x = sowndiv, ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+  scale_x_continuous(
+    breaks = c(1, 2, 4, 8, 16),
+    labels = c(1, 2, 4, 8, 16),
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+   scale_y_continuous(
+    breaks = c(-125,-100,-75,-50,-25, 0)
+  ) +  
+  labs(
+    x = "Sown plant species richness",
+y = expression(
+  atop(
+    "Social costs of",
+    "nitrogen leaching (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+  )
+)
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(aspect.ratio = 0.6)
+
+
+p_mono_leach
+
+ggsave(
+  filename = "Leach_mono.png",
+  plot     = p_mono_leach,
+  device   = "png",
+  path     = out_dir,
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
+```
+
+
+```{r Plot sown diversity - RP}
+#Insurance value and sown diversity
+c_mono_rp <- conditional_effects(fitRPmono)
+plot_mono_rp_data <- c_mono_rp[[1]]
+
+
+p_mono_rp <- ggplot() +
+  geom_point(
+    data   = noMono,
+    aes(x  = sowndiv, y = RP),
+    alpha  = 0.5,
+    size   = 2,
+    shape  = 21,
+    fill   = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4,
+    position = position_jitter(width = 0.12, height = 0)
+  ) +
+  geom_line(
+    data     = plot_mono_rp_data,
+    aes(x    = 2^log2(sowndiv), y = estimate__),
+    colour   = "#0072B2",
+    linewidth = 0.8,
+    linetype = "dashed"
+  ) +
+  geom_ribbon(
+    data  = plot_mono_rp_data,
+    aes(x = 2^log2(sowndiv), ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+  scale_x_continuous(
+    breaks = c(1, 2, 4, 8, 16),
+    labels = c(1, 2, 4, 8, 16),
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+  labs(
+    x = "Sown plant species richness",
+y = expression(atop(
+  "Risk premium (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+)
+)
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(aspect.ratio = 0.6)
+
+p_mono_rp
+
+ggsave(
+  filename = "Fig_mono_RP.png",
+  plot     = p_mono_rp,
+  width    = 8,     # in inches; adjust to Nature’s figure width
+  height   = 5,
+  units    = "in",
+  device   = "png",
+  dpi      = 300,
+  path     = out_dir 
+)
+
+```
+
+
+```{r Plot sown SR - Multi-panel-PLot}
+p_services_mono <- (
+  p_mono_profit + p_mono_soc
+) /
+(
+  p_mono_leach + p_mono_rp
+) +
+  plot_annotation(tag_levels = "a") &
+  theme(
+    plot.tag = element_text(
+      face = "bold",
+      size = 12,
+      hjust = -0.2,
+      vjust = 1.5
+    )
+  )
+
+p_services_mono
+
+ggsave(
+  filename = "Single_Services_mono.png",
+  plot     = p_services_mono,
+  bg       = "white",
+  path     = out_dir,
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
+
+```
+
+```{r Plot sown SR - Economic MF}
+# Economic MF and sown diversity
+c_mono_total <- conditional_effects(fitTotalMono)
+plot_mono_total_data <- c_mono_total[[1]]
+
+# Economic MF (total costs) vs mean sown diversity
+
+p_mono_total <- ggplot() +
+  # raw data
+  geom_point(
+    data   = noMono,
+    aes(x  = sowndiv, y = costs_total_mid),
+    alpha  = 0.5,
+    size   = 2,
+    shape  = 21,
+    fill   = "#0072B2",
+    colour = "#004C70",
+    stroke = 0.4
+  ) +
+  # model-estimated effect
+  geom_line(
+    data     = plot_mono_total_data,
+    aes(x    = sowndiv, y = estimate__),
+    colour   = "#0072B2",
+    linewidth = 0.8
+  ) +
+  # credible interval ribbon
+  geom_ribbon(
+    data  = plot_mono_total_data,
+    aes(x = sowndiv, ymin = lower__, ymax = upper__),
+    fill  = "#0072B2",
+    alpha = 0.15
+  ) +
+  # log2 x-axis, no manual breaks/limits
+  scale_x_continuous(
+    breaks = c(1, 2, 4, 8, 16),
+    labels = c(1, 2, 4, 8, 16),
+    expand = expansion(mult = c(0.02, 0.02))
+  ) +
+  labs(
+    x = "Sown plant species richness",
+y = expression(
+  "Economic multifunctionality (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")"
+)
+
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_custom() +
+  theme(
+    aspect.ratio = 0.6
+  )
+
+p_mono_total
+
+ggsave(
+  filename = "total_mono.png",
+  plot     = p_mono_total,
+  device   = "png",
+  path     = out_dir,
+  dpi      = 300,
+  width    = 8,
+  height   = 5,
+  units    = "in"
+)
+
+
+```
+
+```{r check-variation-monocultures}
+# Low-diversity plots show large variation in total value (reviewer comment R3.33).
+# Check whether low diversity reliably predicts a net cost: compare the observed share
+# of negative values per diversity level with the probability of a negative value
+# from the posterior predictive distribution of the heteroscedastic model.
+
+m_total_het <- fit_or_load("m_total_het", function() {
+  brm(
+  bf(costs_total_mid ~ log2(sowndiv) + (1 | block),
+     sigma ~ log2(sowndiv)),
+  data = synthDat, 
+  family = gaussian(),
+  chains = 4, 
+  iter = 3000, 
+  warmup = 1500,
+  control = list(adapt_delta = 0.95))
+})
+
+summary(m_total_het)
+nd <- data.frame(sowndiv = c(1, 2, 4, 8, 16))
+pp <- posterior_predict(m_total_het, newdata = nd, re_formula = NA)
+data.frame(sowndiv = nd$sowndiv, P_net_cost = colMeans(pp < 0))
+
+# and the raw observed share
+tapply(synthDat$costs_total_mid < 0, synthDat$sowndiv, mean)
+
+
+# do the same for single functions
+responses <- c("profit_mean", "SOC_costs_mid", "leach_costs_mid")
+
+het_models <- lapply(responses, function(y) {
+  fit_or_load(paste0("m_het_", y), function() {
+    brm(
+      bf(as.formula(paste(y, "~ log2(sowndiv) + (1 | block)")),
+         sigma ~ log2(sowndiv)),
+      data = synthDat, 
+      family = gaussian(),
+      chains = 4, 
+      iter = 3000, 
+      warmup = 1500,
+      control = list(adapt_delta = 0.95)
+    )
+  })
+})
+names(het_models) <- responses
+
+# quick overview of the sigma slopes
+lapply(het_models, function(m) fixef(m)["sigma_log2sowndiv", ])
+
+summary(het_models$profit_mean)
+summary(het_models$SOC_costs_mid)
+summary(het_models$leach_costs_mid)
+
+# calculate the share of each service to the total
+mean(abs(synthDat$SOC_costs_mid)) / mean(abs(synthDat$costs_total_mid))
+mean(abs(synthDat$leach_costs_mid)) / mean(abs(synthDat$costs_total_mid))
+mean(synthDat$profit_mean) / mean(abs(synthDat$costs_total_mid))
+
+service_means <- data.frame(
+  richness = sort(unique(synthDat$sowndiv)),
+  operating_profit = tapply(synthDat$profit_mean, synthDat$sowndiv, mean),
+  carbon = tapply(synthDat$SOC_costs_mid, synthDat$sowndiv, mean),
+  nitrogen = tapply(synthDat$leach_costs_mid, synthDat$sowndiv, mean),
+  total_EMF = tapply(synthDat$costs_total_mid, synthDat$sowndiv, mean)
+)
+print(service_means)
+```
+

@@ -256,7 +256,7 @@ corrPlot <- ggplot(joinedMF, aes(x = multifunctionality, y = costs_total_mid)) +
   labs(
     x = "Ecological multifunctionality",
     y = expression(
-  "EMF (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")")
+  "Economic multifunctionality (" * "\u20AC ha"^{-1} ~ "yr"^{-1} * ")")
   ) +
   theme_custom()
 
@@ -287,7 +287,7 @@ fig_MF_and_corr <- (
     plot.tag.position = c(0.08, 0.98),
     plot.tag = element_text(face = "bold", hjust = 0, vjust = 1),
     axis.title.y = element_text(margin = margin(r = 2)),
-    plot.margin = margin(10, 15, 10, 15)
+    plot.margin = margin(25, 15, 10, 15)
   )
 
 fig_MF_and_corr
