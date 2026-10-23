@@ -1115,7 +1115,7 @@ p_real_leach_all <- ggplot() +
     breaks = c(-125,-100,-75,-50,-25, 0)
   ) +  
   labs(
-    x = "Sown plant species richness",
+    x = "Realized plant species richness",
 y = expression(
   atop(
     "Social costs of",

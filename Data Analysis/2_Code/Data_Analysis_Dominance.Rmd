@@ -194,21 +194,21 @@ writexl::write_xlsx(
 
 ## Statistical models
 ```{r Linear models}
-fitProfit <- fit_or_load("fitProfit", function() {
+fitProfitDom <- fit_or_load("fitProfitDom", function() {
   brm(
   profit_mean ~ log2(sowndiv),
   dom_bio_final) 
 })
 
     # check model assumptions 
-    pp_check(fitProfit, type="scatter_avg")
-    pp_check(fitProfit, ndraws=50)
-    check_model(fitProfit, check="linearity")
-    check_model(fitProfit, check="homogeneity")
-    plot(fitProfit)
+    pp_check(fitProfitDom, type="scatter_avg")
+    pp_check(fitProfitDom, ndraws=50)
+    check_model(fitProfitDom, check="linearity")
+    check_model(fitProfitDom, check="homogeneity")
+    plot(fitProfitDom)
     
     # check output of model
-    summary(fitProfit)
+    summary(fitProfitDom)
     
 fitCorg <- fit_or_load("fitCorg", function() {
   brm(
@@ -230,10 +230,10 @@ fitCorg <- fit_or_load("fitCorg", function() {
 ## Final plots
 ```{r Plot profit - sown diversity}
 # plot conditional effects together with dominance results
-c_Profit <- conditional_effects(fitProfit)
-plot_Profit_data <- c_Profit[[1]]
+c_ProfitDom <- conditional_effects(fitProfitDom)
+plot_ProfitDom_data <- c_ProfitDom[[1]]
 
-p_Profit <- ggplot() +
+p_ProfitDom <- ggplot() +
   # raw data
   geom_point(
     data = dom_bio_final,
@@ -247,14 +247,14 @@ p_Profit <- ggplot() +
   ) +
   # model-estimated effect
   geom_line(
-    data = plot_Profit_data,
+    data = plot_ProfitDom_data,
     aes(x = sowndiv, y = estimate__),
     colour    = "#D55E00",
     linewidth = 0.8
   ) +
   # credible interval ribbon
   geom_ribbon(
-    data = plot_Profit_data,
+    data = plot_ProfitDom_data,
     aes(x = sowndiv, ymin = lower__, ymax = upper__),
     fill  = "#D55E00",
     alpha = 0.15
@@ -275,7 +275,7 @@ p_Profit <- ggplot() +
   ) +
   theme_custom()
 
-p_Profit
+p_ProfitDom
 
 # Save
 ggsave(
@@ -357,7 +357,7 @@ ggsave(
 ### Create a 2-panel figure
 ```{r}
 
-fig_dominance <- (p_Profit + p_Corg) +
+fig_dominance <- (p_ProfitDom + p_Corg) +
   plot_annotation(tag_levels = "a") &
   theme(
     # tags inside top-left, slightly nudged right
@@ -465,13 +465,13 @@ p_profit_dif <- ggplot() +
 
   # Dominance model (orange)
   geom_ribbon(
-    data = plot_Profit_data,
+    data = plot_ProfitDom_data,
     aes(x = sowndiv, ymin = lower__, ymax = upper__),
     fill  = "#D55E00",
     alpha = 0.15
   ) +
   geom_line(
-    data = plot_Profit_data,
+    data = plot_ProfitDom_data,
     aes(x = sowndiv, y = estimate__),
     colour    = "#D55E00",
     linewidth = 0.8
