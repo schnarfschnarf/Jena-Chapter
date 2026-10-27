@@ -146,6 +146,9 @@ dom_soc_diff$Corg17_val <- as.numeric(dom_soc_diff$Corg17) * dom_soc_diff$Bulk02
 # create a column with annual SOC-value gain/loss
 dom_soc_diff$Corg_val_diff <- (as.numeric(dom_soc_diff$Corg17_val) - dom_soc_diff$Corg02_val) / 15
 
+# extract block from plotcode
+dom_soc_diff <- dom_soc_diff %>%
+  mutate(block = substr(plotcode, 1, 2))
 
 writexl::write_xlsx(
   dom_soc_diff,
@@ -185,6 +188,10 @@ dom_bio_final$RP <- dom_bio_final$profit_mean - dom_bio_final$CE
 dom_bio_final <- dom_bio_final %>% # merge the biomass and the realized SR data
   left_join(design, by = join_by(plotcode))
 
+# extract block from plotcode
+dom_bio_final <- dom_bio_final %>%
+  mutate(block = substr(plotcode, 1, 2))
+
 writexl::write_xlsx(
   dom_bio_final,
   here("1_Data", "dominance_mean_biomass_profit_2002_to_2017.xlsx")
@@ -196,7 +203,9 @@ writexl::write_xlsx(
 ```{r Linear models}
 fitProfitDom <- fit_or_load("fitProfitDom", function() {
   brm(
-  profit_mean ~ log2(sowndiv),
+  profit_mean ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 3000,
   dom_bio_final) 
 })
 
@@ -212,7 +221,9 @@ fitProfitDom <- fit_or_load("fitProfitDom", function() {
     
 fitCorg <- fit_or_load("fitCorg", function() {
   brm(
-  Corg_val_diff ~ log2(sowndiv),
+  Corg_val_diff ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 3000,
   dom_soc_diff)
 })
 
@@ -398,6 +409,7 @@ MainExp17 <- read_xlsx(
 
 MainExp17$Corg_val_diff <- MainExp17$SOC_diff * MainExp17$mean_bulk * 0.3 * 10000 / 1000 * 3.66 * 300
 
+
 dom_bio_final <- dom_bio_final %>% 
   dplyr::select(plotcode, sowndiv, profit_mean)
 
@@ -411,6 +423,10 @@ MainExp17 <-  MainExp17 %>%
   dplyr::select(plotcode, sowndiv, profit_mean, Corg_val_diff) %>% 
   mutate(experiment = 'main')
 
+# extract block from plotcode
+MainExp17 <- MainExp17 %>%
+  mutate(block = substr(plotcode, 1, 2))
+
 MainDomDiff <- rbind(MainExp17, dom_bio_final)
 
 writexl::write_xlsx(
@@ -423,7 +439,9 @@ writexl::write_xlsx(
 # create linear model for main experiment profit
 fitProfitMain <- fit_or_load("fitProfitMain", function() {
   brm(
-  profit_mean ~ log2(sowndiv),
+  profit_mean ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 4000,
   MainExp17)
 })
 
@@ -503,13 +521,7 @@ p_profit_dif <- ggplot() +
   ) +
   theme_custom() +
   theme(
-    legend.position  = "bottom",
-    legend.title     = element_text(size = 12),
-    legend.text      = element_text(size = 11),
-    legend.direction = "horizontal",
-    legend.box       = "horizontal",
-    legend.spacing.x = unit(4, "pt")
-  )
+    legend.position  = "")
 
 p_profit_dif
 
@@ -531,7 +543,9 @@ ggsave(
 #Soil organic carbon gain/loss and sowndiv - for main experiment until 2017
 fitCorgMain <- fit_or_load("fitCorgMain", function() {
   brm(
-  Corg_val_diff ~ log2(sowndiv),
+  Corg_val_diff ~ log2(sowndiv) + (1|block),
+  control = list(adapt_delta = 0.95),
+  iter = 3000,
   MainExp17)
 })
 
@@ -637,5 +651,36 @@ ggsave(
 )
 
 ```
+### Create a 2-panel figure
+```{r}
 
+fig_difference <- (p_profit_dif / p_Corg_diff) +
+  plot_layout(guides = "collect") +
+  plot_annotation(tag_levels = "a") &
+  theme(
+    plot.tag.position = c(0.06, 0.98),
+    plot.tag = element_text(face = "bold", size = 12, hjust = 0, vjust = 1),
+    axis.title.y = element_text(margin = margin(r = 2)),
+    plot.margin = margin(2, 2, 2, 2),
+    legend.position = "bottom",
+    legend.direction = "horizontal",
+    legend.text  = element_text(size = 8),
+    legend.title = element_text(size = 9),
+    legend.key.size = unit(0.4, "cm")
+  )
+
+fig_difference
+
+# Save as PNG
+ggsave(
+  filename = "Fig_difference.png",
+  plot     = fig_difference,
+  width    = 12, 
+  height   = 16,
+  units    = "cm",
+  dpi      = 300,
+  device   = "png",
+  path     = out_dir
+)
+```
 
