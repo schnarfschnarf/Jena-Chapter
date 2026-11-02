@@ -93,8 +93,8 @@ dom_bio <- bind_rows(
 )
   
 # load data on hay prices and costs
-SGMS <- read_xlsx(
-  here("1_Data", "SGMs.xlsx")
+hay_prices <- read_xlsx(
+  here("1_Data", "hay_prices_and_variable_costs_2003-2023.xlsx")
 ) %>% 
   filter(year < 2018)
 
@@ -115,7 +115,7 @@ dom_bio_a <- dom_bio %>%
 
 # merge with profit data
 dom_bio_a <- dom_bio_a %>% 
-  left_join(SGMS, by = join_by(year)) %>% 
+  left_join(hay_prices, by = join_by(year)) %>% 
   rename_at('Experimental plot', ~'plotcode')
 
 ```
@@ -411,7 +411,7 @@ MainExp17$Corg_val_diff <- MainExp17$SOC_diff * MainExp17$mean_bulk * 0.3 * 1000
 
 
 dom_bio_final <- dom_bio_final %>% 
-  dplyr::select(plotcode, sowndiv, profit_mean)
+  dplyr::select(plotcode, sowndiv, profit_mean, block)
 
 dom_soc_diff <- dom_soc_diff %>% dplyr::select(plotcode, Corg_val_diff)
 
